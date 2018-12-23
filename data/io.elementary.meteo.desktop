@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Meteo
+GenericName=Meteo
+Comment=Forecast App for desktop
+Categories=Utility;Education;Science;
+Exec=io.elementary.meteo
+Icon=io.elementary.meteo
+Terminal=false
+Type=Application
+StartupNotify=true
+X-GNOME-Gettext-Domain=io.elementary.meteo
+Keywords=Meteo;Weather;Forecast;Temperature;Wind;Snow;Rain;
+X-GNOME-UsesNotifications=true

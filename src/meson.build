@@ -1,0 +1,28 @@
+executable(
+    meson.project_name(),
+    'Constants.vala',
+    'MainWindow.vala',
+    'Meteo.vala',
+    'Services/Connector.vala',
+    'Services/GeoLocate.vala',
+    'Services/Settings.vala',
+    'Utils/Iconame.vala',
+    'Utils/Utils.vala',
+    'Widgets/Current.vala',
+    'Widgets/Forecast.vala',
+    'Widgets/Header.vala',
+    'Widgets/Ticket.vala',
+    'Widgets/Today.vala',
+    asresources,
+    dependencies: [
+        dependency('gio-2.0'),
+        dependency('gobject-2.0'),
+        dependency('glib-2.0'),
+        dependency('gtk+-3.0'),
+        dependency('libsoup-2.4'),
+        dependency('json-glib-1.0'),
+        dependency('geocode-glib-1.0'),
+    ],
+    link_args: ['-lm'],
+    install : true
+)

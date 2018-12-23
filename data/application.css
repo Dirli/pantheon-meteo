@@ -1,0 +1,25 @@
+.temp {
+    font-size: 250%;
+    font-weight: 500;
+}
+.weather {
+    font-size: 170%;
+}
+.resumen {
+    font-size: 110%;
+}
+.preferences {
+    font-size: 110%;
+    font-weight: 600;
+}
+.ticket {
+    background-color: @text-color;
+    color: @background_color;
+    opacity: 0.5;
+}
+.ticket:hover {
+    opacity: 1.0;
+}
+.comment {
+    font-size: 90%;
+}
