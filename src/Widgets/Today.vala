@@ -43,8 +43,16 @@ namespace Meteo.Widgets {
             humid.halign = Gtk.Align.START;
             humid_lb.halign = Gtk.Align.END;
 
-            var wind = today_obj.get_object_member ("wind");
-            string wind_str = Meteo.Utils.wind_format (units, wind.get_double_member ("speed"), wind.get_double_member ("deg"));
+            Json.Object wind = today_obj.get_object_member ("wind");
+            double? wind_speed = null;
+            double? wind_deg = null;
+            if (wind.has_member ("speed")) {
+                wind_speed = wind.get_double_member ("speed");
+            }
+            if (wind.has_member ("deg")) {
+                wind_deg = wind.get_double_member ("deg");
+            }
+            string wind_str = Meteo.Utils.wind_format (units, wind_speed, wind_deg);
             Gtk.Label wind_val = new Gtk.Label (wind_str);
             Gtk.Label wind_lb = new Gtk.Label ("Wind :");
             wind_val.halign = Gtk.Align.START;

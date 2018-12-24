@@ -19,21 +19,7 @@ namespace Meteo.Services {
                 settings.set_string ("state", mycity.state);
                 settings.set_string ("country", mycity.country_code);
 
-                clear_cache ();
-            }
-        } catch (Error e) {
-            warning (e.message);
-        }
-    }
-
-    private static void clear_cache () {
-        try {
-            string cache_path = Environment.get_user_cache_dir () + "/" + Constants.EXEC_NAME;
-            string file_name;
-            GLib.Dir dir = GLib.Dir.open (cache_path, 0);
-            while ((file_name = dir.read_name ()) != null) {
-                string path = GLib.Path.build_filename (cache_path, file_name);
-                GLib.FileUtils.remove (path);
+                Meteo.Utils.clear_cache ();
             }
         } catch (Error e) {
             warning (e.message);

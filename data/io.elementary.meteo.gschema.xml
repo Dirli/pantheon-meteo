@@ -56,15 +56,21 @@
     </key>
 
     <key name="interval" type="i">
-        <default>3600</default>
+        <default>1</default>
         <summary>Update interval</summary>
-        <description>Time in seconds to update weather conditions.</description>
+        <description>Time in hours to update weather conditions.</description>
     </key>
 
     <key name="auto" type="b">
       <default>true</default>
       <summary>Autolocation</summary>
       <description>Catch my location on start</description>
+    </key>
+
+    <key name="refresh" type="b">
+      <default>false</default>
+      <summary>Refresh</summary>
+      <description>Refresh the page</description>
     </key>
 
   </schema>

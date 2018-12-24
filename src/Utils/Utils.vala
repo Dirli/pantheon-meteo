@@ -1,4 +1,31 @@
 namespace Meteo.Utils {
+    public static void save_cache (string path, string data) {
+        try {
+            var fcjson = File.new_for_path (path);
+            if (fcjson.query_exists ()) {
+                fcjson.delete ();
+            }
+            var fcjos = new DataOutputStream (fcjson.create (FileCreateFlags.REPLACE_DESTINATION));
+            fcjos.put_string (data);
+        } catch (Error e) {
+            warning (e.message);
+        }
+    }
+
+    public static void clear_cache () {
+        try {
+            string cache_path = Environment.get_user_cache_dir () + "/" + Constants.EXEC_NAME;
+            string file_name;
+            GLib.Dir dir = GLib.Dir.open (cache_path, 0);
+            while ((file_name = dir.read_name ()) != null) {
+                string path = GLib.Path.build_filename (cache_path, file_name);
+                GLib.FileUtils.remove (path);
+            }
+        } catch (Error e) {
+            warning (e.message);
+        }
+    }
+
     public static string temp_format (string units, double temp1, double? temp2 = null) {
         string tempformat = "%.0f".printf(temp1);
         if (temp2 != null) {
@@ -29,7 +56,10 @@ namespace Meteo.Utils {
         return timeformat;
     }
 
-    public static string wind_format (string units, double speed, double deg) {
+    public static string wind_format (string units, double? speed = null, double? deg = null) {
+        if (speed == null) {
+            return "no data";
+        }
         string windformat = "%.1f".printf(speed);
         switch (units) {
             case "imperial":
@@ -40,43 +70,46 @@ namespace Meteo.Utils {
                 windformat += " m/s";
                 break;
         }
-        double degrees = Math.floor((deg / 22.5) + 0.5);
-        string[] arr = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
-        int index = (int)(degrees % 16);
 
-        switch (arr[index]) {
-            case "N":
-            case "NNE":
-            case "NNW":
-                windformat += ", ↓";
+        if (deg != null) {
+            double degrees = Math.floor((deg / 22.5) + 0.5);
+            string[] arr = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
+            int index = (int)(degrees % 16);
+
+            switch (arr[index]) {
+                case "N":
+                case "NNE":
+                case "NNW":
+                    windformat += ", ↓";
                 break;
-            case "NE":
-                windformat += ", ↙";
+                case "NE":
+                    windformat += ", ↙";
                 break;
-            case "ENE":
-            case "E":
-            case "ESE":
-                windformat += ", ←";
+                case "ENE":
+                case "E":
+                case "ESE":
+                    windformat += ", ←";
                 break;
-            case "SE":
-                windformat += ", ↖";
+                case "SE":
+                    windformat += ", ↖";
                 break;
-            case "SSE":
-            case "S":
-            case "SSW":
-                windformat += ", ↑";
+                case "SSE":
+                case "S":
+                case "SSW":
+                    windformat += ", ↑";
                 break;
-            case "SW":
-                windformat += ", ↗";
+                case "SW":
+                    windformat += ", ↗";
                 break;
-            case "WSW":
-            case "W":
-            case "WNW":
-                windformat += ", →";
+                case "WSW":
+                case "W":
+                case "WNW":
+                    windformat += ", →";
                 break;
-            case "NW":
-                windformat += ", ↘";
+                case "NW":
+                    windformat += ", ↘";
                 break;
+            }
         }
         return windformat;
     }

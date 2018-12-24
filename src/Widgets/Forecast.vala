@@ -48,10 +48,17 @@ namespace Meteo.Widgets {
 
         private void forecast_by_day (Json.Array list) {
             DateTime now_dt = new DateTime.now_local();
+            DateTime first_el_date = new DateTime.from_unix_local (list.get_object_element (0).get_int_member ("dt"));
             DateTime date;
-            int periods = (24 - now_dt.get_hour ()) / 3;
-            int index;
 
+            int first_el_hour = first_el_date.get_hour ();
+            int now_hour = now_dt.get_hour ();
+
+            if (first_el_hour < now_hour) {
+                now_hour = first_el_hour;
+            }
+
+            int index, periods = (24 - now_hour) / 3;
             int days_count = (int) GLib.Math.round (list.get_length () / 8.0);
             days_count = int.min (days_count, 5);
 
@@ -70,7 +77,6 @@ namespace Meteo.Widgets {
                     if (date.get_hour () == 12) {
                         icon = new Meteo.Utils.Iconame (list_element.get_array_member ("weather").get_object_element (0).get_string_member ("icon"), 36);
                     }
-
                     double temp_n = list_element.get_object_member ("main").get_double_member ("temp");
 
                     if (temp_n > temp_max) {temp_max = temp_n;}

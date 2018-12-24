@@ -11,6 +11,7 @@ executable(
     'Widgets/Current.vala',
     'Widgets/Forecast.vala',
     'Widgets/Header.vala',
+    'Widgets/Preferences.vala',
     'Widgets/Ticket.vala',
     'Widgets/Today.vala',
     asresources,
@@ -22,6 +23,7 @@ executable(
         dependency('libsoup-2.4'),
         dependency('json-glib-1.0'),
         dependency('geocode-glib-1.0'),
+        dependency('granite')
     ],
     link_args: ['-lm'],
     install : true

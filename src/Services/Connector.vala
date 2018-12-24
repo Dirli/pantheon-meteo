@@ -26,12 +26,7 @@ namespace Meteo.Services {
                 forecast_obj = parser.get_root ().get_object ();
 
                 if (save) {
-                    var fcjson = File.new_for_path (cache_json);
-                    if (fcjson.query_exists ()) {
-                        fcjson.delete ();
-                    }
-                    var fcjos = new DataOutputStream (fcjson.create (FileCreateFlags.REPLACE_DESTINATION));
-                    fcjos.put_string (text);
+                    Meteo.Utils.save_cache (cache_json, text);
                 }
                 return forecast_obj;
             } catch (Error e) {
@@ -47,9 +42,6 @@ namespace Meteo.Services {
             }
             if (type == "forecast") {
                 int round_hour = ((last_update.get_hour () / 3) + 1) * 3;
-                if (round_hour == 24) {
-                    round_hour = 0;
-                }
                 if (round_hour <= now_dt.get_hour ()) {
                     return true;
                 }

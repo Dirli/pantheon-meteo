@@ -1,17 +1,9 @@
 namespace Meteo.Widgets {
     public class Current : Gtk.Box {
-        public Current (Meteo.MainWindow window, Meteo.Widgets.Header header) {
+        public Current (Meteo.MainWindow window) {
             GLib.Settings settings = Meteo.Services.Settings.get_default ();
             orientation = Gtk.Orientation.HORIZONTAL;
-            header.custom_title = null;
 
-            string location_title = settings.get_string ("location") + ", ";
-            if (settings.get_string ("location") != settings.get_string ("state")) {
-                location_title += settings.get_string ("state") + " ";
-            }
-            location_title += settings.get_string ("country");
-
-            header.set_title (location_title);
             string idplace = settings.get_string ("idplace");
             string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
             string units = settings.get_string ("units");
