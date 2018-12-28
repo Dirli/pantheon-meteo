@@ -1,3 +1,17 @@
+/*
+* Copyright (c) 2018 Dirli <litandrej85@gmail.com>
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*/
+
 namespace Meteo.Widgets {
     public class Preferences : Gtk.Dialog {
         private GLib.Settings settings;
@@ -24,12 +38,6 @@ namespace Meteo.Widgets {
             icon_label.halign = Gtk.Align.END;
             Gtk.Switch icon = new Gtk.Switch ();
             icon.halign = Gtk.Align.START;
-
-            //Select indicator
-            Gtk.Label ind_label = new Gtk.Label ("Use System Tray Indicator:");
-            ind_label.halign = Gtk.Align.END;
-            Gtk.Switch ind = new Gtk.Switch ();
-            ind.halign = Gtk.Align.START;
 
             //Update interval
             Gtk.Label update_lab = new Gtk.Label ("Update conditions every :");
@@ -70,8 +78,16 @@ namespace Meteo.Widgets {
 
             layout.attach (icon_label, 0, 1, 1, 1);
             layout.attach (icon,       1, 1, 1, 1);
+
+            //Select indicator
+#if INDICATOR_EXIST
+            Gtk.Label ind_label = new Gtk.Label ("Use System Tray Indicator:");
+            ind_label.halign = Gtk.Align.END;
+            Gtk.Switch ind = new Gtk.Switch ();
+            ind.halign = Gtk.Align.START;
             layout.attach (ind_label,  0, 2, 1, 1);
             layout.attach (ind,        1, 2, 1, 1);
+#endif
 
             layout.attach (tit2_pref,  0, 3, 2, 1);
             layout.attach (unit_lab,   0, 4, 2, 1);
@@ -103,7 +119,9 @@ namespace Meteo.Widgets {
             show_all ();
 
             settings.bind("auto", loc, "active", GLib.SettingsBindFlags.DEFAULT);
+#if INDICATOR_EXIST
             settings.bind("indicator", ind, "active", GLib.SettingsBindFlags.DEFAULT);
+#endif
             settings.bind("symbolic", icon, "active", GLib.SettingsBindFlags.DEFAULT);
             settings.bind("interval", update_box, "value", SettingsBindFlags.DEFAULT);
             unit_box.mode_changed.connect (() => {

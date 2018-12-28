@@ -15,16 +15,46 @@ executable(
     'Widgets/Ticket.vala',
     'Widgets/Today.vala',
     asresources,
+    vala_args: vala_args,
     dependencies: [
-        dependency('gio-2.0'),
-        dependency('gobject-2.0'),
-        dependency('glib-2.0'),
-        dependency('gtk+-3.0'),
-        dependency('libsoup-2.4'),
-        dependency('json-glib-1.0'),
-        dependency('geocode-glib-1.0'),
-        dependency('granite')
+        gio_dep,
+        gobject_dep,
+        glib_dep,
+        gtk_dep,
+        libsoup_dep,
+        json_dep,
+        geocode_dep,
+        granite_dep
     ],
     link_args: ['-lm'],
     install : true
 )
+
+
+if get_option('indicator')
+    shared_library(
+        'meteo',
+        'Indicator.vala',
+        'Constants.vala',
+        'Widgets/Panel.vala',
+        'Widgets/Popover.vala',
+        'Utils/Iconame.vala',
+        'Utils/Utils.vala',
+        'Services/Connector.vala',
+        'Services/ILogindManager.vala',
+        'Services/Settings.vala',
+        dependencies: [
+            gio_dep,
+            gobject_dep,
+            glib_dep,
+            gio_unix_dep,
+            gtk_dep,
+            libsoup_dep,
+            json_dep,
+            wingpanel_dep
+        ],
+        link_args: ['-lm'],
+        install: true,
+        install_dir: wingpanel_dep.get_pkgconfig_variable('indicatorsdir'),
+    )
+endif

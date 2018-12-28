@@ -1,3 +1,17 @@
+/*
+* Copyright (c) 2018 Dirli <litandrej85@gmail.com>
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*/
+
 namespace Meteo.Services {
     public class Connector : Object {
         private static DateTime now_dt;
@@ -15,18 +29,22 @@ namespace Meteo.Services {
 
                 if ( !FileUtils.test(cache_json, FileTest.EXISTS) || check_update (type, settings)) {
                     text = get_forecast (url, type);
-                    if (text != "") {
-                        settings.set_int64(@"$type-update", now_dt.to_unix());
-                        save = true;
+                    if (text == "") {
+                        return null;
                     }
+
+                    save = true;
                 } else {
                     parser.load_from_file (cache_json);
                 }
+
                 Json.Object forecast_obj = new Json.Object ();
                 forecast_obj = parser.get_root ().get_object ();
 
                 if (save) {
-                    Meteo.Utils.save_cache (cache_json, text);
+                    if (Meteo.Utils.save_cache (cache_json, text)) {
+                        settings.set_int64(@"$type-update", now_dt.to_unix());
+                    }
                 }
                 return forecast_obj;
             } catch (Error e) {
@@ -37,9 +55,11 @@ namespace Meteo.Services {
 
         private static bool check_update (string type, GLib.Settings settings) {
             DateTime last_update = new DateTime.from_unix_local(settings.get_int64(@"$type-update"));
+
             if (last_update.get_day_of_year () != now_dt.get_day_of_year ()) {
                 return true;
             }
+
             if (type == "forecast") {
                 int round_hour = ((last_update.get_hour () / 3) + 1) * 3;
                 if (round_hour <= now_dt.get_hour ()) {
@@ -49,7 +69,7 @@ namespace Meteo.Services {
                 if (last_update.get_hour () != now_dt.get_hour ()) {
                     return true;
                 }
-                if (last_update.get_minute () + 5 <= now_dt.get_minute ()) {
+                if (last_update.get_minute () + 20 <= now_dt.get_minute ()) {
                     return true;
                 }
             }
@@ -80,6 +100,7 @@ namespace Meteo.Services {
                         }
                     }
                 }
+
                 return "";
             } catch (Error e) {
                 warning (e.message);

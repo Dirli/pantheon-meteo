@@ -1,7 +1,25 @@
+/*
+* Copyright (c) 2018 Dirli <litandrej85@gmail.com>
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*/
+
 namespace Meteo.Utils {
-    public static void save_cache (string path, string data) {
+    public static bool save_cache (string path_json, string data) {
         try {
-            var fcjson = File.new_for_path (path);
+            var path = File.new_for_path (Environment.get_user_cache_dir () + "/" + Constants.EXEC_NAME);
+            if (!path.query_exists ()) {
+                path.make_directory ();
+            }
+            var fcjson = File.new_for_path (path_json);
             if (fcjson.query_exists ()) {
                 fcjson.delete ();
             }
@@ -9,7 +27,9 @@ namespace Meteo.Utils {
             fcjos.put_string (data);
         } catch (Error e) {
             warning (e.message);
+            return false;
         }
+        return true;
     }
 
     public static void clear_cache () {

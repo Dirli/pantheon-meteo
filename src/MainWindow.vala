@@ -1,3 +1,17 @@
+/*
+* Copyright (c) 2018 Dirli <litandrej85@gmail.com>
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public
+* License as published by the Free Software Foundation; either
+* version 2 of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* General Public License for more details.
+*/
+
 namespace Meteo {
     public class MainWindow : Gtk.Window {
         public MeteoApp app;
@@ -9,8 +23,8 @@ namespace Meteo {
         public MainWindow (MeteoApp app) {
             this.app = app;
             this.set_application (app);
-            this.set_default_size (950, 560);
-            this.set_size_request (950, 560);
+            this.set_default_size (950, 450);
+            this.set_size_request (950, 450);
             window_position = Gtk.WindowPosition.CENTER;
             header = new Meteo.Widgets.Header (this, false);
 
@@ -21,8 +35,7 @@ namespace Meteo {
             settings = Meteo.Services.Settings.get_default ();
 
             header.upd_button.clicked.connect (() => {
-                var current = new Meteo.Widgets.Current (this);
-                change_view (current);
+                change_view ();
             });
 
             this.set_titlebar (header);
@@ -42,13 +55,13 @@ namespace Meteo {
             this.show_all ();
 
             Meteo.Services.geolocate ();
-            var current = new Meteo.Widgets.Current (this);
-            change_view (current);
+            change_view ();
 
             settings.changed.connect(on_settings_change);
         }
 
-        public void change_view (Gtk.Box widget) {
+        public void change_view () {
+            var widget = new Meteo.Widgets.Current (this);
 
             header.custom_title = null;
 
@@ -70,8 +83,7 @@ namespace Meteo {
             switch (key) {
                 case "refresh":
                     if (settings.get_boolean ("refresh")) {
-                        var current = new Meteo.Widgets.Current (this);
-                        change_view (current);
+                        change_view ();
                     }
                 break;
             }

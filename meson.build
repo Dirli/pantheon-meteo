@@ -8,6 +8,22 @@ asresources = gnome.compile_resources(
     c_name: 'as'
 )
 
+gio_dep = dependency('gio-2.0')
+gobject_dep = dependency('gobject-2.0')
+glib_dep = dependency('glib-2.0')
+gio_unix_dep = dependency('gio-unix-2.0')
+gtk_dep = dependency('gtk+-3.0')
+libsoup_dep = dependency('libsoup-2.4')
+json_dep = dependency('json-glib-1.0')
+geocode_dep = dependency('geocode-glib-1.0')
+granite_dep = dependency('granite')
+
+vala_args = []
+if get_option('indicator')
+    wingpanel_dep = dependency('wingpanel-2.0')
+    vala_args += ['--define=INDICATOR_EXIST']
+endif
+
 subdir('data')
 subdir('src')
 

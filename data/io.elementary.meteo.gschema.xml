@@ -1,13 +1,13 @@
 <schemalist>
   <schema id="io.elementary.meteo" path="/io/elementary/meteo/">
 
-    <key type="x" name="forecast-update">
+    <key name="forecast-update" type="x">
         <default>0</default>
         <summary>Last Update Timestamp</summary>
         <description>Timestamp for last update</description>
     </key>
 
-    <key type="x" name="current-update">
+    <key name="current-update" type="x">
         <default>0</default>
         <summary>Last Update Timestamp</summary>
         <description>Timestamp for last update</description>

@@ -12,9 +12,12 @@
 * General Public License for more details.
 */
 
-namespace Constants {
-    public const string EXEC_NAME = "io.elementary.meteo";
-    public const string ICON_NAME = "io.elementary.meteo";
-    public const string OWM_API_ADDR = "http://api.openweathermap.org/data/2.5/";
-    public const string API_KEY = "936b1aed9a541e3446cafb8be2c70e62";
+namespace Meteo {
+    const string LOGIND_BUS_NAME = "org.freedesktop.login1";
+    const string LOGIND_BUS_PATH = "/org/freedesktop/login1";
+
+    [DBus (name = "org.freedesktop.login1.Manager")]
+    interface ILogindManager : DBusProxy {
+        public abstract signal void prepare_for_sleep (bool start);
+    }
 }
