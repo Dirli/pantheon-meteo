@@ -62,7 +62,7 @@ namespace Meteo.Widgets {
             hide_button.text = "Hide indicator";
 
             hide_button.clicked.connect (() => {
-                Meteo.Services.Settings.get_default ().set_boolean ("indicator", false);
+                Meteo.Services.SettingsManager.get_default ().set_boolean ("indicator", false);
             });
 
             var app_button = new Gtk.ModelButton ();

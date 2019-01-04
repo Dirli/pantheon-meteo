@@ -2,7 +2,7 @@
 Name=Meteo
 GenericName=Meteo
 Comment=Forecast App for desktop
-Categories=Utility;Education;Science;
+Categories=Utility;
 Exec=io.elementary.meteo
 Icon=io.elementary.meteo
 Terminal=false

@@ -14,15 +14,12 @@
 
 namespace Meteo.Widgets {
     public class Today : Gtk.Grid {
-        public Today (Json.Object today_obj) {
+        public Today (Json.Object today_obj, string units) {
             valign = Gtk.Align.START;
             halign = Gtk.Align.CENTER;
             row_spacing = 5;
             column_spacing = 5;
             margin = 15;
-
-            var settings = Meteo.Services.Settings.get_default ();
-            string units = settings.get_string ("units");
 
             var main_data = today_obj.get_object_member ("main");
 

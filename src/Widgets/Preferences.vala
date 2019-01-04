@@ -14,16 +14,15 @@
 
 namespace Meteo.Widgets {
     public class Preferences : Gtk.Dialog {
-        private GLib.Settings settings;
-        private bool flag;
-        public Preferences (Meteo.MainWindow window, Meteo.Widgets.Header header) {
+        public Preferences (Meteo.MainWindow window) {
             resizable = false;
             deletable = false;
             transient_for = window;
             modal = true;
 
-            settings = Meteo.Services.Settings.get_default ();
-            flag = false;
+            string? flag = null;
+
+            GLib.Settings settings = Meteo.Services.SettingsManager.get_default ();
 
             //Define sections
             Gtk.Label tit1_pref = new Gtk.Label ("Interface");
@@ -107,10 +106,9 @@ namespace Meteo.Widgets {
             this.response.connect ((source, response_id) => {
                 switch (response_id) {
                     case Gtk.ResponseType.CLOSE:
-                        if (flag) {
+                        if (flag != null) {
                             Meteo.Utils.clear_cache ();
-                            settings.set_boolean ("refresh", true);
-                            settings.set_boolean ("refresh", false);
+                            settings.set_string ("idplace", flag);
                         }
                         destroy ();
                         break;
@@ -130,18 +128,16 @@ namespace Meteo.Widgets {
                 } else {
                     settings.set_string ("units", "metric");
                 }
+                flag = settings.get_string ("idplace");
             });
-            settings.changed.connect(on_settings_change);
-        }
-
-        private void on_settings_change(string key) {
-            switch (key) {
-                case "units":
-                case "auto":
-                case "symbolic":
-                    flag = true;
-                break;
-            }
+            icon.state_set.connect((state) => {
+                flag = settings.get_string ("idplace");
+                return false;
+            });
+            loc.state_set.connect((state) => {
+                flag = settings.get_boolean ("auto") ? "" : "0";
+                return false;
+            });
         }
     }
 }

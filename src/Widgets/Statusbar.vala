@@ -12,19 +12,22 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Services {
-    public class SettingsManager : GLib.Settings {
+namespace Meteo.Widgets {
 
-        private static Meteo.Services.SettingsManager? _settings = null;
-        public static unowned Settings get_default () {
-            if (_settings == null) {
-                _settings = new SettingsManager ();
-            }
-            return _settings;
+    public class Statusbar : Gtk.ActionBar {
+        private Gtk.Label new_msg;
+
+        public Statusbar () {
+            Gtk.Label owm_label = new Gtk.Label ("https://openweathermap.org/");
+            owm_label.margin = 10;
+            pack_end (owm_label);
+            new_msg = new Gtk.Label ("");
+            new_msg.margin = 10;
+            pack_start (new_msg);
         }
 
-        private SettingsManager ()  {
-            Object (schema_id: "io.elementary.meteo");
+        public void add_msg (string msg) {
+            new_msg.set_text (msg);
         }
     }
 }

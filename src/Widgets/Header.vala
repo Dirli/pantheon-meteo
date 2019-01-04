@@ -14,18 +14,21 @@
 
 namespace Meteo.Widgets {
     public class Header : Gtk.HeaderBar {
-
+        private Gtk.Button loc_button;
         public Gtk.Button upd_button;
+        private GLib.Settings settings;
 
-        public Header (Meteo.MainWindow window, bool view) {
+        public Header (Meteo.MainWindow window) {
+            settings = Meteo.Services.SettingsManager.get_default ();
+
             show_close_button = true;
 
             //Create menu
-            var menu = new Gtk.Menu ();
+            Gtk.Menu menu = new Gtk.Menu ();
             var pref_item = new Gtk.MenuItem.with_label ("Preferences");
             menu.add (pref_item);
             pref_item.activate.connect (() => {
-                var preferences = new Meteo.Widgets.Preferences (window, this);
+                var preferences = new Meteo.Widgets.Preferences (window);
                 preferences.run ();
             });
 
@@ -37,12 +40,37 @@ namespace Meteo.Widgets {
 
             //Right buttons
             upd_button = new Gtk.Button.from_icon_name ("view-refresh-symbolic", Gtk.IconSize.BUTTON);
+            upd_button.sensitive = false;
             upd_button.tooltip_text = "Update conditions";
-            upd_button.sensitive = true;
 
             pack_end (app_button);
             pack_end (upd_button);
 
+            loc_button = new Gtk.Button.from_icon_name ("mark-location-symbolic", Gtk.IconSize.BUTTON);
+            loc_button.tooltip_text = "Change location";
+            loc_button.clicked.connect (() => {
+                Meteo.Utils.clear_cache ();
+                settings.reset ("idplace");
+            });
+
+            pack_end (loc_button);
+
+            refresh_btns ();
+        }
+
+        public void refresh_btns () {
+            string idp = settings.get_string ("idplace");
+            if (idp != "" || idp != "0") {
+                upd_button.sensitive = true;
+                if (settings.get_boolean ("auto")) {
+                    loc_button.sensitive = false;
+                } else {
+                    loc_button.sensitive = true;
+                }
+            } else {
+                upd_button.sensitive = false;
+                loc_button.sensitive = false;
+            }
         }
     }
 }

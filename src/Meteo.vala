@@ -25,6 +25,7 @@ namespace Meteo {
             if (get_windows () == null) {
                 window = new MainWindow (this);
                 window.show_all ();
+                window.start_follow ();
             } else {
                 window.present ();
             }

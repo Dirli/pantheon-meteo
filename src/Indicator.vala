@@ -21,7 +21,7 @@ namespace Meteo {
     """;
 
     public class Indicator : Wingpanel.Indicator {
-        private Meteo.Services.Settings settings;
+        private GLib.Settings settings;
         private uint timeout_id;
 
         private Meteo.Widgets.Panel? panel_wid = null;
@@ -51,7 +51,7 @@ namespace Meteo {
                     display_name : "Meteo Indicator",
                     description: "Meteo Indicator displays the current weather and forecast for several days");
 
-            settings = Meteo.Services.Settings.get_default ();
+            settings = Meteo.Services.SettingsManager.get_default ();
             visible = settings.get_boolean ("indicator");
 
             var provider = new Gtk.CssProvider ();
@@ -77,12 +77,13 @@ namespace Meteo {
                 warning (e.message);
             }
 
-            settings.changed.connect(on_settings_change);
+            settings.changed["indicator"].connect (on_indicator_change);
+            settings.changed["interval"].connect (on_interval_change);
         }
 
         private unowned bool update() {
             string idplace = settings.get_string ("idplace");
-            if (idplace == "") {
+            if (idplace == "" || idplace == "0") {
                 return false;
             }
 
@@ -91,7 +92,7 @@ namespace Meteo {
             string uri_query = "?id=" + idplace + "&APPID=" + Constants.API_KEY + "&units=" + units + "&lang=" + lang;
 
             string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
-            Json.Object? today_obj = Meteo.Services.Connector.get_owh_data (uri, "current");
+            Json.Object? today_obj = Meteo.Services.Connector.get_owm_data (uri, "current");
             if (today_obj != null) {
                 if (fast_check) {
                     fast_check = false;
@@ -140,24 +141,19 @@ namespace Meteo {
             return true;
         }
 
-        protected void on_settings_change(string key) {
-            switch (key) {
-                case "indicator":
-                    if (settings.get_boolean ("indicator")) {
-                        visible = true;
-                        counter = 5;
-                        update ();
-                    } else {
-                        visible = false;
-                        stop_watcher ();
-                    }
-                    break;
-                case "interval":
-                    start_watcher ();
-                    break;
+        protected void on_indicator_change () {
+            if (settings.get_boolean ("indicator")) {
+                visible = true;
+                counter = 5;
+                update ();
+            } else {
+                visible = false;
+                stop_watcher ();
             }
+        }
 
-            return;
+        protected void on_interval_change () {
+            start_watcher ();
         }
 
         public override Gtk.Widget get_display_widget () {
@@ -196,13 +192,14 @@ namespace Meteo {
         public override Gtk.Widget? get_widget () {
             if (popover_wid == null) {
                 popover_wid = new Meteo.Widgets.Popover ();
-                update ();
             }
 
             return popover_wid;
         }
 
-        public override void opened () {}
+        public override void opened () {
+            update ();
+        }
         public override void closed () {}
     }
 

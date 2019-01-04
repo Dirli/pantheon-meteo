@@ -4,18 +4,20 @@ executable(
     'MainWindow.vala',
     'Meteo.vala',
     'Services/Connector.vala',
-    'Services/GeoLocate.vala',
+    'Services/Location.vala',
     'Services/Settings.vala',
     'Utils/Iconame.vala',
     'Utils/Utils.vala',
-    'Widgets/Current.vala',
     'Widgets/Forecast.vala',
     'Widgets/Header.vala',
     'Widgets/Preferences.vala',
-    'Widgets/Ticket.vala',
+    'Widgets/Statusbar.vala',
     'Widgets/Today.vala',
     asresources,
     vala_args: vala_args,
+    c_args: [
+        '-DGWEATHER_I_KNOW_THIS_IS_UNSTABLE',
+    ],
     dependencies: [
         gio_dep,
         gobject_dep,
@@ -24,7 +26,8 @@ executable(
         libsoup_dep,
         json_dep,
         geocode_dep,
-        granite_dep
+        granite_dep,
+        dep_gweather
     ],
     link_args: ['-lm'],
     install : true

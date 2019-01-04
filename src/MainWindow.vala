@@ -14,78 +14,124 @@
 
 namespace Meteo {
     public class MainWindow : Gtk.Window {
-        public MeteoApp app;
         private Gtk.Grid view;
-        private GLib.Settings settings;
         private Meteo.Widgets.Header header;
-        public Meteo.Widgets.Ticket ticket;
+        private GLib.Settings settings;
+        private Meteo.Widgets.Statusbar statusbar;
+        private string cur_idplace;
 
         public MainWindow (MeteoApp app) {
-            this.app = app;
-            this.set_application (app);
-            this.set_default_size (950, 450);
-            this.set_size_request (950, 450);
+            set_application (app);
+            set_default_size (950, 450);
+            set_size_request (950, 450);
+            settings = Meteo.Services.SettingsManager.get_default ();
+            cur_idplace = "";
             window_position = Gtk.WindowPosition.CENTER;
-            header = new Meteo.Widgets.Header (this, false);
 
             Gtk.CssProvider provider = new Gtk.CssProvider();
             provider.load_from_resource ("/io/elementary/meteo/application.css");
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-            settings = Meteo.Services.Settings.get_default ();
-
+            header = new Meteo.Widgets.Header (this);
             header.upd_button.clicked.connect (() => {
                 change_view ();
             });
+            set_titlebar (header);
 
-            this.set_titlebar (header);
-
-            var overlay = new Gtk.Overlay ();
             view = new Gtk.Grid ();
             view.expand = true;
-            view.halign = Gtk.Align.FILL;
-            view.valign = Gtk.Align.FILL;
-            view.attach (new Gtk.Label("Loading ..."), 0, 0, 1, 1);
-            overlay.add_overlay (view);
+            view.halign = view.valign = Gtk.Align.FILL;
 
-            ticket = new Meteo.Widgets.Ticket ("");
-            overlay.add_overlay (ticket);
+            insert_def_page ();
 
-            add (overlay);
-            this.show_all ();
+            statusbar = new Meteo.Widgets.Statusbar ();
+            view.attach (statusbar, 0, 1, 1, 1);
 
-            Meteo.Services.geolocate ();
-            change_view ();
-
-            settings.changed.connect(on_settings_change);
+            add (view);
+            determine_loc ();
         }
 
-        public void change_view () {
-            var widget = new Meteo.Widgets.Current (this);
+        private void insert_def_page () {
+            Gtk.Label default_page = new Gtk.Label("Loading ...");
+            default_page.expand = true;
+            var exist_widget = view.get_child_at (0,0);
+            if (exist_widget != null) {
+                exist_widget.destroy ();
+            }
+            default_page.show_all ();
+            view.attach (default_page, 0, 0, 1, 1);
+        }
 
+        public void start_follow () {
+            settings.changed["idplace"].connect (on_idplace_change);
+        }
+
+        private void determine_loc () {
+            string idp = settings.get_string ("idplace");
+            if (settings.get_boolean ("auto")) {
+                Meteo.Services.Location.geolocate ();
+            } else if (idp == "" || idp == "0") {
+                header.set_custom_title (new Meteo.Services.Location ());
+                header.show_all ();
+            } else {
+                change_view ();
+            }
+        }
+
+        public void change_view (string statusbar_msg = "") {
             header.custom_title = null;
 
             string location_title = settings.get_string ("location") + ", ";
-            if (settings.get_string ("location") != settings.get_string ("state")) {
-                location_title += settings.get_string ("state") + " ";
-            }
             location_title += settings.get_string ("country");
-
             header.set_title (location_title);
+
+            var widget = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+
+            string idplace = settings.get_string ("idplace");
+            string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
+            string units = settings.get_string ("units");
+            string uri_query = "?id=" + idplace + "&APPID=" + Constants.API_KEY + "&units=" + units + "&lang=" + lang;
+
+            string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
+            Json.Object? today_obj = Meteo.Services.Connector.get_owm_data (uri, "current");
+            string upd_msg;
+            if (statusbar_msg == "") {
+                DateTime upd_dt = new DateTime.from_unix_local ((int64) today_obj.get_int_member ("dt"));
+                upd_msg = "Last update: " + upd_dt.format ("%a, %e  %b %R");
+            } else {
+                upd_msg = statusbar_msg;
+            }
+            statusbar.add_msg (upd_msg);
+
+            Gtk.Grid today = new Meteo.Widgets.Today (today_obj, units);
+
+            uri = Constants.OWM_API_ADDR + "forecast" + uri_query;
+            Json.Object? forecast_obj = Meteo.Services.Connector.get_owm_data (uri, "forecast");
+            Gtk.Grid forecast = new Meteo.Widgets.Forecast (forecast_obj, units);
+
+            Gtk.Separator separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
+
+            widget.pack_start (today, true, true, 0);
+            widget.pack_start (separator, false, true, 0);
+            widget.pack_start (forecast, true, true, 0);
 
             this.view.get_child_at (0,0).destroy ();
             widget.expand = true;
-            this.view.attach (widget, 0, 0, 1, 1);
             widget.show_all ();
+            this.view.attach (widget, 0, 0, 1, 1);
         }
 
-        private void on_settings_change(string key) {
-            switch (key) {
-                case "refresh":
-                    if (settings.get_boolean ("refresh")) {
-                        change_view ();
-                    }
-                break;
+        private void on_idplace_change () {
+            header.refresh_btns ();
+            string actual_idplace = settings.get_string ("idplace");
+            if (cur_idplace != actual_idplace) {
+                cur_idplace = actual_idplace;
+                if (actual_idplace == "" || actual_idplace == "0") {
+                    insert_def_page ();
+                    determine_loc ();
+                } else {
+                    change_view ();
+                }
             }
         }
     }

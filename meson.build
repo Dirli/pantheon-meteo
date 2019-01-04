@@ -17,6 +17,7 @@ libsoup_dep = dependency('libsoup-2.4')
 json_dep = dependency('json-glib-1.0')
 geocode_dep = dependency('geocode-glib-1.0')
 granite_dep = dependency('granite')
+dep_gweather = dependency('gweather-3.0')
 
 vala_args = []
 if get_option('indicator')

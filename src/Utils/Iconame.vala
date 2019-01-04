@@ -15,7 +15,7 @@
 namespace Meteo.Utils {
     public class Iconame : Gtk.Image {
         public Iconame (string iconum, int size) {
-            GLib.Settings settings = Meteo.Services.Settings.get_default ();
+            GLib.Settings settings = Meteo.Services.SettingsManager.get_default ();
             icon_size = Gtk.IconSize.DIALOG;
             icon_name = get_icon (iconum);
             if (settings.get_boolean ("symbolic")) {

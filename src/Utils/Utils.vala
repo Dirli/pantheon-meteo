@@ -13,6 +13,23 @@
 */
 
 namespace Meteo.Utils {
+    public static int64 update_idplace (string uri) {
+        Soup.Session session = new Soup.Session ();
+        Soup.Message message = new Soup.Message ("GET", uri);
+        session.send_message (message);
+        int64 id = 0;
+        try {
+            var parser = new Json.Parser ();
+            parser.load_from_data ((string) message.response_body.flatten ().data, -1);
+            var root = parser.get_root ().get_object ();
+            id = root.get_int_member ("id");
+        } catch (Error e) {
+            warning (e.message);
+        }
+
+        return id;
+    }
+
     public static bool save_cache (string path_json, string data) {
         try {
             var path = File.new_for_path (Environment.get_user_cache_dir () + "/" + Constants.EXEC_NAME);

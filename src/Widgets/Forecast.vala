@@ -14,18 +14,13 @@
 
 namespace Meteo.Widgets {
     public class Forecast : Gtk.Grid {
-        private string units;
-
-        public Forecast (Json.Object forecast_obj) {
+        public Forecast (Json.Object forecast_obj, string units) {
             valign = Gtk.Align.START;
             halign = Gtk.Align.CENTER;
             row_spacing = 5;
             column_spacing = 10;
             column_homogeneous = true;
             margin = 15;
-
-            var settings = Meteo.Services.Settings.get_default ();
-            units = settings.get_string ("units");
 
             Gtk.Label forecast = new Gtk.Label ("Forecast");
             forecast.get_style_context ().add_class ("weather");
@@ -36,10 +31,10 @@ namespace Meteo.Widgets {
             uint list_len = list.get_length ();
 
             if (list_len >= 5) {
-                forecast_by_hours (list);
+                forecast_by_hours (list, units);
                 attach (new Gtk.Label (" "), 1, 4, 1, 1);
                 if (list_len >= 25) {
-                    forecast_by_day (list);
+                    forecast_by_day (list, units);
                 }
             }
         }
@@ -60,7 +55,7 @@ namespace Meteo.Widgets {
             return index;
         }
 
-        private void forecast_by_day (Json.Array list) {
+        private void forecast_by_day (Json.Array list, string units) {
             DateTime now_dt = new DateTime.now_local();
             DateTime first_el_date = new DateTime.from_unix_local (list.get_object_element (0).get_int_member ("dt"));
             DateTime date;
@@ -114,7 +109,7 @@ namespace Meteo.Widgets {
             }
         }
 
-        private void forecast_by_hours (Json.Array list) {
+        private void forecast_by_hours (Json.Array list, string units) {
             for (int a = 0; a < 5; a++) {
                 Gtk.Label time = new Gtk.Label (Meteo.Utils.time_format (new DateTime.from_unix_local (list.get_object_element (a).get_int_member ("dt"))));
                 var icon = new Meteo.Utils.Iconame (list.get_object_element(a).get_array_member ("weather").get_object_element (0).get_string_member ("icon"), 36);
