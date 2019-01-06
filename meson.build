@@ -1,4 +1,4 @@
-project('io.elementary.meteo', ['vala', 'c'], version: '0.1.0')
+project('io.elementary.meteo', ['vala', 'c'], version: '0.5.0')
 
 gnome = import('gnome')
 
@@ -18,6 +18,12 @@ json_dep = dependency('json-glib-1.0')
 geocode_dep = dependency('geocode-glib-1.0')
 granite_dep = dependency('granite')
 dep_gweather = dependency('gweather-3.0')
+
+# Make gettext work
+add_project_arguments(
+    '-DGETTEXT_PACKAGE="@0@"'.format(meson.project_name()),
+    language:'c'
+)
 
 vala_args = []
 if get_option('indicator')

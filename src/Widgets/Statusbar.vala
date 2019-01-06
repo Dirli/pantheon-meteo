@@ -17,7 +17,7 @@ namespace Meteo.Widgets {
     public class Statusbar : Gtk.ActionBar {
         private Gtk.Label new_msg;
 
-        public Statusbar () {
+        private Statusbar () {
             Gtk.Label owm_label = new Gtk.Label ("https://openweathermap.org/");
             owm_label.margin = 10;
             pack_end (owm_label);
@@ -29,5 +29,26 @@ namespace Meteo.Widgets {
         public void add_msg (string msg) {
             new_msg.set_text (msg);
         }
+
+        public void no_connection () {
+            new_msg.set_text (_("Check internet connection"));
+        }
+
+        public void not_available () {
+            new_msg.set_text (_("Data not available"));
+        }
+
+        public void not_location () {
+            new_msg.set_text (_("Not determine location"));
+        }
+
+        private static Meteo.Widgets.Statusbar? _statusbar = null;
+        public static unowned Meteo.Widgets.Statusbar get_default () {
+            if (_statusbar == null) {
+                _statusbar = new Statusbar ();
+            }
+            return _statusbar;
+        }
+
     }
 }

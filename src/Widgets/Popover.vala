@@ -33,40 +33,40 @@ namespace Meteo.Widgets {
 
             humidity_item = new Gtk.Label ("-");
             humidity_item.halign = Gtk.Align.START;
-            Gtk.Box humidity_box = create_box (humidity_item, create_icon ("showers", "Humidity"));
+            Gtk.Box humidity_box = create_box (humidity_item, create_icon ("showers", _("Humidity")));
 
             pressure_item = new Gtk.Label ("-");
             pressure_item.halign = Gtk.Align.START;
-            Gtk.Box pressure_box = create_box (pressure_item, create_icon ("severe-alert", "Pressure"));
+            Gtk.Box pressure_box = create_box (pressure_item, create_icon ("severe-alert", _("Pressure")));
 
             wind_item = new Gtk.Label ("-");
             wind_item.halign = Gtk.Align.START;
-            Gtk.Box wind_box = create_box (wind_item, create_icon ("windy", "Wind"));
+            Gtk.Box wind_box = create_box (wind_item, create_icon ("windy", _("Wind")));
 
             cloud_item = new Gtk.Label ("-");
             cloud_item.halign = Gtk.Align.START;
-            Gtk.Box cloud_box = create_box (cloud_item, create_icon ("overcast", "Clouds"));
+            Gtk.Box cloud_box = create_box (cloud_item, create_icon ("overcast", _("Clouds")));
 
             sunrise_item = new Gtk.Label ("-");
             sunrise_item.halign = Gtk.Align.START;
-            Gtk.Box sunrise_box = create_box (sunrise_item, create_icon ("clear", "Sunrise"));
+            Gtk.Box sunrise_box = create_box (sunrise_item, create_icon ("clear", _("Sunrise")));
 
             sunset_item = new Gtk.Label ("-");
             sunset_item.halign = Gtk.Align.START;
-            Gtk.Box sunset_box = create_box (sunset_item, create_icon ("clear-night", "Sunset"));
+            Gtk.Box sunset_box = create_box (sunset_item, create_icon ("clear-night", _("Sunset")));
 
             var separator = new Wingpanel.Widgets.Separator ();
             separator.hexpand = true;
 
             var hide_button = new Gtk.ModelButton ();
-            hide_button.text = "Hide indicator";
+            hide_button.text = _("Hide indicator");
 
             hide_button.clicked.connect (() => {
                 Meteo.Services.SettingsManager.get_default ().set_boolean ("indicator", false);
             });
 
             var app_button = new Gtk.ModelButton ();
-            app_button.text = "Start meteo";
+            app_button.text = _("Start meteo");
 
             app_button.clicked.connect (() => {
                 var app_info = new GLib.DesktopAppInfo("io.elementary.meteo.desktop");

@@ -25,28 +25,28 @@ namespace Meteo.Widgets {
             GLib.Settings settings = Meteo.Services.SettingsManager.get_default ();
 
             //Define sections
-            Gtk.Label tit1_pref = new Gtk.Label ("Interface");
+            Gtk.Label tit1_pref = new Gtk.Label (_("Interface"));
             tit1_pref.get_style_context ().add_class ("preferences");
             tit1_pref.halign = Gtk.Align.START;
-            var tit2_pref = new Gtk.Label ("General");
+            var tit2_pref = new Gtk.Label (_("General"));
             tit2_pref.get_style_context ().add_class ("preferences");
             tit2_pref.halign = Gtk.Align.START;
 
             //Select type of icons:symbolic or realistic
-            Gtk.Label icon_label = new Gtk.Label ("Symbolic icons:");
+            Gtk.Label icon_label = new Gtk.Label (_("Symbolic icons") + ":");
             icon_label.halign = Gtk.Align.END;
             Gtk.Switch icon = new Gtk.Switch ();
             icon.halign = Gtk.Align.START;
 
             //Update interval
-            Gtk.Label update_lab = new Gtk.Label ("Update conditions every :");
+            Gtk.Label update_lab = new Gtk.Label (_("Update conditions every") + " :");
             update_lab.halign = Gtk.Align.END;
             Gtk.SpinButton update_box = new Gtk.SpinButton.with_range (1, 24, 1);
             update_box.set_halign (Gtk.Align.END);
             update_box.set_width_chars (4);
 
             //System units
-            Gtk.Label unit_lab = new Gtk.Label ("Units" + ":");
+            Gtk.Label unit_lab = new Gtk.Label (_("Units") + ":");
             unit_lab.halign = Gtk.Align.CENTER;
 
             var unit_box = new Granite.Widgets.ModeButton ();
@@ -60,7 +60,7 @@ namespace Meteo.Widgets {
             }
 
             //Automatic location
-            Gtk.Label loc_label = new Gtk.Label ("Find my location automatically:");
+            Gtk.Label loc_label = new Gtk.Label (_("Find my location automatically") + ":");
             loc_label.halign = Gtk.Align.END;
             Gtk.Switch loc = new Gtk.Switch ();
             loc.halign = Gtk.Align.START;
@@ -80,7 +80,7 @@ namespace Meteo.Widgets {
 
             //Select indicator
 #if INDICATOR_EXIST
-            Gtk.Label ind_label = new Gtk.Label ("Use System Tray Indicator:");
+            Gtk.Label ind_label = new Gtk.Label (_("Use System Tray Indicator") + ":");
             ind_label.halign = Gtk.Align.END;
             Gtk.Switch ind = new Gtk.Switch ();
             ind.halign = Gtk.Align.START;
@@ -102,7 +102,7 @@ namespace Meteo.Widgets {
             content.add (layout);
 
             //Actions
-            add_button ("Close", Gtk.ResponseType.CLOSE);
+            add_button (_("Close"), Gtk.ResponseType.CLOSE);
             this.response.connect ((source, response_id) => {
                 switch (response_id) {
                     case Gtk.ResponseType.CLOSE:

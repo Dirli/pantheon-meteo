@@ -8,6 +8,7 @@ executable(
     'Services/Settings.vala',
     'Utils/Iconame.vala',
     'Utils/Utils.vala',
+    'Widgets/Default.vala',
     'Widgets/Forecast.vala',
     'Widgets/Header.vala',
     'Widgets/Preferences.vala',

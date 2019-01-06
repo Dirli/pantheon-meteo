@@ -18,6 +18,7 @@ namespace Meteo.Services {
             double lat;
             double lon;
         }
+
         public static void geolocate () {
             get_ip_location ((mycoord) => {
                 var location = new Geocode.Location (mycoord.lat, mycoord.lon);
@@ -28,6 +29,8 @@ namespace Meteo.Services {
                         new_location (mycoord, mycity.town, mycity.country);
                     }
                 } catch (Error e) {
+                    Meteo.Widgets.Statusbar statusbar = Meteo.Widgets.Statusbar.get_default ();
+                    statusbar.not_location ();
                     warning (e.message);
                 }
             });
@@ -36,7 +39,7 @@ namespace Meteo.Services {
         public Location () {
             new GWeather.LocationEntry(GWeather.Location.get_world());
 
-            placeholder_text = "Search for new location:";
+            placeholder_text = _("Search for new location") + ":";
             width_chars = 30;
 
             activate.connect (location_entry_changed);
@@ -67,10 +70,19 @@ namespace Meteo.Services {
 
                         callback (coord);
                     } catch (Error e) {
+                        Meteo.Widgets.Statusbar statusbar = Meteo.Widgets.Statusbar.get_default ();
+                        statusbar.not_available ();
                         warning (e.message);
                     }
                 } else {
                     warning ("Status Code: %u\n", mess.status_code);
+                    Meteo.Widgets.Statusbar statusbar = Meteo.Widgets.Statusbar.get_default ();
+                    if (mess.status_code == 2) {
+                        statusbar.no_connection ();
+                    }
+                    if (mess.status_code >= 400) {
+                        statusbar.not_available ();
+                    }
                 }
             });
         }
@@ -98,6 +110,9 @@ namespace Meteo.Services {
                 location.get_coords(out coord.lat, out coord.lon);
 
                 new_location (coord, location.get_city_name (), location.get_country_name ());
+            } else {
+                Meteo.Widgets.Statusbar statusbar = Meteo.Widgets.Statusbar.get_default ();
+                statusbar.not_location ();
             }
         }
     }

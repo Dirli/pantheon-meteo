@@ -22,7 +22,7 @@ namespace Meteo.Widgets {
             column_homogeneous = true;
             margin = 15;
 
-            Gtk.Label forecast = new Gtk.Label ("Forecast");
+            Gtk.Label forecast = new Gtk.Label (_("Forecast"));
             forecast.get_style_context ().add_class ("weather");
             forecast.halign = Gtk.Align.START;
             attach (forecast, 0, 0, 2, 1);

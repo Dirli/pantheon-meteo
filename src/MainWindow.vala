@@ -44,7 +44,7 @@ namespace Meteo {
 
             insert_def_page ();
 
-            statusbar = new Meteo.Widgets.Statusbar ();
+            statusbar = Meteo.Widgets.Statusbar.get_default ();
             view.attach (statusbar, 0, 1, 1, 1);
 
             add (view);
@@ -52,7 +52,7 @@ namespace Meteo {
         }
 
         private void insert_def_page () {
-            Gtk.Label default_page = new Gtk.Label("Loading ...");
+            var default_page = new Meteo.Widgets.Default ();
             default_page.expand = true;
             var exist_widget = view.get_child_at (0,0);
             if (exist_widget != null) {
@@ -79,6 +79,7 @@ namespace Meteo {
         }
 
         public void change_view (string statusbar_msg = "") {
+            warning ("Changed view");
             header.custom_title = null;
 
             string location_title = settings.get_string ("location") + ", ";
@@ -97,7 +98,7 @@ namespace Meteo {
             string upd_msg;
             if (statusbar_msg == "") {
                 DateTime upd_dt = new DateTime.from_unix_local ((int64) today_obj.get_int_member ("dt"));
-                upd_msg = "Last update: " + upd_dt.format ("%a, %e  %b %R");
+                upd_msg = _("Last update:") + " " + upd_dt.format ("%a, %e  %b %R");
             } else {
                 upd_msg = statusbar_msg;
             }
@@ -124,6 +125,10 @@ namespace Meteo {
         private void on_idplace_change () {
             header.refresh_btns ();
             string actual_idplace = settings.get_string ("idplace");
+            //FIXME: After recording a new location or updating an old one,
+            // the event fires an arbitrary number of times (1-3). Changed
+            // event is generated on all properties. I don't know why
+            warning (@"Changed setting idplace: $actual_idplace");
             if (cur_idplace != actual_idplace) {
                 cur_idplace = actual_idplace;
                 if (actual_idplace == "" || actual_idplace == "0") {

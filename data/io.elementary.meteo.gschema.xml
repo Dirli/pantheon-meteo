@@ -1,64 +1,77 @@
 <schemalist>
     <schema id="io.elementary.meteo" path="/io/elementary/meteo/">
+
         <key name="idplace" type="s">
             <default>""</default>
             <summary>City ID</summary>
             <description>City ID from OpenWeatherMap</description>
         </key>
+
         <key name="auto" type="b">
             <default>true</default>
             <summary>Autolocation</summary>
             <description>Catch my location on start</description>
         </key>
+
         <key name="country" type="s">
             <default>""</default>
             <summary>Country name</summary>
             <description>Country name</description>
         </key>
+
         <key name="current-update" type="x">
             <default>0</default>
             <summary>Last Update Timestamp</summary>
             <description>Timestamp for last update</description>
         </key>
+
         <key name="forecast-update" type="x">
             <default>0</default>
             <summary>Last Update Timestamp</summary>
             <description>Timestamp for last update</description>
         </key>
+
         <key name="indicator" type="b">
             <default>false</default>
             <summary>Use indicator</summary>
             <description>Mark to use app indicator and minimized to system tray.</description>
         </key>
+
         <key name="interval" type="i">
             <default>1</default>
             <summary>Update interval</summary>
             <description>Time in hours to update weather conditions.</description>
         </key>
+
         <key name="latitude" type="d">
             <default>0</default>
             <summary>Latitude</summary>
             <description>Latitude</description>
         </key>
+
         <key name="location" type="s">
             <default>""</default>
             <summary>City name</summary>
             <description>City name</description>
         </key>
+
         <key name="longitude" type="d">
             <default>0</default>
             <summary>Longitude</summary>
             <description>Longitude</description>
         </key>
+
         <key name="symbolic" type="b">
             <default>true</default>
             <summary>Symbolic icons</summary>
             <description>Use symbolic icons. Otherwise, application use realistic icons.</description>
         </key>
+
         <key name="units" type="s">
             <default>"metric"</default>
             <summary>Local units</summary>
             <description>Units System to use in application: metric or imperial</description>
         </key>
+
     </schema>
 </schemalist>

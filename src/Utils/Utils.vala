@@ -97,14 +97,14 @@ namespace Meteo.Utils {
         if (speed == null) {
             return "no data";
         }
-        string windformat = "%.1f".printf(speed);
+        string windformat = "%.1f ".printf(speed);
         switch (units) {
             case "imperial":
-                windformat += " mph";
+                windformat += _("mph");
                 break;
             case "metric":
             default:
-                windformat += " m/s";
+                windformat += _("m/s");
                 break;
         }
 

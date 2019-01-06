@@ -25,7 +25,7 @@ namespace Meteo.Widgets {
 
             //Create menu
             Gtk.Menu menu = new Gtk.Menu ();
-            var pref_item = new Gtk.MenuItem.with_label ("Preferences");
+            var pref_item = new Gtk.MenuItem.with_label (_("Preferences"));
             menu.add (pref_item);
             pref_item.activate.connect (() => {
                 var preferences = new Meteo.Widgets.Preferences (window);
@@ -34,27 +34,26 @@ namespace Meteo.Widgets {
 
             var app_button = new Gtk.MenuButton ();
             app_button.popup = menu;
-            app_button.tooltip_text = "Options";
+            app_button.tooltip_text = _("Options");
             app_button.image = new Gtk.Image.from_icon_name ("open-menu-symbolic", Gtk.IconSize.BUTTON);
             menu.show_all ();
 
             //Right buttons
             upd_button = new Gtk.Button.from_icon_name ("view-refresh-symbolic", Gtk.IconSize.BUTTON);
             upd_button.sensitive = false;
-            upd_button.tooltip_text = "Update conditions";
+            upd_button.tooltip_text = _("Update conditions");
 
             pack_end (app_button);
             pack_end (upd_button);
 
             loc_button = new Gtk.Button.from_icon_name ("mark-location-symbolic", Gtk.IconSize.BUTTON);
-            loc_button.tooltip_text = "Change location";
+            loc_button.tooltip_text = _("Change location");
             loc_button.clicked.connect (() => {
                 Meteo.Utils.clear_cache ();
                 settings.reset ("idplace");
             });
 
             pack_end (loc_button);
-
             refresh_btns ();
         }
 
