@@ -1,6 +1,7 @@
-project('io.elementary.meteo', ['vala', 'c'], version: '0.5.0')
+project('io.elementary.meteo', ['vala', 'c'], version: '0.7.0')
 
 gnome = import('gnome')
+i18n = import('i18n')
 
 asresources = gnome.compile_resources(
     'as-resources', join_paths('data', meson.project_name() + '.gresource.xml'),
@@ -33,5 +34,6 @@ endif
 
 subdir('data')
 subdir('src')
+subdir('po')
 
 meson.add_install_script('meson/post_install.py')

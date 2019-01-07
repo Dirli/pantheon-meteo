@@ -39,7 +39,7 @@ namespace Meteo.Widgets {
         }
 
         public void not_location () {
-            new_msg.set_text (_("Not determine location"));
+            new_msg.set_text (_("No location defined"));
         }
 
         private static Meteo.Widgets.Statusbar? _statusbar = null;

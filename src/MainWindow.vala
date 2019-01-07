@@ -79,7 +79,7 @@ namespace Meteo {
         }
 
         public void change_view (string statusbar_msg = "") {
-            warning ("Changed view");
+            // warning ("Changed view");
             header.custom_title = null;
 
             string location_title = settings.get_string ("location") + ", ";
@@ -128,7 +128,7 @@ namespace Meteo {
             //FIXME: After recording a new location or updating an old one,
             // the event fires an arbitrary number of times (1-3). Changed
             // event is generated on all properties. I don't know why
-            warning (@"Changed setting idplace: $actual_idplace");
+            // warning (@"Changed setting idplace: $actual_idplace");
             if (cur_idplace != actual_idplace) {
                 cur_idplace = actual_idplace;
                 if (actual_idplace == "" || actual_idplace == "0") {

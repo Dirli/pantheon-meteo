@@ -26,10 +26,16 @@ namespace Meteo.Widgets {
             //Create menu
             Gtk.Menu menu = new Gtk.Menu ();
             var pref_item = new Gtk.MenuItem.with_label (_("Preferences"));
+            var about_item = new Gtk.MenuItem.with_label (_("About"));
             menu.add (pref_item);
+            menu.add (about_item);
             pref_item.activate.connect (() => {
                 var preferences = new Meteo.Widgets.Preferences (window);
                 preferences.run ();
+            });
+            about_item.activate.connect (() => {
+                var about = new Meteo.Widgets.About ();
+                about.show ();
             });
 
             var app_button = new Gtk.MenuButton ();
@@ -41,7 +47,7 @@ namespace Meteo.Widgets {
             //Right buttons
             upd_button = new Gtk.Button.from_icon_name ("view-refresh-symbolic", Gtk.IconSize.BUTTON);
             upd_button.sensitive = false;
-            upd_button.tooltip_text = _("Update conditions");
+            upd_button.tooltip_text = _("Update");
 
             pack_end (app_button);
             pack_end (upd_button);
