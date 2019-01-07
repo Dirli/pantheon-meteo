@@ -14,6 +14,15 @@ Developed with Vala & Gtk, using OpenWeatherMap API (https://openweathermap.org/
 
 ----
 
+![Screenshot](data/screenshot3.png)
+
+![Screenshot](data/screenshot1.png)  
+
+### Prefrences
+![Screenshot](data/screenshot2.png)
+
+---
+
 ### How To Install
 
 ### How To Build
