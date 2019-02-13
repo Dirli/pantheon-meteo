@@ -1,4 +1,4 @@
-project('io.elementary.meteo', ['vala', 'c'], version: '0.8.0')
+project('io.elementary.meteo', ['vala', 'c'], version: '0.8.1')
 
 gnome = import('gnome')
 i18n = import('i18n')
