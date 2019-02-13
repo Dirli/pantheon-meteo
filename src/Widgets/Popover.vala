@@ -49,11 +49,11 @@ namespace Meteo.Widgets {
 
             sunrise_item = new Gtk.Label ("-");
             sunrise_item.halign = Gtk.Align.START;
-            Gtk.Box sunrise_box = create_box (sunrise_item, create_icon ("clear", _("Sunrise")));
+            Gtk.Box sunrise_box = create_box (sunrise_item, create_icon ("daytime-sunrise-symbolic", _("Sunrise")));
 
             sunset_item = new Gtk.Label ("-");
             sunset_item.halign = Gtk.Align.START;
-            Gtk.Box sunset_box = create_box (sunset_item, create_icon ("clear-night", _("Sunset")));
+            Gtk.Box sunset_box = create_box (sunset_item, create_icon ("daytime-sunset-symbolic", _("Sunset")));
 
             var separator = new Wingpanel.Widgets.Separator ();
             separator.hexpand = true;

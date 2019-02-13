@@ -122,13 +122,15 @@ namespace Meteo {
                         var clouds = today_obj.get_object_member ("clouds");
                         var sys = today_obj.get_object_member ("sys");
 
-                        popover_wid.update_state (settings.get_string ("location"),
-                        "%d %%".printf ((int) main_data.get_int_member ("humidity")),
-                        Meteo.Utils.pressure_format ((int) main_data.get_int_member ("pressure")),
-                        Meteo.Utils.wind_format (units, wind_speed, wind_deg),
-                        "%d %%".printf ((int) clouds.get_int_member ("all")),
-                        Meteo.Utils.time_format (new DateTime.from_unix_local (sys.get_int_member ("sunrise"))),
-                        Meteo.Utils.time_format (new DateTime.from_unix_local (sys.get_int_member ("sunset"))));
+                        popover_wid.update_state (
+                            settings.get_string ("location"),
+                            "%d %%".printf ((int) main_data.get_int_member ("humidity")),
+                            Meteo.Utils.pressure_format ((int) main_data.get_int_member ("pressure")),
+                            Meteo.Utils.wind_format (units, wind_speed, wind_deg),
+                            "%d %%".printf ((int) clouds.get_int_member ("all")),
+                            Meteo.Utils.time_format (new DateTime.from_unix_local (sys.get_int_member ("sunrise"))),
+                            Meteo.Utils.time_format (new DateTime.from_unix_local (sys.get_int_member ("sunset")))
+                        );
                     }
                 }
             } else if (fast_check) {
