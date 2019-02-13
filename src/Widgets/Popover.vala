@@ -33,27 +33,27 @@ namespace Meteo.Widgets {
 
             humidity_item = new Gtk.Label ("-");
             humidity_item.halign = Gtk.Align.START;
-            Gtk.Box humidity_box = create_box (humidity_item, create_icon ("showers", _("Humidity")));
+            Gtk.Box humidity_box = create_box (humidity_item, create_icon ("weather-showers", _("Humidity")));
 
             pressure_item = new Gtk.Label ("-");
             pressure_item.halign = Gtk.Align.START;
-            Gtk.Box pressure_box = create_box (pressure_item, create_icon ("severe-alert", _("Pressure")));
+            Gtk.Box pressure_box = create_box (pressure_item, create_icon ("weather-severe-alert", _("Pressure")));
 
             wind_item = new Gtk.Label ("-");
             wind_item.halign = Gtk.Align.START;
-            Gtk.Box wind_box = create_box (wind_item, create_icon ("windy", _("Wind")));
+            Gtk.Box wind_box = create_box (wind_item, create_icon ("weather-windy", _("Wind")));
 
             cloud_item = new Gtk.Label ("-");
             cloud_item.halign = Gtk.Align.START;
-            Gtk.Box cloud_box = create_box (cloud_item, create_icon ("overcast", _("Clouds")));
+            Gtk.Box cloud_box = create_box (cloud_item, create_icon ("weather-overcast", _("Clouds")));
 
             sunrise_item = new Gtk.Label ("-");
             sunrise_item.halign = Gtk.Align.START;
-            Gtk.Box sunrise_box = create_box (sunrise_item, create_icon ("daytime-sunrise-symbolic", _("Sunrise")));
+            Gtk.Box sunrise_box = create_box (sunrise_item, create_icon ("daytime-sunrise", _("Sunrise")));
 
             sunset_item = new Gtk.Label ("-");
             sunset_item.halign = Gtk.Align.START;
-            Gtk.Box sunset_box = create_box (sunset_item, create_icon ("daytime-sunset-symbolic", _("Sunset")));
+            Gtk.Box sunset_box = create_box (sunset_item, create_icon ("daytime-sunset", _("Sunset")));
 
             var separator = new Wingpanel.Widgets.Separator ();
             separator.hexpand = true;
@@ -112,7 +112,7 @@ namespace Meteo.Widgets {
 
         private Gtk.Image create_icon (string icon_name, string tooltip) {
             Gtk.Image icon = new Gtk.Image ();
-            icon.set_from_icon_name(@"weather-$icon_name-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+            icon.set_from_icon_name(icon_name + "-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
             icon.margin_start = icon.margin_end = 5;
             icon.tooltip_text = tooltip;
 
