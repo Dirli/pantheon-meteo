@@ -80,7 +80,9 @@ namespace Meteo.Services {
                     if (mess.status_code == 2) {
                         statusbar.no_connection ();
                     }
-                    if (mess.status_code >= 400) {
+                    if (mess.status_code == 426) {
+                        statusbar.bad_account ();
+                    } else if (mess.status_code >= 400) {
                         statusbar.not_available ();
                     }
                 }
@@ -89,11 +91,17 @@ namespace Meteo.Services {
 
 
         private static void new_location (Coord coords, string city, string country) {
-            string uri_query = "?lat=" + coords.lat.to_string () + "&lon=" + coords.lon.to_string () + "&APPID=" + Constants.API_KEY;
+            GLib.Settings settings = Meteo.Services.SettingsManager.get_default ();
+
+            string api_key = settings.get_string ("personal-key").replace ("/", "");
+            if (api_key == "") {
+                api_key = Constants.API_KEY;
+            }
+
+            string uri_query = "?lat=" + coords.lat.to_string () + "&lon=" + coords.lon.to_string () + "&APPID=" + api_key;
             string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
 
             string new_idplace = Meteo.Utils.update_idplace (uri).to_string ();
-            GLib.Settings settings = Meteo.Services.SettingsManager.get_default ();
 
             settings.set_string ("location", city);
             settings.set_double ("longitude", coords.lon);

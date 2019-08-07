@@ -16,14 +16,20 @@ namespace Meteo.Widgets {
 
     public class Statusbar : Gtk.ActionBar {
         private Gtk.Label new_msg;
+        private Gtk.Label provider_label;
+        private string provider_name = "openweathermap.org";
 
         private Statusbar () {
-            Gtk.Label owm_label = new Gtk.Label ("https://openweathermap.org/");
-            owm_label.margin = 10;
-            pack_end (owm_label);
+            provider_label = new Gtk.Label ("");
+            provider_label.margin = 10;
+            pack_end (provider_label);
             new_msg = new Gtk.Label ("");
             new_msg.margin = 10;
             pack_start (new_msg);
+        }
+
+        public void mod_provider_label (bool personal_key) {
+            provider_label.set_label (provider_name + (personal_key ? " (pesonal key)" : " (public key)"));
         }
 
         public void add_msg (string msg) {
@@ -32,6 +38,10 @@ namespace Meteo.Widgets {
 
         public void no_connection () {
             new_msg.set_text (_("Check internet connection"));
+        }
+
+        public void bad_account () {
+            new_msg.set_text (_("Problems with api-key"));
         }
 
         public void not_available () {

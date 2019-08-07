@@ -19,6 +19,17 @@ namespace Meteo {
         private GLib.Settings settings;
         private Meteo.Widgets.Statusbar statusbar;
         private string cur_idplace;
+        private bool _personal_key;
+
+        private bool personal_key {
+            get { return _personal_key; }
+            set {
+                if (_personal_key != value) {
+                    _personal_key = value;
+                    statusbar.mod_provider_label (personal_key);
+                }
+            }
+        }
 
         public MainWindow (MeteoApp app) {
             set_application (app);
@@ -46,6 +57,8 @@ namespace Meteo {
 
             statusbar = Meteo.Widgets.Statusbar.get_default ();
             view.attach (statusbar, 0, 1, 1, 1);
+
+            personal_key = settings.get_string ("personal-key").replace ("/", "") == "";
 
             add (view);
             determine_loc ();
@@ -79,7 +92,6 @@ namespace Meteo {
         }
 
         public void change_view (string statusbar_msg = "") {
-            // warning ("Changed view");
             header.custom_title = null;
 
             string location_title = settings.get_string ("location") + ", ";
@@ -91,7 +103,16 @@ namespace Meteo {
             string idplace = settings.get_string ("idplace");
             string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
             string units = settings.get_string ("units");
-            string uri_query = "?id=" + idplace + "&APPID=" + Constants.API_KEY + "&units=" + units + "&lang=" + lang;
+
+            string api_key = settings.get_string ("personal-key").replace ("/", "");
+            if (api_key == "") {
+                api_key = Constants.API_KEY;
+                personal_key = false;
+            } else {
+                personal_key = true;
+            }
+
+            string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
 
             string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
             Json.Object? today_obj = Meteo.Services.Connector.get_owm_data (uri, "current");

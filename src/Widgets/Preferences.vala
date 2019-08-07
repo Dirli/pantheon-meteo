@@ -59,6 +59,13 @@ namespace Meteo.Widgets {
                 unit_box.selected = 1;
             }
 
+            // local api ley
+            Gtk.Label api_key_label = new Gtk.Label (_("Personal api key") + ":");
+            api_key_label.halign = Gtk.Align.START;
+            var local_key = new Gtk.Entry ();
+            local_key.hexpand = true;
+            local_key.placeholder_text = _("Enter personal api key");
+
             //Automatic location
             Gtk.Label loc_label = new Gtk.Label (_("Find my location automatically") + ":");
             loc_label.halign = Gtk.Align.END;
@@ -95,6 +102,8 @@ namespace Meteo.Widgets {
             layout.attach (update_box, 1, 6, 1, 1);
             layout.attach (loc_label,  0, 7, 1, 1);
             layout.attach (loc,        1, 7, 1, 1);
+            layout.attach (api_key_label, 0, 8, 2, 1);
+            layout.attach (local_key,     0, 9, 2, 1);
 
             Gtk.Box content = this.get_content_area () as Gtk.Box;
             content.valign = Gtk.Align.START;
@@ -122,6 +131,7 @@ namespace Meteo.Widgets {
 #endif
             settings.bind("symbolic", icon, "active", GLib.SettingsBindFlags.DEFAULT);
             settings.bind("interval", update_box, "value", SettingsBindFlags.DEFAULT);
+            settings.bind("personal-key", local_key, "text", SettingsBindFlags.DEFAULT);
             unit_box.mode_changed.connect (() => {
                 if (unit_box.selected == 1) {
                     settings.set_string ("units", "imperial");

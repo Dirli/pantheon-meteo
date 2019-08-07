@@ -89,7 +89,13 @@ namespace Meteo {
 
             string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
             string units = settings.get_string ("units");
-            string uri_query = "?id=" + idplace + "&APPID=" + Constants.API_KEY + "&units=" + units + "&lang=" + lang;
+
+            string api_key = settings.get_string ("personal-key").replace ("/", "");
+            if (api_key == "") {
+                api_key = Constants.API_KEY;
+            }
+
+            string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
 
             string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
             Json.Object? today_obj = Meteo.Services.Connector.get_owm_data (uri, "current");

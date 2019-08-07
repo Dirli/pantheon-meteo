@@ -61,6 +61,12 @@
             <description>Longitude</description>
         </key>
 
+        <key name="personal-key" type="s">
+            <default>""</default>
+            <summary>Personal key</summary>
+            <description>Your personal API key</description>
+        </key>
+
         <key name="symbolic" type="b">
             <default>true</default>
             <summary>Symbolic icons</summary>
