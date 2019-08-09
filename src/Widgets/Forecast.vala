@@ -14,29 +14,27 @@
 
 namespace Meteo.Widgets {
     public class Forecast : Gtk.Grid {
+        private Gtk.Box forecast_box;
         public Forecast (Json.Object forecast_obj, string units) {
-            valign = Gtk.Align.START;
-            halign = Gtk.Align.CENTER;
             row_spacing = 5;
             column_spacing = 10;
             column_homogeneous = true;
             margin = 15;
 
-            Gtk.Label forecast = new Gtk.Label (_("Forecast"));
-            forecast.get_style_context ().add_class ("weather");
-            forecast.halign = Gtk.Align.START;
-            attach (forecast, 0, 0, 2, 1);
+            Gtk.ScrolledWindow scr_window = new Gtk.ScrolledWindow (null, null);
+
+            forecast_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            scr_window.expand = true;;
+            scr_window.add (forecast_box);
 
             Json.Array list = forecast_obj.get_array_member ("list");
             uint list_len = list.get_length ();
 
-            if (list_len >= 5) {
-                forecast_by_hours (list, units);
-                attach (new Gtk.Label (" "), 1, 4, 1, 1);
-                if (list_len >= 25) {
-                    forecast_by_day (list, units);
-                }
+            if (list_len > 0) {
+                forecast_by_day (list, units);
             }
+
+            add (scr_window);
         }
 
         private int get_index (int periods, int day_index, int time_index) {
@@ -68,28 +66,37 @@ namespace Meteo.Widgets {
             }
 
             int index, periods = (24 - now_hour) / 3;
+
             int days_count = (int) GLib.Math.round (list.get_length () / 8.0);
             days_count = int.min (days_count, 5);
 
             for (int b = 0; b < days_count; b++) {
-                double temp_min = 50;
-                double temp_max = -50;
-                Gtk.Image? icon = null;
-                Gtk.Label time = new Gtk.Label ("-");
+                Gtk.Box day_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 3);
+                day_box.get_style_context ().add_class ("box");
+                Gtk.Box hours_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 8);
+                day_box.pack_start (hours_box);
+
                 for (int c = 0; c < 8; c++) {
+                    Gtk.Box hour_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 5);
                     index = get_index (periods, b, c);
+
                     var list_element = list.get_object_element (index);
                     date = new DateTime.from_unix_local (list_element.get_int_member ("dt"));
-                    if (c == 0) {
-                        time.label = date.format ("%a, %d %b");
-                    }
-                    if (date.get_hour () == 12) {
-                        icon = new Meteo.Utils.Iconame (list_element.get_array_member ("weather").get_object_element (0).get_string_member ("icon"), 36);
-                    }
-                    double temp_n = list_element.get_object_member ("main").get_double_member ("temp");
 
-                    if (temp_n > temp_max) {temp_max = temp_n;}
-                    if (temp_n < temp_min) {temp_min = temp_n;}
+                    if (c == 0) {
+                        Gtk.Label format_time = new Gtk.Label (date.format ("%a, %d %b"));
+                        day_box.pack_end (format_time);
+                    }
+
+                    Gtk.Label hour_val = new Gtk.Label (Meteo.Utils.time_format (date));
+                    hour_box.add (hour_val);
+
+                    Gtk.Image hour_icon = new Meteo.Utils.Iconame (list_element.get_array_member ("weather").get_object_element (0).get_string_member ("icon"), 36);
+                    hour_box.add (hour_icon);
+
+                    double hour_temp = list_element.get_object_member ("main").get_double_member ("temp");
+                    Gtk.Label temp = new Gtk.Label (Meteo.Utils.temp_format (units, hour_temp));
+                    hour_box.add (temp);
 
                     if (b == 0 && periods > 3 && periods == (c + 1) ) {
                         break;
@@ -97,28 +104,11 @@ namespace Meteo.Widgets {
                     if (b == 4 && periods < 4 && (8 - periods) == c + 1 ) {
                         break;
                     }
+
+                    hours_box.add (hour_box);
                 }
 
-                Gtk.Label temp = new Gtk.Label (Meteo.Utils.temp_format (units, temp_min, temp_max));
-
-                attach (time, 0, 5 + b, 2, 1);
-                if (icon != null) {
-                    attach (icon, 2, 5 + b, 1, 1);
-                }
-                attach (temp, 3, 5 + b, 2, 1);
-            }
-        }
-
-        private void forecast_by_hours (Json.Array list, string units) {
-            for (int a = 0; a < 5; a++) {
-                Gtk.Label time = new Gtk.Label (Meteo.Utils.time_format (new DateTime.from_unix_local (list.get_object_element (a).get_int_member ("dt"))));
-                var icon = new Meteo.Utils.Iconame (list.get_object_element(a).get_array_member ("weather").get_object_element (0).get_string_member ("icon"), 36);
-                double temp_n = list.get_object_element(a).get_object_member ("main").get_double_member ("temp");
-                Gtk.Label temp = new Gtk.Label (Meteo.Utils.temp_format (units, temp_n));
-
-                attach (time, a, 1, 1, 1);
-                attach (icon, a, 2, 1, 1);
-                attach (temp, a, 3, 1, 1);
+                forecast_box.add (day_box);
             }
         }
     }

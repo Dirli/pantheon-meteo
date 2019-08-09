@@ -23,3 +23,7 @@
 .comment {
     font-size: 90%;
 }
+.box {
+    border: 1px solid;
+    padding: 1em;
+}

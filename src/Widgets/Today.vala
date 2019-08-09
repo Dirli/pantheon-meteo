@@ -16,10 +16,11 @@ namespace Meteo.Widgets {
     public class Today : Gtk.Grid {
         public Today (Json.Object today_obj, string units) {
             valign = Gtk.Align.START;
-            halign = Gtk.Align.CENTER;
+            halign = Gtk.Align.START;
             row_spacing = 5;
             column_spacing = 5;
             margin = 15;
+            margin_start = 30;
 
             var main_data = today_obj.get_object_member ("main");
 
@@ -42,6 +43,7 @@ namespace Meteo.Widgets {
             Gtk.Label temp = new Gtk.Label (Meteo.Utils.temp_format (units, temp_n));
             temp.get_style_context ().add_class ("temp");
             temp.halign = Gtk.Align.START;
+            temp.valign = Gtk.Align.CENTER;
 
             string pressure = Meteo.Utils.pressure_format ((int)main_data.get_int_member ("pressure"));
             Gtk.Label pres = new Gtk.Label (pressure);
@@ -85,23 +87,23 @@ namespace Meteo.Widgets {
             sun_s.halign = sun_r.halign = Gtk.Align.END;
             sunset.halign = sunrise.halign = Gtk.Align.START;
 
-            attach (title,               0, 0, 2, 1);
-            attach (weather_main,        0, 1, 2, 1);
-            attach (temp,                0, 2, 2, 1);
-            attach (icon,                3, 0, 3, 3);
-            attach (new Gtk.Label (" "), 1, 3, 2, 1);
-            attach (pres_lb,             1, 4, 2, 1);
-            attach (pres,                3, 4, 2, 1);
-            attach (humid_lb,            1, 5, 2, 1);
-            attach (humid,               3, 5, 2, 1);
-            attach (wind_lb,             1, 6, 2, 1);
-            attach (wind_val,            3, 6, 2, 1);
-            attach (clouds_lb,           1, 7, 2, 1);
-            attach (clouds_all,          3, 7, 2, 1);
-            attach (sun_r,               1, 8, 2, 1);
-            attach (sunrise,             3, 8, 2, 1);
-            attach (sun_s,               1, 9, 2, 1);
-            attach (sunset,              3, 9, 2, 1);
+            attach (title,               0, 0, 4, 1);
+            attach (temp,                0, 1, 1, 4);
+            attach (icon,                1, 1, 1, 4);
+            attach (weather_main,        0, 5, 4, 1);
+            attach (wind_lb,             2, 1, 1, 1);
+            attach (wind_val,            3, 1, 1, 1);
+            attach (pres_lb,             2, 2, 1, 1);
+            attach (pres,                3, 2, 1, 1);
+            attach (humid_lb,            2, 3, 1, 1);
+            attach (humid,               3, 3, 1, 1);
+            attach (clouds_lb,           2, 4, 1, 1);
+            attach (clouds_all,          3, 4, 1, 1);
+
+            // attach (sun_r,               1, 8, 2, 1);
+            // attach (sunrise,             3, 8, 2, 1);
+            // attach (sun_s,               1, 9, 2, 1);
+            // attach (sunset,              3, 9, 2, 1);
         }
     }
 }

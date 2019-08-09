@@ -33,11 +33,13 @@ namespace Meteo {
 
         public MainWindow (MeteoApp app) {
             set_application (app);
-            set_default_size (950, 450);
-            set_size_request (950, 450);
+            set_default_size (950, 750);
+            set_size_request (950, 750);
+            window_position = Gtk.WindowPosition.CENTER;
+            resizable = false;
+
             settings = Meteo.Services.SettingsManager.get_default ();
             cur_idplace = "";
-            window_position = Gtk.WindowPosition.CENTER;
 
             Gtk.CssProvider provider = new Gtk.CssProvider();
             provider.load_from_resource ("/io/elementary/meteo/application.css");
@@ -98,7 +100,7 @@ namespace Meteo {
             location_title += settings.get_string ("country");
             header.set_title (location_title);
 
-            var widget = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            var widget = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
 
             string idplace = settings.get_string ("idplace");
             string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
@@ -131,9 +133,9 @@ namespace Meteo {
             Json.Object? forecast_obj = Meteo.Services.Connector.get_owm_data (uri, "forecast");
             Gtk.Grid forecast = new Meteo.Widgets.Forecast (forecast_obj, units);
 
-            Gtk.Separator separator = new Gtk.Separator (Gtk.Orientation.VERTICAL);
+            Gtk.Separator separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 
-            widget.pack_start (today, true, true, 0);
+            widget.pack_start (today, true, false, 0);
             widget.pack_start (separator, false, true, 0);
             widget.pack_start (forecast, true, true, 0);
 
