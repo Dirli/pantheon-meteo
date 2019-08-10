@@ -14,7 +14,7 @@
 
 namespace Meteo.Widgets {
     public class Today : Gtk.Grid {
-        public Today (Json.Object today_obj, string units) {
+        public Today (Json.Object today_obj, string units, SunState sun_state) {
             valign = Gtk.Align.START;
             halign = Gtk.Align.START;
             row_spacing = 5;
@@ -77,9 +77,8 @@ namespace Meteo.Widgets {
             clouds_all.halign = Gtk.Align.START;
             clouds_lb.halign = Gtk.Align.END;
 
-            var sys = today_obj.get_object_member ("sys");
-            string sunrise_t = Meteo.Utils.time_format (new DateTime.from_unix_local (sys.get_int_member ("sunrise")));
-            string sunset_t = Meteo.Utils.time_format (new DateTime.from_unix_local (sys.get_int_member ("sunset")));
+            string sunrise_t = Meteo.Utils.time_format (sun_state.sunrise);
+            string sunset_t = Meteo.Utils.time_format (sun_state.sunset);
             Gtk.Label sun_r = new Gtk.Label (_("Sunrise") + " :");
             Gtk.Label sunrise = new Gtk.Label (sunrise_t);
             Gtk.Label sun_s = new Gtk.Label (_("Sunset") + " :");

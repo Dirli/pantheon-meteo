@@ -13,6 +13,12 @@
 */
 
 namespace Meteo {
+    public struct SunState {
+        GLib.DateTime day;
+        GLib.DateTime sunrise;
+        GLib.DateTime sunset;
+    }
+
     public class MainWindow : Gtk.Window {
         private Gtk.Grid view;
         private Meteo.Widgets.Header header;
@@ -119,19 +125,26 @@ namespace Meteo {
             string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
             Json.Object? today_obj = Meteo.Services.Connector.get_owm_data (uri, "current");
             string upd_msg;
+
+            SunState sun_state = {};
+            var sys = today_obj.get_object_member ("sys");
+            sun_state.sunrise = new GLib.DateTime.from_unix_local (sys.get_int_member ("sunrise"));
+            sun_state.sunset = new GLib.DateTime.from_unix_local (sys.get_int_member ("sunset"));
+            sun_state.day = new GLib.DateTime.from_unix_local ((int64) today_obj.get_int_member ("dt"));
+
             if (statusbar_msg == "") {
-                DateTime upd_dt = new DateTime.from_unix_local ((int64) today_obj.get_int_member ("dt"));
+                GLib.DateTime upd_dt = sun_state.day;
                 upd_msg = _("Last update:") + " " + upd_dt.format ("%a, %e  %b %R");
             } else {
                 upd_msg = statusbar_msg;
             }
             statusbar.add_msg (upd_msg);
 
-            Gtk.Grid today = new Meteo.Widgets.Today (today_obj, units);
+            Gtk.Grid today = new Meteo.Widgets.Today (today_obj, units, sun_state);
 
             uri = Constants.OWM_API_ADDR + "forecast" + uri_query;
             Json.Object? forecast_obj = Meteo.Services.Connector.get_owm_data (uri, "forecast");
-            Gtk.Grid forecast = new Meteo.Widgets.Forecast (forecast_obj, units);
+            Gtk.Grid forecast = new Meteo.Widgets.Forecast (forecast_obj, units, sun_state);
 
             Gtk.Separator separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
 
