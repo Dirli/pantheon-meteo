@@ -39,17 +39,13 @@ namespace Meteo.Widgets {
 
         private int get_index (int periods, int day_index, int time_index) {
             int index;
-            if (periods == 0) {
-                index = day_index*8 + time_index;
-            } else if (periods > 3) {
-                if (day_index == 0) {
-                    index = time_index;
-                } else {
-                    index = (day_index - 1) * 8 + periods + time_index;
-                }
+
+            if (day_index == 0) {
+                index = time_index;
             } else {
-                index = day_index * 8 + periods + time_index;
+                index = (day_index - 1) * 8 + time_index + (periods == 0 ? 8 : periods);
             }
+
             return index;
         }
 
@@ -65,10 +61,11 @@ namespace Meteo.Widgets {
                 now_hour = first_el_hour;
             }
 
-            int index, periods = (24 - now_hour) / 3;
+            int index, periods = (23 - now_hour) / 3;
+
 
             int days_count = (int) GLib.Math.round (list.get_length () / 8.0);
-            days_count = int.min (days_count, 5);
+            days_count = days_count < 5 ? days_count : periods == 0 ? 5 : 6;
 
             for (int b = 0; b < days_count; b++) {
                 Gtk.Box day_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 3);
@@ -98,14 +95,14 @@ namespace Meteo.Widgets {
                     Gtk.Label temp = new Gtk.Label (Meteo.Utils.temp_format (units, hour_temp));
                     hour_box.add (temp);
 
-                    if (b == 0 && periods > 3 && periods == (c + 1) ) {
-                        break;
-                    }
-                    if (b == 4 && periods < 4 && (8 - periods) == c + 1 ) {
-                        break;
-                    }
-
                     hours_box.add (hour_box);
+
+                    if (b == 0 && periods != 0 && periods == (c + 1) ) {
+                        break;
+                    }
+                    if ((b + 1) == days_count && periods != 0 && (8 - periods) == c + 1 ) {
+                        break;
+                    }
                 }
 
                 forecast_box.add (day_box);

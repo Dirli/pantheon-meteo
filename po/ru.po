@@ -175,7 +175,7 @@ msgstr "Местоположение не определено"
 
 #: src/Widgets/Today.vala:26
 msgid "Today"
-msgstr "Сегодня"
+msgstr "Сейчас"
 
 #: src/Widgets/Today.vala:74
 msgid "Cloudiness"
