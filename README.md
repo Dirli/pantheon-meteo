@@ -29,12 +29,12 @@ Developed with Vala & Gtk, using OpenWeatherMap API (https://openweathermap.org/
 
 Library Dependencies :
 
-- gtk+-3.0
-- libsoup-2.4
+- libgtk-3-dev
+- libsoup2.4-dev
 - libgranite-dev
-- json-glib-1.0
-- geocode-glib-1.0
-- gweather-3.0
+- libjson-glib-dev
+- libgeocode-glib-dev
+- libgweather-3-dev
 - meson
 - valac
 
