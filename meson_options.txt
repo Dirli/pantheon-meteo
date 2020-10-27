@@ -1,1 +1,2 @@
 option ('indicator', type : 'boolean', value : true)
+option ('geoclue', type : 'boolean', value : true)

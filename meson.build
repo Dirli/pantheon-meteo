@@ -36,6 +36,11 @@ app_deps = common_deps + [
 ]
 
 vala_args = []
+if get_option ('geoclue')
+    app_deps += dependency ('libgeoclue-2.0')
+    vala_args += ['--define=GEOCLUE_EXIST']
+endif
+
 if get_option ('indicator')
     vala_args += ['--define=INDICATOR_EXIST']
 endif
