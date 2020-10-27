@@ -14,6 +14,8 @@
 
 namespace Meteo.Widgets {
     public class Header : Gtk.HeaderBar {
+        public signal void show_preferences ();
+
         private Gtk.Button loc_button;
         public Gtk.Button upd_button;
         private GLib.Settings settings;
@@ -30,11 +32,10 @@ namespace Meteo.Widgets {
             menu.add (pref_item);
             menu.add (about_item);
             pref_item.activate.connect (() => {
-                var preferences = new Meteo.Widgets.Preferences (window);
-                preferences.run ();
+                show_preferences ();
             });
             about_item.activate.connect (() => {
-                var about = new Meteo.Widgets.About ();
+                var about = new Meteo.Dialogs.About ();
                 about.show ();
             });
 

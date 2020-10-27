@@ -12,17 +12,21 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Widgets {
-    public class Preferences : Gtk.Dialog {
-        public Preferences (Meteo.MainWindow window) {
-            resizable = false;
-            deletable = false;
-            transient_for = window;
+namespace Meteo {
+    public class Dialogs.Preferences : Gtk.Dialog {
+        public Preferences (MainWindow main_window) {
+            Object (border_width: 6,
+                    deletable: false,
+                    destroy_with_parent: true,
+                    resizable: false,
+                    title: _("Preferences"),
+                    transient_for: main_window,
+                    window_position: Gtk.WindowPosition.CENTER_ON_PARENT
+            );
+
             modal = true;
 
             string? flag = null;
-
-            GLib.Settings settings = Meteo.Services.SettingsManager.get_default ();
 
             //Define sections
             Gtk.Label tit1_pref = new Gtk.Label (_("Interface"));
@@ -53,7 +57,7 @@ namespace Meteo.Widgets {
             unit_box.append_text ("\u00B0" + "C - m/s");
             unit_box.append_text ("\u00B0" + "F - mph");
 
-            if (settings.get_string ("units") == "metric") {
+            if (main_window.settings.get_string ("units") == "metric") {
                 unit_box.selected = 0;
             } else {
                 unit_box.selected = 1;
@@ -116,8 +120,8 @@ namespace Meteo.Widgets {
                 switch (response_id) {
                     case Gtk.ResponseType.CLOSE:
                         if (flag != null) {
-                            Meteo.Utils.clear_cache ();
-                            settings.set_string ("idplace", flag);
+                            Utils.clear_cache ();
+                            main_window.settings.set_string ("idplace", flag);
                         }
                         destroy ();
                         break;
@@ -125,27 +129,27 @@ namespace Meteo.Widgets {
             });
             show_all ();
 
-            settings.bind("auto", loc, "active", GLib.SettingsBindFlags.DEFAULT);
+            main_window.settings.bind("auto", loc, "active", GLib.SettingsBindFlags.DEFAULT);
 #if INDICATOR_EXIST
-            settings.bind("indicator", ind, "active", GLib.SettingsBindFlags.DEFAULT);
+            main_window.settings.bind("indicator", ind, "active", GLib.SettingsBindFlags.DEFAULT);
 #endif
-            settings.bind("symbolic", icon, "active", GLib.SettingsBindFlags.DEFAULT);
-            settings.bind("interval", update_box, "value", SettingsBindFlags.DEFAULT);
-            settings.bind("personal-key", local_key, "text", SettingsBindFlags.DEFAULT);
+            main_window.settings.bind("symbolic", icon, "active", GLib.SettingsBindFlags.DEFAULT);
+            main_window.settings.bind("interval", update_box, "value", SettingsBindFlags.DEFAULT);
+            main_window.settings.bind("personal-key", local_key, "text", SettingsBindFlags.DEFAULT);
             unit_box.mode_changed.connect (() => {
                 if (unit_box.selected == 1) {
-                    settings.set_string ("units", "imperial");
+                    main_window.settings.set_string ("units", "imperial");
                 } else {
-                    settings.set_string ("units", "metric");
+                    main_window.settings.set_string ("units", "metric");
                 }
-                flag = settings.get_string ("idplace");
+                flag = main_window.settings.get_string ("idplace");
             });
             icon.state_set.connect((state) => {
-                flag = settings.get_string ("idplace");
+                flag = main_window.settings.get_string ("idplace");
                 return false;
             });
             loc.state_set.connect((state) => {
-                flag = settings.get_boolean ("auto") ? "" : "0";
+                flag = main_window.settings.get_boolean ("auto") ? "" : "0";
                 return false;
             });
         }

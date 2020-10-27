@@ -20,9 +20,10 @@ namespace Meteo {
     }
 
     public class MainWindow : Gtk.Window {
+        public GLib.Settings settings;
+
         private Gtk.Grid view;
         private Meteo.Widgets.Header header;
-        private GLib.Settings settings;
         private Meteo.Widgets.Statusbar statusbar;
         private string cur_idplace;
         private bool _personal_key;
@@ -54,6 +55,10 @@ namespace Meteo {
             header = new Meteo.Widgets.Header (this);
             header.upd_button.clicked.connect (() => {
                 change_view ();
+            });
+            header.show_preferences.connect (() => {
+                var preferences = new Meteo.Dialogs.Preferences (this);
+                preferences.run ();
             });
             set_titlebar (header);
 

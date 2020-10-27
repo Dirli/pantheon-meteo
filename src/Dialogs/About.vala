@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 Dirli <litandrej85@gmail.com>
+* Copyright (c) 2018-2020 Dirli <litandrej85@gmail.com>
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -12,8 +12,8 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Widgets {
-    public class About : Granite.GtkPatch.AboutDialog {
+namespace Meteo {
+    public class Dialogs.About : Granite.GtkPatch.AboutDialog {
         public About () {
             modal = true;
             destroy_with_parent = true;
