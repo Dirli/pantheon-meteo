@@ -32,7 +32,7 @@ namespace Meteo.Utils {
 
     public static bool save_cache (string path_json, string data) {
         try {
-            var path = File.new_for_path (Environment.get_user_cache_dir () + "/" + Constants.EXEC_NAME);
+            var path = File.new_for_path (Environment.get_user_cache_dir () + "/" + Constants.APP_NAME);
             if (!path.query_exists ()) {
                 path.make_directory ();
             }
@@ -51,7 +51,7 @@ namespace Meteo.Utils {
 
     public static void clear_cache () {
         try {
-            string cache_path = Environment.get_user_cache_dir () + "/" + Constants.EXEC_NAME;
+            string cache_path = Environment.get_user_cache_dir () + "/" + Constants.APP_NAME;
             string file_name;
             GLib.Dir dir = GLib.Dir.open (cache_path, 0);
             while ((file_name = dir.read_name ()) != null) {

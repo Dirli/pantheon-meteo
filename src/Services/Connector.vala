@@ -22,7 +22,7 @@ namespace Meteo.Services {
             now_dt = new DateTime.now_local();
             try {
                 bool save = false;
-                string cache_json = Environment.get_user_cache_dir () + "/" + Constants.EXEC_NAME + @"/$type.json";
+                string cache_json = Environment.get_user_cache_dir () + "/" + Constants.APP_NAME + @"/$type.json";
                 string text = "";
 
                 parser = new Json.Parser ();

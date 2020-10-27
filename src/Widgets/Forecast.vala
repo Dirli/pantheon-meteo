@@ -95,7 +95,7 @@ namespace Meteo.Widgets {
                         if (sun_state_day == date.get_day_of_year ()) {
                             if (!up_flag && date.get_hour () > sun_state.sunrise.get_hour () && (date.get_hour () - 3) <= sun_state.sunrise.get_hour ()) {
                                 Gtk.Image sunrise_icon = new Gtk.Image ();
-                                sunrise_icon.set_from_icon_name("daytime-sunrise-symbolic", Gtk.IconSize.DIALOG);
+                                sunrise_icon.set_from_icon_name ("daytime-sunrise-symbolic", Gtk.IconSize.DIALOG);
 
                                 hours_box.add (create_iter_box (sun_state.sunrise, sunrise_icon));
                                 up_flag = true;
@@ -103,7 +103,7 @@ namespace Meteo.Widgets {
 
                             if (!down_flag && date.get_hour () > sun_state.sunset.get_hour () && (date.get_hour () - 3) <= sun_state.sunset.get_hour ()) {
                                 Gtk.Image sunset_icon = new Gtk.Image ();
-                                sunset_icon.set_from_icon_name("daytime-sunset-symbolic", Gtk.IconSize.DIALOG);
+                                sunset_icon.set_from_icon_name ("daytime-sunset-symbolic", Gtk.IconSize.DIALOG);
 
                                 hours_box.add (create_iter_box (sun_state.sunset, sunset_icon));
                                 down_flag = true;

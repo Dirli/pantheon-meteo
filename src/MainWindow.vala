@@ -47,7 +47,7 @@ namespace Meteo {
             settings = Meteo.Services.SettingsManager.get_default ();
             cur_idplace = "";
 
-            Gtk.CssProvider provider = new Gtk.CssProvider();
+            Gtk.CssProvider provider = new Gtk.CssProvider ();
             provider.load_from_resource ("/io/elementary/meteo/application.css");
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 

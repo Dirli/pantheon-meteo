@@ -112,7 +112,7 @@ namespace Meteo.Widgets {
 
         private Gtk.Image create_icon (string icon_name, string tooltip) {
             Gtk.Image icon = new Gtk.Image ();
-            icon.set_from_icon_name(icon_name + "-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+            icon.set_from_icon_name (icon_name + "-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
             icon.margin_start = icon.margin_end = 5;
             icon.tooltip_text = tooltip;
 

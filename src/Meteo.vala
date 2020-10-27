@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 Dirli <litandrej85@gmail.com>
+* Copyright (c) 2018-2020 Dirli <litandrej85@gmail.com>
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -14,26 +14,26 @@
 
 namespace Meteo {
     public class MeteoApp : Gtk.Application {
-        public MainWindow window;
+        private MainWindow main_window;
 
-        public MeteoApp () {
-            application_id = "io.elementary.meteo";
+        construct {
+            application_id = Constants.APP_NAME;
             flags |= GLib.ApplicationFlags.FLAGS_NONE;
         }
 
         public override void activate () {
-            if (get_windows () == null) {
-                window = new MainWindow (this);
-                window.show_all ();
-                window.start_follow ();
-            } else {
-                window.present ();
+            if (main_window == null) {
+                main_window = new MainWindow (this);
+                main_window.show_all ();
+                main_window.start_follow ();
             }
+
+            main_window.present ();
         }
 
-        public static void main (string [] args) {
+        public static int main (string [] args) {
             var app = new Meteo.MeteoApp ();
-            app.run (args);
+            return app.run (args);
         }
     }
 }
