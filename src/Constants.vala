@@ -12,7 +12,7 @@
 * General Public License for more details.
 */
 
-namespace Constants {
+namespace Meteo.Constants {
     public const string APP_NAME = "io.elementary.meteo";
     public const string OWM_API_ADDR = "http://api.openweathermap.org/data/2.5/";
     public const string API_KEY = "5767c553547943d85f70c2849aa47cc8";

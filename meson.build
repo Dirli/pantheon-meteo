@@ -19,6 +19,14 @@ add_project_arguments (
     language: 'c'
 )
 
+conf_data = configuration_data ()
+conf_data.set_quoted ('VERSION', meson.project_version ())
+config_header = configure_file (
+    input: 'src/config.vala.in',
+    output: 'config.vala',
+    configuration: conf_data
+)
+
 common_deps = [
     dependency ('gio-2.0'),
     dependency ('gobject-2.0'),
@@ -66,6 +74,7 @@ executable (
     'src/Widgets/Statusbar.vala',
     'src/Widgets/Today.vala',
     asresources,
+    config_header,
     vala_args: vala_args,
     c_args: [
         '-DGWEATHER_I_KNOW_THIS_IS_UNSTABLE',
@@ -75,7 +84,6 @@ executable (
 )
 
 if get_option ('indicator')
-    # indicator_deps = common_deps
     wingpanel_dep = dependency ('wingpanel-2.0')
 
     indicator_deps = common_deps + [
