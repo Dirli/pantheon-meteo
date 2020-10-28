@@ -12,6 +12,11 @@
 * General Public License for more details.
 */
 
+[DBus (name = "org.freedesktop.login1.Manager")]
+interface ILogindManager : DBusProxy {
+    public abstract signal void prepare_for_sleep (bool start);
+}
+
 namespace Meteo {
 
     private const string CITY_FS = """
@@ -24,8 +29,8 @@ namespace Meteo {
         private GLib.Settings settings;
         private uint timeout_id;
 
-        private Meteo.Widgets.Panel? panel_wid = null;
-        private Meteo.Widgets.Popover? popover_wid = null;
+        private Widgets.Panel? panel_wid = null;
+        private Widgets.Popover? popover_wid = null;
         private ILogindManager? logind_manager;
 
 
@@ -38,11 +43,11 @@ namespace Meteo {
                 } else {
                     fast_check = false;
                 }
-                return this._counter;
+                return _counter;
             }
             set {
-                this._counter = value;
-                this.fast_check = true;
+                _counter = value;
+                fast_check = true;
             }
         }
 
@@ -60,12 +65,14 @@ namespace Meteo {
                 provider.load_from_data (CITY_FS);
                 Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-                logind_manager = Bus.get_proxy_sync (BusType.SYSTEM, LOGIND_BUS_NAME, LOGIND_BUS_PATH);
+                logind_manager = GLib.Bus.get_proxy_sync (GLib.BusType.SYSTEM,
+                                                          Constants.LOGIND_BUS_NAME,
+                                                          Constants.LOGIND_BUS_PATH);
                 if (logind_manager != null) {
                     logind_manager.prepare_for_sleep.connect((start) => {
                         if (!start) {
-                            new Thread<int>("", () => {
-                                Thread.usleep(10000000);
+                            new GLib.Thread<int> ("", () => {
+                                GLib.Thread.usleep (10000000);
                                 counter = 5;
                                 update ();
                                 return 0;
@@ -199,7 +206,7 @@ namespace Meteo {
 
         public override Gtk.Widget? get_widget () {
             if (popover_wid == null) {
-                popover_wid = new Meteo.Widgets.Popover ();
+                popover_wid = new Widgets.Popover ();
             }
 
             return popover_wid;

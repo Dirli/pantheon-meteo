@@ -100,7 +100,6 @@ if get_option ('indicator')
         'src/Utils/Iconame.vala',
         'src/Utils/Utils.vala',
         'src/Services/Connector.vala',
-        'src/Services/ILogindManager.vala',
         'src/Services/Settings.vala',
         dependencies: indicator_deps,
         install: true,
