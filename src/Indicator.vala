@@ -52,9 +52,7 @@ namespace Meteo {
         }
 
         public Indicator () {
-            Object (code_name : "meteo-indicator",
-                    display_name : _("Meteo Indicator"),
-                    description: _("Meteo Indicator displays the current weather and forecast for several days"));
+            Object (code_name : "meteo-indicator");
 
             settings = Meteo.Services.SettingsManager.get_default ();
             visible = settings.get_boolean ("indicator");
