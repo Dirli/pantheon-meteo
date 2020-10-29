@@ -12,17 +12,17 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Widgets {
-
-    public class Statusbar : Gtk.ActionBar {
+namespace Meteo {
+    public class Widgets.Statusbar : Gtk.ActionBar {
         private Gtk.Label new_msg;
         private Gtk.Label provider_label;
         private string provider_name = "openweathermap.org";
 
-        private Statusbar () {
+        construct {
             provider_label = new Gtk.Label ("");
             provider_label.margin = 10;
             pack_end (provider_label);
+
             new_msg = new Gtk.Label ("");
             new_msg.margin = 10;
             pack_start (new_msg);

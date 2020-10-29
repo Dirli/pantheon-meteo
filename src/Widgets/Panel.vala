@@ -12,12 +12,16 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Widgets {
-    public class Panel : Gtk.Box {
+namespace Meteo {
+    public class Widgets.Panel : Gtk.Box {
         private Gtk.Label temp;
         private Gtk.Image weather_icon;
+
         public Panel () {
             Object (orientation: Gtk.Orientation.HORIZONTAL);
+        }
+
+        construct {
             weather_icon = new Gtk.Image ();
             temp = new Gtk.Label ("-");
             pack_start (weather_icon, false, false, 0);

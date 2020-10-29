@@ -12,8 +12,8 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Services {
-    public class Connector : Object {
+namespace Meteo {
+    public class Services.Connector : GLib.Object {
         private static DateTime now_dt;
         private static Json.Parser parser;
 

@@ -12,13 +12,11 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Widgets {
-    public class Default : Granite.Widgets.Welcome  {
+namespace Meteo {
+    public class Widgets.Default : Granite.Widgets.Welcome  {
         public Default () {
-            Object (
-                title: _("Weather application"),
-                subtitle: _("Displays the weather forecast for the selected city.")
-            );
+            Object (title: _("Weather application"),
+                    subtitle: _("Displays the weather forecast for the selected city."));
         }
     }
 }

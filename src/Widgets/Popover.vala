@@ -12,8 +12,8 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Widgets {
-    public class Popover : Gtk.Grid {
+namespace Meteo {
+    public class Widgets.Popover : Gtk.Grid {
         private Gtk.Label city_item;
         private Gtk.Label humidity_item;
         private Gtk.Label pressure_item;
@@ -23,10 +23,13 @@ namespace Meteo.Widgets {
         private Gtk.Label sunset_item;
 
         public Popover () {
-            orientation = Gtk.Orientation.HORIZONTAL;
-            hexpand = true;
-            row_spacing = 10;
+            Object (orientation: Gtk.Orientation.HORIZONTAL,
+                    hexpand: true,
+                    row_spacing: 10);
 
+        }
+
+        construct {
             city_item = new Gtk.Label ("-");
             city_item.get_style_context ().add_class ("city");
             city_item.margin_top = 10;
@@ -69,14 +72,14 @@ namespace Meteo.Widgets {
             app_button.text = _("Start meteo");
 
             app_button.clicked.connect (() => {
-                var app_info = new GLib.DesktopAppInfo("io.elementary.meteo.desktop");
+                var app_info = new GLib.DesktopAppInfo (Constants.APP_NAME + ".desktop");
 
                 if (app_info == null) {
                     return;
                 }
 
                 try {
-                    app_info.launch(null, null);
+                    app_info.launch (null, null);
                 } catch (Error e) {
                     warning ("Unable to launch io.elementary.meteo.desktop: %s", e.message);
                 }

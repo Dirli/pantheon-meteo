@@ -12,8 +12,8 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Services {
-    public class Location : GWeather.LocationEntry {
+namespace Meteo {
+    public class Services.Location : GWeather.LocationEntry {
         private struct Coord {
             double lat;
             double lon;

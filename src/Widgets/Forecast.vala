@@ -12,16 +12,16 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Widgets {
-    public class Forecast : Gtk.Grid {
+namespace Meteo {
+    public class Widgets.Forecast : Gtk.Grid {
         private Gtk.Box forecast_box;
         private SunState sun_state;
 
         public Forecast (Json.Object forecast_obj, string units, SunState sun_state) {
-            row_spacing = 5;
-            column_spacing = 10;
-            column_homogeneous = true;
-            margin = 15;
+            Object (row_spacing: 5,
+                    column_spacing: 10,
+                    column_homogeneous: true,
+                    margin: 15);
 
             this.sun_state = sun_state;
 

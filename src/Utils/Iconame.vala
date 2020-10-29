@@ -12,8 +12,8 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Utils {
-    public class Iconame : Gtk.Image {
+namespace Meteo {
+    public class Utils.Iconame : Gtk.Image {
         public Iconame (string iconum, int size) {
             GLib.Settings settings = Meteo.Services.SettingsManager.get_default ();
             icon_size = Gtk.IconSize.DIALOG;

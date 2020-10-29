@@ -12,16 +12,16 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Widgets {
-    public class Header : Gtk.HeaderBar {
+namespace Meteo {
+    public class Widgets.Header : Gtk.HeaderBar {
         public signal void show_preferences ();
 
         private Gtk.Button loc_button;
         public Gtk.Button upd_button;
         private GLib.Settings settings;
 
-        public Header (Meteo.MainWindow window) {
-            settings = Meteo.Services.SettingsManager.get_default ();
+        public Header (MainWindow window) {
+            settings = Services.SettingsManager.get_default ();
 
             show_close_button = true;
 
@@ -35,7 +35,7 @@ namespace Meteo.Widgets {
                 show_preferences ();
             });
             about_item.activate.connect (() => {
-                var about = new Meteo.Dialogs.About ();
+                var about = new Dialogs.About ();
                 about.show ();
             });
 
@@ -56,7 +56,7 @@ namespace Meteo.Widgets {
             loc_button = new Gtk.Button.from_icon_name ("mark-location-symbolic", Gtk.IconSize.BUTTON);
             loc_button.tooltip_text = _("Change location");
             loc_button.clicked.connect (() => {
-                Meteo.Utils.clear_cache ();
+                Utils.clear_cache ();
                 settings.reset ("idplace");
             });
 

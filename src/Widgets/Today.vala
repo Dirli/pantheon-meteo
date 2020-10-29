@@ -12,16 +12,16 @@
 * General Public License for more details.
 */
 
-namespace Meteo.Widgets {
-    public class Today : Gtk.Grid {
+namespace Meteo {
+    public class Widgets.Today : Gtk.Grid {
         public Today (Json.Object today_obj, string units, SunState sun_state) {
-            valign = Gtk.Align.FILL;
-            halign = Gtk.Align.CENTER;
-            row_spacing = 5;
-            column_spacing = 5;
-            margin = 15;
-            margin_start = 30;
-            vexpand = true;
+            Object (valign: Gtk.Align.FILL,
+                    halign: Gtk.Align.CENTER,
+                    row_spacing: 5,
+                    column_spacing: 5,
+                    margin: 15,
+                    margin_start: 30,
+                    vexpand: true);
 
             var main_data = today_obj.get_object_member ("main");
 

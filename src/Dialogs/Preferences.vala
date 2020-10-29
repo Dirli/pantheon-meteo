@@ -21,8 +21,7 @@ namespace Meteo {
                     resizable: false,
                     title: _("Preferences"),
                     transient_for: main_window,
-                    window_position: Gtk.WindowPosition.CENTER_ON_PARENT
-            );
+                    window_position: Gtk.WindowPosition.CENTER_ON_PARENT);
 
             modal = true;
 
