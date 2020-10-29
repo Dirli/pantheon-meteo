@@ -25,9 +25,10 @@ namespace Meteo.Widgets {
 
             this.sun_state = sun_state;
 
-            Gtk.ScrolledWindow scr_window = new Gtk.ScrolledWindow (null, null);
-
             forecast_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+            forecast_box.valign = Gtk.Align.END;
+
+            Gtk.ScrolledWindow scr_window = new Gtk.ScrolledWindow (null, null);
             scr_window.expand = true;;
             scr_window.add (forecast_box);
 

@@ -22,7 +22,9 @@ namespace Meteo {
     public class MainWindow : Gtk.Window {
         public GLib.Settings settings;
 
-        private Gtk.Grid view;
+        private Gtk.Stack main_stack;
+        private Gtk.Box weather_page;
+
         private Meteo.Widgets.Header header;
         private Meteo.Widgets.Statusbar statusbar;
         private string cur_idplace;
@@ -39,19 +41,28 @@ namespace Meteo {
         }
 
         public MainWindow (MeteoApp app) {
-            set_application (app);
-            set_default_size (950, 750);
-            set_size_request (950, 750);
-            window_position = Gtk.WindowPosition.CENTER;
-            resizable = false;
-
-            settings = Meteo.Services.SettingsManager.get_default ();
-            cur_idplace = "";
+            Object (application: app,
+                    window_position: Gtk.WindowPosition.CENTER);
 
             Gtk.CssProvider provider = new Gtk.CssProvider ();
             provider.load_from_resource ("/io/elementary/meteo/application.css");
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        }
 
+        construct {
+            set_default_size (950, 750);
+
+            settings = Meteo.Services.SettingsManager.get_default ();
+            cur_idplace = "";
+
+            build_ui ();
+
+            personal_key = settings.get_string ("personal-key").replace ("/", "") == "";
+
+            determine_loc ();
+        }
+
+        private void build_ui () {
             header = new Meteo.Widgets.Header (this);
             header.upd_button.clicked.connect (() => {
                 change_view ();
@@ -60,32 +71,27 @@ namespace Meteo {
                 var preferences = new Meteo.Dialogs.Preferences (this);
                 preferences.run ();
             });
+
             set_titlebar (header);
 
-            view = new Gtk.Grid ();
-            view.expand = true;
-            view.halign = view.valign = Gtk.Align.FILL;
+            main_stack = new Gtk.Stack ();
+            main_stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT_RIGHT;
+            main_stack.expand = true;
 
-            insert_def_page ();
+            var default_page = new Meteo.Widgets.Default ();
+            weather_page = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
+
+            main_stack.add_named (default_page, "default");
+            main_stack.add_named (weather_page, "weather");
 
             statusbar = Meteo.Widgets.Statusbar.get_default ();
-            view.attach (statusbar, 0, 1, 1, 1);
 
-            personal_key = settings.get_string ("personal-key").replace ("/", "") == "";
+            var view_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
+            view_box.add (main_stack);
+            view_box.add (statusbar);
+            view_box.show_all ();
 
-            add (view);
-            determine_loc ();
-        }
-
-        private void insert_def_page () {
-            var default_page = new Meteo.Widgets.Default ();
-            default_page.expand = true;
-            var exist_widget = view.get_child_at (0,0);
-            if (exist_widget != null) {
-                exist_widget.destroy ();
-            }
-            default_page.show_all ();
-            view.attach (default_page, 0, 0, 1, 1);
+            add (view_box);
         }
 
         public void start_follow () {
@@ -107,11 +113,13 @@ namespace Meteo {
         public void change_view (string statusbar_msg = "") {
             header.custom_title = null;
 
+            foreach (unowned Gtk.Widget item in weather_page.get_children ()) {
+                weather_page.remove (item);
+            }
+
             string location_title = settings.get_string ("location") + ", ";
             location_title += settings.get_string ("country");
             header.set_title (location_title);
-
-            var widget = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
 
             string idplace = settings.get_string ("idplace");
             string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
@@ -128,7 +136,7 @@ namespace Meteo {
             string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
 
             string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
-            Json.Object? today_obj = Meteo.Services.Connector.get_owm_data (uri, "current");
+            Json.Object? today_obj = Services.Connector.get_owm_data (uri, "current");
             string upd_msg;
 
             SunState sun_state = {};
@@ -145,22 +153,18 @@ namespace Meteo {
             }
             statusbar.add_msg (upd_msg);
 
-            Gtk.Grid today = new Meteo.Widgets.Today (today_obj, units, sun_state);
+            Gtk.Grid today = new Widgets.Today (today_obj, units, sun_state);
 
             uri = Constants.OWM_API_ADDR + "forecast" + uri_query;
-            Json.Object? forecast_obj = Meteo.Services.Connector.get_owm_data (uri, "forecast");
-            Gtk.Grid forecast = new Meteo.Widgets.Forecast (forecast_obj, units, sun_state);
+            Json.Object? forecast_obj = Services.Connector.get_owm_data (uri, "forecast");
+            Gtk.Grid forecast = new Widgets.Forecast (forecast_obj, units, sun_state);
 
-            Gtk.Separator separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+            weather_page.add (today);
+            weather_page.add (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
+            weather_page.add (forecast);
 
-            widget.pack_start (today, true, false, 0);
-            widget.pack_start (separator, false, true, 0);
-            widget.pack_start (forecast, true, true, 0);
-
-            this.view.get_child_at (0,0).destroy ();
-            widget.expand = true;
-            widget.show_all ();
-            this.view.attach (widget, 0, 0, 1, 1);
+            weather_page.show_all ();
+            main_stack.set_visible_child_name ("weather");
         }
 
         private void on_idplace_change () {
@@ -173,7 +177,7 @@ namespace Meteo {
             if (cur_idplace != actual_idplace) {
                 cur_idplace = actual_idplace;
                 if (actual_idplace == "" || actual_idplace == "0") {
-                    insert_def_page ();
+                    main_stack.set_visible_child_name ("default");
                     determine_loc ();
                 } else {
                     change_view ();
