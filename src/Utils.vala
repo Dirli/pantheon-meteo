@@ -30,6 +30,28 @@ namespace Meteo.Utils {
         return id;
     }
 
+    public static string get_icon_name (string code) {
+        return code == "01d" ? "weather-clear" :
+               code == "01n" ? "weather-clear-night" :
+               code == "02d" ? "weather-few-clouds" :
+               code == "02n" ? "weather-few-clouds" :
+               code == "03d" ? "weather-few-clouds" :
+               code == "03n" ? "weather-few-clouds-night" :
+               code == "04d" ? "weather-overcast" :
+               code == "04n" ? "weather-overcast" :
+               code == "09d" ? "weather-showers-scattered" :
+               code == "09n" ? "weather-showers-scattered" :
+               code == "10d" ? "weather-showers" :
+               code == "10n" ? "weather-showers" :
+               code == "11d" ? "weather-storm" :
+               code == "11n" ? "weather-storm" :
+               code == "13d" ? "weather-snow" :
+               code == "13n" ? "weather-snow" :
+               code == "50d" ? "weather-fog" :
+               code == "50n" ? "weather-fog" :
+               "dialog-error";
+    }
+
     public static bool save_cache (string path_json, string data) {
         try {
             var path = File.new_for_path (Environment.get_user_cache_dir () + "/" + Constants.APP_NAME);

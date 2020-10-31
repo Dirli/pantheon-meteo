@@ -35,13 +35,18 @@ namespace Meteo {
             weather_main.halign = Gtk.Align.START;
             weather_main.get_style_context ().add_class ("resumen");
 
-            string _icon = weather.get_object_element (0).get_string_member ("icon");
-            var icon = new Meteo.Utils.Iconame (_icon, 128);
+            string icon_name = weather.get_object_element (0).get_string_member ("icon");
+            if (Services.SettingsManager.get_default ().get_boolean ("symbolic")) {
+                icon_name += "-symbolic";
+            }
+
+            var icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.DIALOG);
+            icon.pixel_size = 128;
             icon.halign = Gtk.Align.END;
             icon.valign = Gtk.Align.START;
 
             double temp_n = main_data.get_double_member ("temp");
-            Gtk.Label temp = new Gtk.Label (Meteo.Utils.temp_format (units, temp_n));
+            Gtk.Label temp = new Gtk.Label (Utils.temp_format (units, temp_n));
             temp.get_style_context ().add_class ("temp");
             temp.halign = Gtk.Align.START;
             temp.valign = Gtk.Align.CENTER;

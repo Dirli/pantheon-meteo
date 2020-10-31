@@ -14,6 +14,8 @@
 
 namespace Meteo {
     public class Widgets.Popover : Gtk.Grid {
+        public signal void hide_indicator ();
+
         private Gtk.Label city_item;
         private Gtk.Label humidity_item;
         private Gtk.Label pressure_item;
@@ -65,7 +67,7 @@ namespace Meteo {
             hide_button.text = _("Hide indicator");
 
             hide_button.clicked.connect (() => {
-                Meteo.Services.SettingsManager.get_default ().set_boolean ("indicator", false);
+                hide_indicator ();
             });
 
             var app_button = new Gtk.ModelButton ();

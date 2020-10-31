@@ -205,6 +205,9 @@ namespace Meteo {
         public override Gtk.Widget? get_widget () {
             if (popover_wid == null) {
                 popover_wid = new Widgets.Popover ();
+                popover_wid.hide_indicator.connect (() => {
+                    settings.set_boolean ("indicator", false);
+                });
             }
 
             return popover_wid;

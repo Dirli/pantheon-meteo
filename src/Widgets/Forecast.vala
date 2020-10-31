@@ -112,7 +112,15 @@ namespace Meteo {
                         }
                     }
 
-                    Gtk.Image hour_icon = new Meteo.Utils.Iconame (list_element.get_array_member ("weather").get_object_element (0).get_string_member ("icon"), 36);
+                    var icon_name = Utils.get_icon_name (list_element.get_array_member ("weather").get_object_element (0).get_string_member ("icon"));
+
+                    if (Services.SettingsManager.get_default ().get_boolean ("symbolic")) {
+                        icon_name += "-symbolic";
+                    }
+
+                    var hour_icon = new Gtk.Image.from_icon_name (icon_name, Gtk.IconSize.DIALOG);
+                    hour_icon.pixel_size = 36;
+
                     double hour_temp = list_element.get_object_member ("main").get_double_member ("temp");
                     Gtk.Label temp = new Gtk.Label (Meteo.Utils.temp_format (units, hour_temp));
 
