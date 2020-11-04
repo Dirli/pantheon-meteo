@@ -17,7 +17,7 @@ namespace Meteo {
         private static DateTime now_dt;
         private static Json.Parser parser;
 
-        public static Json.Object? get_owm_data (string url, string type) {
+        public static Json.Object? get_owm_data (string url_query, string type) {
             GLib.Settings settings = Meteo.Services.SettingsManager.get_default ();
             now_dt = new DateTime.now_local();
             try {
@@ -28,6 +28,7 @@ namespace Meteo {
                 parser = new Json.Parser ();
 
                 if ( !FileUtils.test(cache_json, FileTest.EXISTS) || check_update (type, settings)) {
+                    var url = Constants.OWM_API_ADDR + url_query;
                     text = get_forecast (url, type);
                     if (text == "") {
                         return null;

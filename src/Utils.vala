@@ -52,6 +52,32 @@ namespace Meteo.Utils {
                "dialog-error";
     }
 
+    public int get_time_index (int periods, int day_index, int time_index) {
+        int index;
+
+        if (day_index == 0) {
+            index = time_index;
+        } else {
+            index = (day_index - 1) * 8 + time_index + (periods == 0 ? 8 : periods);
+        }
+
+        return index;
+    }
+
+    public int get_forecast_periods (int64 first_dt) {
+        GLib.DateTime now_dt = new GLib.DateTime.now_local();
+        GLib.DateTime first_el_date = new GLib.DateTime.from_unix_local (first_dt);
+
+        int first_el_hour = first_el_date.get_hour ();
+        int now_hour = now_dt.get_hour ();
+
+        if (first_el_hour < now_hour || now_dt.get_day_of_year () != first_el_date.get_day_of_year ()) {
+            now_hour = first_el_hour == 21 ? 20 : first_el_hour;
+        }
+
+        return (23 - now_hour) / 3;
+    }
+
     public static bool save_cache (string path_json, string data) {
         try {
             var path = File.new_for_path (Environment.get_user_cache_dir () + "/" + Constants.APP_NAME);

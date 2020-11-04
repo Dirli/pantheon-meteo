@@ -13,17 +13,21 @@
 */
 
 namespace Meteo {
-    public struct SunState {
-        GLib.DateTime day;
-        GLib.DateTime sunrise;
-        GLib.DateTime sunset;
+    public struct WeatherStruct {
+        public string description;
+        public string icon_name;
+        public string temp;
+        public string pressure;
+        public string wind;
+        public string clouds;
+        public string humidity;
     }
 
     public class MainWindow : Gtk.Window {
         public GLib.Settings settings;
 
         private Gtk.Stack main_stack;
-        private Gtk.Box weather_page;
+        private Views.WeatherPage weather_page;
 
         private Meteo.Widgets.Header header;
         private Meteo.Widgets.Statusbar statusbar;
@@ -50,7 +54,7 @@ namespace Meteo {
         }
 
         construct {
-            set_default_size (950, 750);
+            set_default_size (750, 400);
 
             settings = Meteo.Services.SettingsManager.get_default ();
             cur_idplace = "";
@@ -79,7 +83,7 @@ namespace Meteo {
             main_stack.expand = true;
 
             var default_page = new Meteo.Widgets.Default ();
-            weather_page = new Gtk.Box (Gtk.Orientation.VERTICAL, 10);
+            weather_page = new Views.WeatherPage ();
 
             main_stack.add_named (default_page, "default");
             main_stack.add_named (weather_page, "weather");
@@ -113,17 +117,13 @@ namespace Meteo {
         public void change_view (string statusbar_msg = "") {
             header.custom_title = null;
 
-            foreach (unowned Gtk.Widget item in weather_page.get_children ()) {
-                weather_page.remove (item);
-            }
-
             string location_title = settings.get_string ("location") + ", ";
             location_title += settings.get_string ("country");
             header.set_title (location_title);
 
             string idplace = settings.get_string ("idplace");
             string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
-            string units = settings.get_string ("units");
+            var units = settings.get_string ("units");
 
             string api_key = settings.get_string ("personal-key").replace ("/", "");
             if (api_key == "") {
@@ -135,36 +135,109 @@ namespace Meteo {
 
             string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
 
-            string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
-            Json.Object? today_obj = Services.Connector.get_owm_data (uri, "current");
+            Json.Object? today_obj = Services.Connector.get_owm_data ("weather" + uri_query, "current");
             string upd_msg;
 
-            SunState sun_state = {};
-            var sys = today_obj.get_object_member ("sys");
-            sun_state.sunrise = new GLib.DateTime.from_unix_local (sys.get_int_member ("sunrise"));
-            sun_state.sunset = new GLib.DateTime.from_unix_local (sys.get_int_member ("sunset"));
-            sun_state.day = new GLib.DateTime.from_unix_local ((int64) today_obj.get_int_member ("dt"));
-
             if (statusbar_msg == "") {
-                GLib.DateTime upd_dt = sun_state.day;
-                upd_msg = _("Last update:") + " " + upd_dt.format ("%a, %e  %b %R");
+                GLib.DateTime upd_dt = new GLib.DateTime.from_unix_local (today_obj.get_int_member ("dt"));
+                upd_msg = _("Last update: ") + upd_dt.format ("%a, %e  %b %R");
             } else {
                 upd_msg = statusbar_msg;
             }
             statusbar.add_msg (upd_msg);
 
-            Gtk.Grid today = new Widgets.Today (today_obj, units, sun_state);
+            if (today_obj != null) {
+                var sys = today_obj.get_object_member ("sys");
+                weather_page.set_sun_state (sys.get_int_member ("sunrise"), sys.get_int_member ("sunset"));
+                fill_today (today_obj, units);
+            }
 
-            uri = Constants.OWM_API_ADDR + "forecast" + uri_query;
-            Json.Object? forecast_obj = Services.Connector.get_owm_data (uri, "forecast");
-            Gtk.Grid forecast = new Widgets.Forecast (forecast_obj, units, sun_state);
+            Json.Object? forecast_obj = Services.Connector.get_owm_data ("forecast" + uri_query, "forecast");
+            if (forecast_obj != null) {
+                Json.Array forecast_list = forecast_obj.get_array_member ("list");
 
-            weather_page.add (today);
-            weather_page.add (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
-            weather_page.add (forecast);
+                if (forecast_list.get_length () > 0) {
+                    fill_forecast (forecast_list, units);
+                }
+            }
 
-            weather_page.show_all ();
             main_stack.set_visible_child_name ("weather");
+        }
+
+        private void fill_today (Json.Object today_obj, string units) {
+            var main_data = today_obj.get_object_member ("main");
+            var weather = today_obj.get_array_member ("weather");
+
+            WeatherStruct today_weather = {};
+
+            today_weather.description = weather.get_object_element (0).get_string_member ("description");
+
+            var icon_name = Utils.get_icon_name (weather.get_object_element (0).get_string_member ("icon"));
+            if (settings.get_boolean ("symbolic")) {
+                icon_name += "-symbolic";
+            }
+            today_weather.icon_name = icon_name;
+
+            today_weather.temp = Utils.temp_format (units, main_data.get_double_member ("temp"));
+            today_weather.pressure = Utils.pressure_format ((int) main_data.get_int_member ("pressure"));
+            today_weather.humidity = "%d %%".printf ((int) main_data.get_int_member ("humidity"));
+
+            Json.Object wind = today_obj.get_object_member ("wind");
+            double? wind_speed = null;
+            if (wind.has_member ("speed")) {
+                wind_speed = wind.get_double_member ("speed");
+            }
+
+            double? wind_deg = null;
+            if (wind.has_member ("deg")) {
+                wind_deg = wind.get_double_member ("deg");
+            }
+
+            today_weather.wind = Utils.wind_format (units, wind_speed, wind_deg);
+
+            var clouds = today_obj.get_object_member ("clouds");
+            today_weather.clouds = "%d %%".printf ((int) clouds.get_int_member ("all"));
+
+            weather_page.update_today (today_weather);
+        }
+
+        private void fill_forecast (Json.Array forecast_list, string units) {
+            weather_page.clear_forecast ();
+
+            int periods = Utils.get_forecast_periods (forecast_list.get_object_element (0).get_int_member ("dt"));
+
+            int days_count = (int) GLib.Math.round (forecast_list.get_length () / 8.0);
+            days_count = days_count < 5 ? days_count : periods == 0 ? 5 : 6;
+
+            int elem_index;
+            GLib.DateTime date;
+
+            for (int day_index = 0; day_index < days_count; day_index++) {
+                for (int time_index = 0; time_index < 8; time_index++) {
+                    elem_index = Utils.get_time_index (periods, day_index, time_index);
+
+                    var list_element = forecast_list.get_object_element (elem_index);
+                    date = new GLib.DateTime.from_unix_local (list_element.get_int_member ("dt"));
+
+                    if (time_index == 0) {
+                        weather_page.add_day_label (date, day_index);
+                    }
+
+                    var icon_name = Utils.get_icon_name (list_element.get_array_member ("weather").get_object_element (0).get_string_member ("icon"));
+                    if (settings.get_boolean ("symbolic")) {
+                        icon_name += "-symbolic";
+                    }
+
+                    string temp = Utils.temp_format (units, list_element.get_object_member ("main").get_double_member ("temp"));
+                    if (!weather_page.add_forecast_time (day_index, date, icon_name, temp)) {
+                        break;
+                    }
+
+                    if (day_index == 0 && periods != 0 && periods == (time_index + 1) ) {break;}
+                    if ((day_index + 1) == days_count && periods != 0 && (8 - periods) == time_index + 1 ) {break;}
+                }
+            }
+
         }
 
         private void on_idplace_change () {

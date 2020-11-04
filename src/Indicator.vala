@@ -102,8 +102,7 @@ namespace Meteo {
 
             string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
 
-            string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
-            Json.Object? today_obj = Meteo.Services.Connector.get_owm_data (uri, "current");
+            Json.Object? today_obj = Meteo.Services.Connector.get_owm_data ("weather" + uri_query, "current");
             if (today_obj != null) {
                 if (fast_check) {
                     fast_check = false;
