@@ -29,8 +29,8 @@ namespace Meteo {
         private Gtk.Stack main_stack;
         private Views.WeatherPage weather_page;
 
-        private Meteo.Widgets.Header header;
-        private Meteo.Widgets.Statusbar statusbar;
+        private Widgets.Header header;
+        private Widgets.Statusbar statusbar;
         private string cur_idplace;
         private bool _personal_key;
 
@@ -56,10 +56,13 @@ namespace Meteo {
         construct {
             set_default_size (750, 400);
 
-            settings = Meteo.Services.SettingsManager.get_default ();
+            settings = Services.SettingsManager.get_default ();
             cur_idplace = "";
 
             build_ui ();
+
+            settings.bind ("auto", header, "auto-location", GLib.SettingsBindFlags.GET);
+            settings.bind ("idplace", header, "idplace", GLib.SettingsBindFlags.GET);
 
             personal_key = settings.get_string ("personal-key").replace ("/", "") == "";
 
@@ -67,13 +70,18 @@ namespace Meteo {
         }
 
         private void build_ui () {
-            header = new Meteo.Widgets.Header (this);
-            header.upd_button.clicked.connect (() => {
+            header = new Widgets.Header ();
+            header.update_data.connect (() => {
                 change_view ();
             });
             header.show_preferences.connect (() => {
-                var preferences = new Meteo.Dialogs.Preferences (this);
+                var preferences = new Dialogs.Preferences (this);
                 preferences.run ();
+            });
+            header.change_location.connect (() => {
+                Utils.clear_cache ();
+                main_stack.set_visible_child_name ("weather");
+                settings.reset ("idplace");
             });
 
             set_titlebar (header);
@@ -82,13 +90,13 @@ namespace Meteo {
             main_stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT_RIGHT;
             main_stack.expand = true;
 
-            var default_page = new Meteo.Widgets.Default ();
+            var default_page = new Widgets.Default ();
             weather_page = new Views.WeatherPage ();
 
             main_stack.add_named (default_page, "default");
             main_stack.add_named (weather_page, "weather");
 
-            statusbar = Meteo.Widgets.Statusbar.get_default ();
+            statusbar = Widgets.Statusbar.get_default ();
 
             var view_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
             view_box.add (main_stack);
@@ -105,9 +113,9 @@ namespace Meteo {
         private void determine_loc () {
             string idp = settings.get_string ("idplace");
             if (settings.get_boolean ("auto")) {
-                Meteo.Services.Location.geolocate ();
+                Services.Location.geolocate ();
             } else if (idp == "" || idp == "0") {
-                header.set_custom_title (new Meteo.Services.Location ());
+                header.set_custom_title (new Services.Location ());
                 header.show_all ();
             } else {
                 change_view ();
@@ -241,7 +249,6 @@ namespace Meteo {
         }
 
         private void on_idplace_change () {
-            header.refresh_btns ();
             string actual_idplace = settings.get_string ("idplace");
             //FIXME: After recording a new location or updating an old one,
             // the event fires an arbitrary number of times (1-3). Changed
