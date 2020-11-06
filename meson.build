@@ -38,7 +38,7 @@ common_deps = [
 ]
 
 app_deps = common_deps + [
-    dependency ('geocode-glib-1.0'),
+    #dependency ('geocode-glib-1.0'),
     dependency ('gweather-3.0'),
     dependency ('granite'),
 ]
@@ -65,10 +65,10 @@ executable (
     'src/Dialogs/About.vala',
     'src/Dialogs/Preferences.vala',
     'src/Services/Connector.vala',
-    'src/Services/Location.vala',
+    'src/Services/Geolocation.vala',
     'src/Services/Settings.vala',
+    'src/Views/DefaultPage.vala',
     'src/Views/WeatherPage.vala',
-    'src/Widgets/Default.vala',
     'src/Widgets/Header.vala',
     'src/Widgets/Statusbar.vala',
     asresources,

@@ -8,7 +8,7 @@
         </key>
 
         <key name="auto" type="b">
-            <default>true</default>
+            <default>false</default>
             <summary>Autolocation</summary>
             <description>Catch my location on start</description>
         </key>

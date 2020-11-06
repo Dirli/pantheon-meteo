@@ -25,7 +25,6 @@ namespace Meteo {
             if (main_window == null) {
                 main_window = new MainWindow (this);
                 main_window.show_all ();
-                main_window.start_follow ();
             }
 
             main_window.present ();

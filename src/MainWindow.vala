@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 Dirli <litandrej85@gmail.com>
+* Copyright (c) 2018-2020 Dirli <litandrej85@gmail.com>
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,6 +23,12 @@ namespace Meteo {
         public string humidity;
     }
 
+    public struct LocationStruct {
+        public string location;
+        public string country;
+        public string idplace;
+    }
+
     public class MainWindow : Gtk.Window {
         public GLib.Settings settings;
 
@@ -31,18 +37,8 @@ namespace Meteo {
 
         private Widgets.Header header;
         private Widgets.Statusbar statusbar;
-        private string cur_idplace;
-        private bool _personal_key;
 
-        private bool personal_key {
-            get { return _personal_key; }
-            set {
-                if (_personal_key != value) {
-                    _personal_key = value;
-                    statusbar.mod_provider_label (personal_key);
-                }
-            }
-        }
+        private Services.Geolocation geo_service;
 
         public MainWindow (MeteoApp app) {
             Object (application: app,
@@ -57,32 +53,43 @@ namespace Meteo {
             set_default_size (750, 400);
 
             settings = Services.SettingsManager.get_default ();
-            cur_idplace = "";
+            settings.changed["idplace"].connect (fetch_data);
+
+            string api_key = settings.get_string ("personal-key").replace ("/", "");
+            if (api_key == "") {
+                api_key = Constants.API_KEY;
+            }
+
+            geo_service = new Services.Geolocation (api_key);
+            geo_service.existing_location.connect (() => {
+                fetch_data ();
+            });
+            geo_service.new_location.connect ((loc) => {
+                settings.set_string ("location", loc.location);
+                settings.set_string ("country", loc.country);
+                settings.set_string ("idplace", loc.idplace);
+            });
 
             build_ui ();
 
             settings.bind ("auto", header, "auto-location", GLib.SettingsBindFlags.GET);
             settings.bind ("idplace", header, "idplace", GLib.SettingsBindFlags.GET);
+            settings.bind ("longitude", geo_service, "longitude", GLib.SettingsBindFlags.DEFAULT);
+            settings.bind ("latitude", geo_service, "latitude", GLib.SettingsBindFlags.DEFAULT);
 
-            personal_key = settings.get_string ("personal-key").replace ("/", "") == "";
-
-            determine_loc ();
+            fetch_data ();
         }
 
         private void build_ui () {
             header = new Widgets.Header ();
             header.update_data.connect (() => {
-                change_view ();
+                fetch_data ();
             });
             header.show_preferences.connect (() => {
                 var preferences = new Dialogs.Preferences (this);
                 preferences.run ();
             });
-            header.change_location.connect (() => {
-                Utils.clear_cache ();
-                main_stack.set_visible_child_name ("weather");
-                settings.reset ("idplace");
-            });
+            header.change_location.connect (reset_location);
 
             set_titlebar (header);
 
@@ -90,7 +97,20 @@ namespace Meteo {
             main_stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT_RIGHT;
             main_stack.expand = true;
 
-            var default_page = new Widgets.Default ();
+            var default_page = new Views.DefaultPage ();
+            default_page.activated.connect ((index) => {
+                remove_custome_title ();
+                switch (index) {
+                    case 0:
+                        settings.set_boolean ("auto", true);
+                        break;
+                    case 1:
+                        settings.set_boolean ("auto", false);
+                        break;
+                }
+
+                reset_location ();
+            });
             weather_page = new Views.WeatherPage ();
 
             main_stack.add_named (default_page, "default");
@@ -106,40 +126,47 @@ namespace Meteo {
             add (view_box);
         }
 
-        public void start_follow () {
-            settings.changed["idplace"].connect (on_idplace_change);
-        }
-
-        private void determine_loc () {
-            string idp = settings.get_string ("idplace");
-            if (settings.get_boolean ("auto")) {
-                Services.Location.geolocate ();
-            } else if (idp == "" || idp == "0") {
-                header.set_custom_title (new Services.Location ());
-                header.show_all ();
-            } else {
-                change_view ();
+        public void remove_custome_title () {
+            if (header.get_custom_title () != null) {
+                header.custom_title = null;
             }
         }
 
-        public void change_view (string statusbar_msg = "") {
-            header.custom_title = null;
+        private void reset_location () {
+            Utils.clear_cache ();
+            settings.reset ("longitude");
+            settings.reset ("latitude");
+            settings.set_string ("idplace", "");
+            determine_loc ();
+        }
 
-            string location_title = settings.get_string ("location") + ", ";
-            location_title += settings.get_string ("country");
-            header.set_title (location_title);
+        private void determine_loc () {
+            if (settings.get_boolean ("auto")) {
+                geo_service.auto_detect ();
+            } else {
+                geo_service.manually_detect ();
+                header.set_custom_title (geo_service.location_entry);
+                header.show_all ();
+            }
+        }
 
+        public void fetch_data (string statusbar_msg = "") {
             string idplace = settings.get_string ("idplace");
-            string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
-            var units = settings.get_string ("units");
+            if (idplace == "") {
+                main_stack.set_visible_child_name ("default");
+                return;
+            }
+
+            remove_custome_title ();
+            header.set_title (settings.get_string ("location") + ", " + settings.get_string ("country"));
 
             string api_key = settings.get_string ("personal-key").replace ("/", "");
             if (api_key == "") {
                 api_key = Constants.API_KEY;
-                personal_key = false;
-            } else {
-                personal_key = true;
             }
+
+            string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
+            var units = settings.get_string ("units");
 
             string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
 
@@ -243,24 +270,6 @@ namespace Meteo {
 
                     if (day_index == 0 && periods != 0 && periods == (time_index + 1) ) {break;}
                     if ((day_index + 1) == days_count && periods != 0 && (8 - periods) == time_index + 1 ) {break;}
-                }
-            }
-
-        }
-
-        private void on_idplace_change () {
-            string actual_idplace = settings.get_string ("idplace");
-            //FIXME: After recording a new location or updating an old one,
-            // the event fires an arbitrary number of times (1-3). Changed
-            // event is generated on all properties. I don't know why
-            // warning (@"Changed setting idplace: $actual_idplace");
-            if (cur_idplace != actual_idplace) {
-                cur_idplace = actual_idplace;
-                if (actual_idplace == "" || actual_idplace == "0") {
-                    main_stack.set_visible_child_name ("default");
-                    determine_loc ();
-                } else {
-                    change_view ();
                 }
             }
         }

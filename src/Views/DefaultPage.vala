@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 Dirli <litandrej85@gmail.com>
+* Copyright (c) 2018-2020 Dirli <litandrej85@gmail.com>
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -13,10 +13,15 @@
 */
 
 namespace Meteo {
-    public class Widgets.Default : Granite.Widgets.Welcome  {
-        public Default () {
+    public class Views.DefaultPage : Granite.Widgets.Welcome  {
+        public DefaultPage () {
             Object (title: _("Weather application"),
                     subtitle: _("Displays the weather forecast for the selected city."));
+        }
+
+        construct {
+            append ("find-location-symbolic", _("Auto location"), _("Determine automatically location"));
+            append ("mark-location-symbolic", _("Manual location"), _("Determine the location manually"));
         }
     }
 }
