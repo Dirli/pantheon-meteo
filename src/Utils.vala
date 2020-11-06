@@ -71,7 +71,7 @@ namespace Meteo.Utils {
         int first_el_hour = first_el_date.get_hour ();
         int now_hour = now_dt.get_hour ();
 
-        if (first_el_hour < now_hour || now_dt.get_day_of_year () != first_el_date.get_day_of_year ()) {
+        if (first_el_hour < now_hour && now_dt.get_day_of_year () == first_el_date.get_day_of_year ()) {
             now_hour = first_el_hour == 21 ? 20 : first_el_hour;
         }
 
