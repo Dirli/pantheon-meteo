@@ -19,14 +19,18 @@ namespace Meteo {
             get; private set;
         }
 
+#if GEOCLUE_EXIST
         private GClue.Simple? gclue_simple;
+#endif
 
         public Geolocation (string key) {
             Object (api_key: key);
         }
 
-        public void auto_detect () {
+        public bool auto_detect () {
+#if GEOCLUE_EXIST
             auto_detect_async.begin ();
+            return true;
         }
 
         private async void auto_detect_async () {
@@ -56,13 +60,20 @@ namespace Meteo {
 
             determine_id (lon, lat, location.get_city_name (), location.get_country_name ());
         }
+#else
+            return false;
+        }
+#endif
+
 
         public void manually_detect () {
             if (location_entry != null) {
                 return;
             }
 
+#if GEOCLUE_EXIST
             gclue_simple = null;
+#endif
             location_entry = new GWeather.LocationEntry (GWeather.Location.get_world ());
 
             location_entry.placeholder_text = _("Search for new location:");

@@ -27,7 +27,7 @@ namespace Meteo {
             set_default_response (Gtk.ResponseType.CLOSE);
 
             //Define sections
-            Gtk.Label tit1_pref = new Gtk.Label (_("Interface"));
+            var tit1_pref = new Gtk.Label (_("Interface"));
             tit1_pref.get_style_context ().add_class ("preferences");
             tit1_pref.halign = Gtk.Align.START;
             var tit2_pref = new Gtk.Label (_("General"));
@@ -63,12 +63,6 @@ namespace Meteo {
             local_key.hexpand = true;
             local_key.placeholder_text = _("Enter personal api key");
 
-            //Automatic location
-            Gtk.Label loc_label = new Gtk.Label (_("Find my location automatically") + ":");
-            loc_label.halign = Gtk.Align.END;
-            Gtk.Switch loc = new Gtk.Switch ();
-            loc.halign = Gtk.Align.START;
-
             //Create UI
             var layout = new Gtk.Grid ();
             layout.valign = Gtk.Align.START;
@@ -77,10 +71,11 @@ namespace Meteo {
             layout.margin = 12;
             layout.margin_top = 0;
 
-            layout.attach (tit1_pref,  0, 0, 2, 1);
+            var top = 0;
+            layout.attach (tit1_pref,  0, top++, 2, 1);
 
-            layout.attach (icon_label, 0, 1, 1, 1);
-            layout.attach (icon,       1, 1, 1, 1);
+            layout.attach (icon_label, 0, top, 1, 1);
+            layout.attach (icon,       1, top++, 1, 1);
 
             //Select indicator
 #if INDICATOR_EXIST
@@ -88,19 +83,32 @@ namespace Meteo {
             ind_label.halign = Gtk.Align.END;
             Gtk.Switch ind = new Gtk.Switch ();
             ind.halign = Gtk.Align.START;
-            layout.attach (ind_label,  0, 2, 1, 1);
-            layout.attach (ind,        1, 2, 1, 1);
+            layout.attach (ind_label,  0, top, 1, 1);
+            layout.attach (ind,        1, top++, 1, 1);
+
+            main_window.settings.bind ("indicator", ind, "active", GLib.SettingsBindFlags.DEFAULT);
 #endif
 
-            layout.attach (tit2_pref,  0, 3, 2, 1);
-            layout.attach (unit_lab,   0, 4, 2, 1);
-            layout.attach (unit_box,   0, 5, 2, 1);
-            layout.attach (update_lab, 0, 6, 1, 1);
-            layout.attach (update_box, 1, 6, 1, 1);
-            layout.attach (loc_label,  0, 7, 1, 1);
-            layout.attach (loc,        1, 7, 1, 1);
-            layout.attach (api_key_label, 0, 8, 2, 1);
-            layout.attach (local_key,     0, 9, 2, 1);
+            layout.attach (tit2_pref,  0, top++, 2, 1);
+            layout.attach (unit_lab,   0, top++, 2, 1);
+            layout.attach (unit_box,   0, top++, 2, 1);
+            layout.attach (update_lab, 0, top, 1, 1);
+            layout.attach (update_box, 1, top++, 1, 1);
+
+#if GEOCLUE_EXIST
+            //Automatic location
+            Gtk.Label loc_label = new Gtk.Label (_("Find my location automatically") + ":");
+            loc_label.halign = Gtk.Align.END;
+            Gtk.Switch loc = new Gtk.Switch ();
+            loc.halign = Gtk.Align.START;
+
+            main_window.settings.bind ("auto", loc, "active", GLib.SettingsBindFlags.DEFAULT);
+            layout.attach (loc_label,  0, top, 1, 1);
+            layout.attach (loc,        1, top++, 1, 1);
+#endif
+
+            layout.attach (api_key_label, 0, top++, 2, 1);
+            layout.attach (local_key,     0, top++, 2, 1);
 
             Gtk.Box content = this.get_content_area () as Gtk.Box;
             content.valign = Gtk.Align.START;
@@ -113,10 +121,6 @@ namespace Meteo {
             response.connect (() => {destroy ();});
             show_all ();
 
-            main_window.settings.bind ("auto", loc, "active", GLib.SettingsBindFlags.DEFAULT);
-#if INDICATOR_EXIST
-            main_window.settings.bind ("indicator", ind, "active", GLib.SettingsBindFlags.DEFAULT);
-#endif
             main_window.settings.bind ("symbolic", icon, "active", GLib.SettingsBindFlags.DEFAULT);
             main_window.settings.bind ("interval", update_box, "value", SettingsBindFlags.DEFAULT);
             main_window.settings.bind ("personal-key", local_key, "text", SettingsBindFlags.DEFAULT);

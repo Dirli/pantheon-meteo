@@ -98,7 +98,9 @@ namespace Meteo {
                     reset_location ();
                 }
 
-                geo_service.auto_detect ();
+                if (!geo_service.auto_detect ()) {
+                    settings.set_boolean ("auto", false);
+                }
             } else {
                 fetch_data ();
             }
@@ -163,12 +165,14 @@ namespace Meteo {
             settings.set_string ("idplace", "");
 
             if (settings.get_boolean ("auto")) {
-                geo_service.auto_detect ();
-            } else {
-                geo_service.manually_detect ();
-                header.set_custom_title (geo_service.location_entry);
-                header.show_all ();
+                if (geo_service.auto_detect ()) {
+                    return;
+                }
             }
+
+            geo_service.manually_detect ();
+            header.set_custom_title (geo_service.location_entry);
+            header.show_all ();
         }
 
         public void fetch_data () {
