@@ -109,7 +109,8 @@ namespace Meteo {
         }
 
         public void reset_today () {
-            //
+            sunrise_added = false;
+            sunset_added = false;
         }
 
         public void clear_forecast () {

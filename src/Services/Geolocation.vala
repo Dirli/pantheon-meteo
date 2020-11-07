@@ -34,8 +34,6 @@ namespace Meteo {
                 return;
             }
 
-            warning ("detect location");
-
             location_entry = null;
 
             try {
@@ -53,7 +51,6 @@ namespace Meteo {
         }
 
         private void on_changed_location (double lat, double lon) {
-            warning ("changed location");
             var location = GWeather.Location.get_world ();
             location = location.find_nearest_city (lat, lon);
 
@@ -75,8 +72,6 @@ namespace Meteo {
         }
 
         private void determine_id (double lon, double lat, string city, string country) {
-            warning (@"detected $(city) $(country)");
-
             if (lon != longitude || lat != latitude) {
                 string uri_query = "?lat=" + lat.to_string () + "&lon=" + lon.to_string () + "&APPID=" + api_key;
                 string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
@@ -100,8 +95,6 @@ namespace Meteo {
         private unowned void location_entry_changed () {
             location_entry.activate.disconnect (location_entry_changed);
             GWeather.Location? location = location_entry.get_location ();
-
-            warning ("select location");
 
             if (location != null) {
                 double lon;

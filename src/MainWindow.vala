@@ -40,6 +40,17 @@ namespace Meteo {
 
         private Services.Geolocation geo_service;
 
+        public string api_key {
+            owned get {
+                string _api_key = settings.get_string ("personal-key").replace ("/", "");
+                if (_api_key == "") {
+                    return Constants.API_KEY;
+                }
+
+                return _api_key;
+            }
+        }
+
         public MainWindow (MeteoApp app) {
             Object (application: app,
                     window_position: Gtk.WindowPosition.CENTER);
@@ -54,17 +65,14 @@ namespace Meteo {
 
             settings = Services.SettingsManager.get_default ();
             settings.changed["idplace"].connect (fetch_data);
-
-            string api_key = settings.get_string ("personal-key").replace ("/", "");
-            if (api_key == "") {
-                api_key = Constants.API_KEY;
-            }
+            settings.changed["auto"].connect (determine_loc);
 
             geo_service = new Services.Geolocation (api_key);
             geo_service.existing_location.connect (() => {
                 fetch_data ();
             });
             geo_service.new_location.connect ((loc) => {
+                Utils.clear_cache ();
                 settings.set_string ("location", loc.location);
                 settings.set_string ("country", loc.country);
                 settings.set_string ("idplace", loc.idplace);
@@ -77,7 +85,15 @@ namespace Meteo {
             settings.bind ("longitude", geo_service, "longitude", GLib.SettingsBindFlags.DEFAULT);
             settings.bind ("latitude", geo_service, "latitude", GLib.SettingsBindFlags.DEFAULT);
 
-            fetch_data ();
+            if (settings.get_boolean ("auto")) {
+                if (settings.get_string ("idplace") == "") {
+                    reset_location ();
+                }
+
+                geo_service.auto_detect ();
+            } else {
+                fetch_data ();
+            }
         }
 
         private void build_ui () {
@@ -89,7 +105,7 @@ namespace Meteo {
                 var preferences = new Dialogs.Preferences (this);
                 preferences.run ();
             });
-            header.change_location.connect (reset_location);
+            header.change_location.connect (determine_loc);
 
             set_titlebar (header);
 
@@ -100,16 +116,7 @@ namespace Meteo {
             var default_page = new Views.DefaultPage ();
             default_page.activated.connect ((index) => {
                 remove_custome_title ();
-                switch (index) {
-                    case 0:
-                        settings.set_boolean ("auto", true);
-                        break;
-                    case 1:
-                        settings.set_boolean ("auto", false);
-                        break;
-                }
-
-                reset_location ();
+                settings.set_boolean ("auto", index == 0 ? true : false);
             });
             weather_page = new Views.WeatherPage ();
 
@@ -133,14 +140,19 @@ namespace Meteo {
         }
 
         private void reset_location () {
-            Utils.clear_cache ();
             settings.reset ("longitude");
             settings.reset ("latitude");
-            settings.set_string ("idplace", "");
-            determine_loc ();
+            settings.reset ("location");
+            settings.reset ("country");
+
+            weather_page.reset_today ();
         }
 
         private void determine_loc () {
+            reset_location ();
+
+            settings.set_string ("idplace", "");
+
             if (settings.get_boolean ("auto")) {
                 geo_service.auto_detect ();
             } else {
@@ -150,9 +162,10 @@ namespace Meteo {
             }
         }
 
-        public void fetch_data (string statusbar_msg = "") {
+        public void fetch_data () {
             string idplace = settings.get_string ("idplace");
             if (idplace == "") {
+                header.set_title ("Meteo");
                 main_stack.set_visible_child_name ("default");
                 return;
             }
@@ -160,25 +173,16 @@ namespace Meteo {
             remove_custome_title ();
             header.set_title (settings.get_string ("location") + ", " + settings.get_string ("country"));
 
-            string api_key = settings.get_string ("personal-key").replace ("/", "");
-            if (api_key == "") {
-                api_key = Constants.API_KEY;
-            }
-
             string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
             var units = settings.get_string ("units");
 
             string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
 
             Json.Object? today_obj = Services.Connector.get_owm_data ("weather" + uri_query, "current");
-            string upd_msg;
 
-            if (statusbar_msg == "") {
-                GLib.DateTime upd_dt = new GLib.DateTime.from_unix_local (today_obj.get_int_member ("dt"));
-                upd_msg = _("Last update: ") + upd_dt.format ("%a, %e  %b %R");
-            } else {
-                upd_msg = statusbar_msg;
-            }
+            GLib.DateTime upd_dt = new GLib.DateTime.from_unix_local (today_obj.get_int_member ("dt"));
+            var upd_msg = _("Last update: ") + upd_dt.format ("%a, %e  %b %R");
+
             statusbar.add_msg (upd_msg);
 
             if (today_obj != null) {
@@ -272,6 +276,8 @@ namespace Meteo {
                     if ((day_index + 1) == days_count && periods != 0 && (8 - periods) == time_index + 1 ) {break;}
                 }
             }
+
+            weather_page.show_all ();
         }
     }
 }

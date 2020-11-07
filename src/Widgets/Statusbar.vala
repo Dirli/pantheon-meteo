@@ -20,11 +20,11 @@ namespace Meteo {
 
         construct {
             provider_label = new Gtk.Label ("");
-            provider_label.margin = 10;
+            provider_label.margin = 2;
             pack_end (provider_label);
 
             new_msg = new Gtk.Label ("");
-            new_msg.margin = 10;
+            new_msg.margin = 2;
             pack_start (new_msg);
         }
 

@@ -16,6 +16,7 @@ namespace Meteo {
     public class Dialogs.Preferences : Gtk.Dialog {
         public Preferences (MainWindow main_window) {
             Object (border_width: 6,
+                    modal: true,
                     deletable: false,
                     destroy_with_parent: true,
                     resizable: false,
@@ -23,9 +24,7 @@ namespace Meteo {
                     transient_for: main_window,
                     window_position: Gtk.WindowPosition.CENTER_ON_PARENT);
 
-            modal = true;
-
-            string? flag = null;
+            set_default_response (Gtk.ResponseType.CLOSE);
 
             //Define sections
             Gtk.Label tit1_pref = new Gtk.Label (_("Interface"));
@@ -55,15 +54,10 @@ namespace Meteo {
             var unit_box = new Granite.Widgets.ModeButton ();
             unit_box.append_text ("\u00B0" + "C - m/s");
             unit_box.append_text ("\u00B0" + "F - mph");
-
-            if (main_window.settings.get_string ("units") == "metric") {
-                unit_box.selected = 0;
-            } else {
-                unit_box.selected = 1;
-            }
+            unit_box.selected = main_window.settings.get_string ("units") == "metric" ? 0 : 1;
 
             // local api ley
-            Gtk.Label api_key_label = new Gtk.Label (_("Personal api key") + ":");
+            Gtk.Label api_key_label = new Gtk.Label (_("Personal api key:"));
             api_key_label.halign = Gtk.Align.START;
             var local_key = new Gtk.Entry ();
             local_key.hexpand = true;
@@ -115,41 +109,19 @@ namespace Meteo {
 
             //Actions
             add_button (_("Close"), Gtk.ResponseType.CLOSE);
-            this.response.connect ((source, response_id) => {
-                switch (response_id) {
-                    case Gtk.ResponseType.CLOSE:
-                        if (flag != null) {
-                            Utils.clear_cache ();
-                            main_window.settings.set_string ("idplace", flag);
-                        }
-                        destroy ();
-                        break;
-                }
-            });
+
+            response.connect (() => {destroy ();});
             show_all ();
 
-            main_window.settings.bind("auto", loc, "active", GLib.SettingsBindFlags.DEFAULT);
+            main_window.settings.bind ("auto", loc, "active", GLib.SettingsBindFlags.DEFAULT);
 #if INDICATOR_EXIST
-            main_window.settings.bind("indicator", ind, "active", GLib.SettingsBindFlags.DEFAULT);
+            main_window.settings.bind ("indicator", ind, "active", GLib.SettingsBindFlags.DEFAULT);
 #endif
-            main_window.settings.bind("symbolic", icon, "active", GLib.SettingsBindFlags.DEFAULT);
-            main_window.settings.bind("interval", update_box, "value", SettingsBindFlags.DEFAULT);
-            main_window.settings.bind("personal-key", local_key, "text", SettingsBindFlags.DEFAULT);
+            main_window.settings.bind ("symbolic", icon, "active", GLib.SettingsBindFlags.DEFAULT);
+            main_window.settings.bind ("interval", update_box, "value", SettingsBindFlags.DEFAULT);
+            main_window.settings.bind ("personal-key", local_key, "text", SettingsBindFlags.DEFAULT);
             unit_box.mode_changed.connect (() => {
-                if (unit_box.selected == 1) {
-                    main_window.settings.set_string ("units", "imperial");
-                } else {
-                    main_window.settings.set_string ("units", "metric");
-                }
-                flag = main_window.settings.get_string ("idplace");
-            });
-            icon.state_set.connect((state) => {
-                flag = main_window.settings.get_string ("idplace");
-                return false;
-            });
-            loc.state_set.connect((state) => {
-                flag = main_window.settings.get_boolean ("auto") ? "" : "0";
-                return false;
+                main_window.settings.set_string ("units", unit_box.selected == 1 ? "imperial" : "metric");
             });
         }
     }
