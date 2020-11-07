@@ -39,6 +39,7 @@ namespace Meteo {
         private Widgets.Statusbar statusbar;
 
         private Services.Geolocation geo_service;
+        private Services.Connector con_service;
 
         public string api_key {
             owned get {
@@ -63,10 +64,11 @@ namespace Meteo {
         construct {
             set_default_size (750, 400);
 
-            settings = Services.SettingsManager.get_default ();
+            settings = new GLib.Settings (Constants.APP_NAME);
             settings.changed["idplace"].connect (fetch_data);
             settings.changed["auto"].connect (determine_loc);
 
+            con_service = new Services.Connector ();
             geo_service = new Services.Geolocation (api_key);
             geo_service.existing_location.connect (() => {
                 fetch_data ();
@@ -80,10 +82,16 @@ namespace Meteo {
 
             build_ui ();
 
+            geo_service.show_message.connect ((msg) => {
+                statusbar.add_msg (msg);
+            });
+
             settings.bind ("auto", header, "auto-location", GLib.SettingsBindFlags.GET);
             settings.bind ("idplace", header, "idplace", GLib.SettingsBindFlags.GET);
             settings.bind ("longitude", geo_service, "longitude", GLib.SettingsBindFlags.DEFAULT);
             settings.bind ("latitude", geo_service, "latitude", GLib.SettingsBindFlags.DEFAULT);
+            settings.bind ("current-update", con_service, "current-update", GLib.SettingsBindFlags.DEFAULT);
+            settings.bind ("forecast-update", con_service, "period-update", GLib.SettingsBindFlags.DEFAULT);
 
             if (settings.get_boolean ("auto")) {
                 if (settings.get_string ("idplace") == "") {
@@ -123,7 +131,8 @@ namespace Meteo {
             main_stack.add_named (default_page, "default");
             main_stack.add_named (weather_page, "weather");
 
-            statusbar = Widgets.Statusbar.get_default ();
+            statusbar = new Widgets.Statusbar ();
+            statusbar.mod_provider_label (settings.get_string ("personal-key").replace ("/", "") != "");
 
             var view_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
             view_box.add (main_stack);
@@ -178,20 +187,19 @@ namespace Meteo {
 
             string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
 
-            Json.Object? today_obj = Services.Connector.get_owm_data ("weather" + uri_query, "current");
-
-            GLib.DateTime upd_dt = new GLib.DateTime.from_unix_local (today_obj.get_int_member ("dt"));
-            var upd_msg = _("Last update: ") + upd_dt.format ("%a, %e  %b %R");
-
-            statusbar.add_msg (upd_msg);
-
+            Json.Object? today_obj = con_service.get_owm_data ("weather" + uri_query, Enums.ForecastType.CURRENT);
             if (today_obj != null) {
+                GLib.DateTime upd_dt = new GLib.DateTime.from_unix_local (today_obj.get_int_member ("dt"));
+                var upd_msg = _("Last update: ") + upd_dt.format ("%a, %e  %b %R");
+
+                statusbar.add_msg (upd_msg);
+
                 var sys = today_obj.get_object_member ("sys");
                 weather_page.set_sun_state (sys.get_int_member ("sunrise"), sys.get_int_member ("sunset"));
                 fill_today (today_obj, units);
             }
 
-            Json.Object? forecast_obj = Services.Connector.get_owm_data ("forecast" + uri_query, "forecast");
+            Json.Object? forecast_obj = con_service.get_owm_data ("forecast" + uri_query, Enums.ForecastType.PERIOD);
             if (forecast_obj != null) {
                 Json.Array forecast_list = forecast_obj.get_array_member ("list");
 

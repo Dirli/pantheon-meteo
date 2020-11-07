@@ -51,14 +51,5 @@ namespace Meteo {
         public void not_location () {
             new_msg.set_text (_("No location defined"));
         }
-
-        private static Meteo.Widgets.Statusbar? _statusbar = null;
-        public static unowned Meteo.Widgets.Statusbar get_default () {
-            if (_statusbar == null) {
-                _statusbar = new Statusbar ();
-            }
-            return _statusbar;
-        }
-
     }
 }

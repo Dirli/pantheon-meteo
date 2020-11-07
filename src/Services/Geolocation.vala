@@ -1,5 +1,5 @@
 namespace Meteo {
-    public class Services.Geolocation : GLib.Object {
+    public class Services.Geolocation : Services.AbstractService {
         public signal void new_location (LocationStruct location_struct);
         public signal void existing_location ();
 
@@ -45,7 +45,7 @@ namespace Meteo {
                 on_changed_location (gclue_simple.location.latitude, gclue_simple.location.longitude);
             } catch (Error e) {
                 warning ("Failed to connect to GeoClue2 service: %s", e.message);
-                return;
+                show_message ("location could not be determined automatically");
             }
 
         }
@@ -72,7 +72,7 @@ namespace Meteo {
         }
 
         private void determine_id (double lon, double lat, string city, string country) {
-            if (lon != longitude || lat != latitude) {
+            if ("%.3f".printf (lon) != "%.3f".printf (longitude) || "%.3f".printf (lat) != "%.3f".printf (latitude)) {
                 string uri_query = "?lat=" + lat.to_string () + "&lon=" + lon.to_string () + "&APPID=" + api_key;
                 string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
                 string new_idplace = Utils.update_idplace (uri).to_string ();
@@ -103,7 +103,7 @@ namespace Meteo {
 
                 determine_id (lon, lat, location.get_city_name (), location.get_country_name ());
             } else {
-                //
+                show_message ("location could not be determined");
             }
 
             location_entry = null;

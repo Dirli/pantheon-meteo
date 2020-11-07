@@ -33,6 +33,7 @@ namespace Meteo {
         private Widgets.Popover? popover_wid = null;
         private ILogindManager? logind_manager;
 
+        private Services.Connector con_service;
 
         private bool fast_check = true;
         private uint _counter = 5;
@@ -54,8 +55,13 @@ namespace Meteo {
         public Indicator () {
             Object (code_name : "meteo-indicator");
 
-            settings = Meteo.Services.SettingsManager.get_default ();
+            settings = new GLib.Settings (Constants.APP_NAME);
             visible = settings.get_boolean ("indicator");
+
+            con_service = new Services.Connector ();
+
+            settings.bind ("current-update", con_service, "current-update", GLib.SettingsBindFlags.DEFAULT);
+            settings.bind ("forecast-update", con_service, "period-update", GLib.SettingsBindFlags.DEFAULT);
 
             var provider = new Gtk.CssProvider ();
 
@@ -102,7 +108,7 @@ namespace Meteo {
 
             string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
 
-            Json.Object? today_obj = Meteo.Services.Connector.get_owm_data ("weather" + uri_query, "current");
+            Json.Object? today_obj = con_service.get_owm_data ("weather" + uri_query, Enums.ForecastType.CURRENT);
             if (today_obj != null) {
                 if (fast_check) {
                     fast_check = false;
