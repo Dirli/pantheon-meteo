@@ -13,22 +13,6 @@
 */
 
 namespace Meteo {
-    public struct WeatherStruct {
-        public string description;
-        public string icon_name;
-        public string temp;
-        public string pressure;
-        public string wind;
-        public string clouds;
-        public string humidity;
-    }
-
-    public struct LocationStruct {
-        public string location;
-        public string country;
-        public string idplace;
-    }
-
     public class MainWindow : Gtk.Window {
         public GLib.Settings settings;
 
@@ -219,7 +203,7 @@ namespace Meteo {
             var main_data = today_obj.get_object_member ("main");
             var weather = today_obj.get_array_member ("weather");
 
-            WeatherStruct today_weather = {};
+            Structs.WeatherStruct today_weather = {};
 
             today_weather.description = weather.get_object_element (0).get_string_member ("description");
 

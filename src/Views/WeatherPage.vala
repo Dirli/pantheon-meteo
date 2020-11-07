@@ -119,7 +119,7 @@ namespace Meteo {
             }
         }
 
-        public void update_today (WeatherStruct weather_struct) {
+        public void update_today (Structs.WeatherStruct weather_struct) {
             today_icon.set_from_icon_name (weather_struct.icon_name, Gtk.IconSize.DIALOG);
 
             today_temp.label = weather_struct.temp;

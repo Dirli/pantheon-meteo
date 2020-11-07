@@ -1,6 +1,6 @@
 namespace Meteo {
     public class Services.Geolocation : Services.AbstractService {
-        public signal void new_location (LocationStruct location_struct);
+        public signal void new_location (Structs.LocationStruct location_struct);
         public signal void existing_location ();
 
         public string api_key {
@@ -91,7 +91,7 @@ namespace Meteo {
                 latitude = lat;
                 longitude = lon;
 
-                LocationStruct loc = {};
+                Structs.LocationStruct loc = {};
 
                 loc.location = city;
                 loc.country = country;

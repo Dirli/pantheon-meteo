@@ -62,6 +62,7 @@ executable (
     'src/Enums.vala',
     'src/MainWindow.vala',
     'src/Meteo.vala',
+    'src/Structs.vala',
     'src/Utils.vala',
     'src/Dialogs/About.vala',
     'src/Dialogs/Preferences.vala',
