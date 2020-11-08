@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2018 Dirli <litandrej85@gmail.com>
+* Copyright (c) 2018-2020 Dirli <litandrej85@gmail.com>
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public
@@ -23,7 +23,7 @@ namespace Meteo {
 
         construct {
             weather_icon = new Gtk.Image ();
-            temp = new Gtk.Label ("-");
+            temp = new Gtk.Label (null);
             pack_start (weather_icon, false, false, 0);
             pack_start (temp, false, false, 0);
         }
