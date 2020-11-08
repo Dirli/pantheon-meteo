@@ -17,11 +17,11 @@ Know the forecast of the next hours & days using OpenWeatherMap API (https://ope
 
 ----
 
-![Screenshot](data/screenshot3.png)
+![Screenshot](data/screenshot1.png)
 
-![Screenshot](data/screenshot1.png)  
+![Screenshot](data/screenshot2.png)  
 
-![Prefrences](data/screenshot2.png)
+![Prefrences](data/screenshot3.png)
 
 ---
 
