@@ -13,23 +13,18 @@
 */
 
 namespace Meteo.Utils {
-    public static int64 update_idplace (string uri) {
-        Soup.Session session = new Soup.Session ();
-        Soup.Message message = new Soup.Message ("GET", uri);
-        session.send_message (message);
-        int64 id = 0;
-        try {
-            var parser = new Json.Parser ();
-            parser.load_from_data ((string) message.response_body.flatten ().data, -1);
-            var root = parser.get_root ().get_object ();
-            id = root.get_int_member ("id");
-        } catch (Error e) {
-            warning (e.message);
+    public static string parse_code (uint code) {
+        switch (code) {
+            case 2:
+                return _("Check internet connection");
+            case 400:
+                return _("Data not available");
+            case 426:
+                return _("Problems with api-key");
+            default:
+                return _("Unknown problem yet");
         }
-
-        return id;
     }
-
     public static string get_icon_name (string code) {
         return code == "01d" ? "weather-clear" :
                code == "01n" ? "weather-clear-night" :

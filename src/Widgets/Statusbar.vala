@@ -35,21 +35,5 @@ namespace Meteo {
         public void add_msg (string msg) {
             new_msg.set_text (msg);
         }
-
-        public void no_connection () {
-            new_msg.set_text (_("Check internet connection"));
-        }
-
-        public void bad_account () {
-            new_msg.set_text (_("Problems with api-key"));
-        }
-
-        public void not_available () {
-            new_msg.set_text (_("Data not available"));
-        }
-
-        public void not_location () {
-            new_msg.set_text (_("No location defined"));
-        }
     }
 }

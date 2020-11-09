@@ -66,9 +66,8 @@ namespace Meteo {
 
             build_ui ();
 
-            geo_service.show_message.connect ((msg) => {
-                statusbar.add_msg (msg);
-            });
+            geo_service.show_message.connect (statusbar.add_msg);
+            con_service.show_message.connect (statusbar.add_msg);
 
             settings.bind ("auto", header, "auto-location", GLib.SettingsBindFlags.GET);
             settings.bind ("idplace", header, "idplace", GLib.SettingsBindFlags.GET);

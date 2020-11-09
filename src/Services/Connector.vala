@@ -13,7 +13,7 @@
 */
 
 namespace Meteo {
-    public class Services.Connector : GLib.Object {
+    public class Services.Connector : Services.AbstractService {
         public int64 current_update {get; set;}
         public int64 period_update {get; set;}
 
@@ -98,38 +98,43 @@ namespace Meteo {
         }
 
         private string get_forecast (string url, Enums.ForecastType type) {
-            try {
-                var session = new Soup.Session ();
-                var message = new Soup.Message ("GET", url);
+            var session = new Soup.Session ();
+            var message = new Soup.Message ("GET", url);
 
-                session.send_message (message);
+            var response_code = session.send_message (message);
+            if (response_code == 200) {
+                try {
+                    string text = (string) message.response_body.flatten ().data;
+                    parser.load_from_data (text, -1);
+                    Json.Node? node = parser.get_root ();
 
-                string text = (string) message.response_body.flatten ().data;
-                parser.load_from_data (text, -1);
-                Json.Node? node = parser.get_root ();
-
-                if (node != null) {
-                    var forecast_object = node.get_object ();
-                    if (forecast_object == null) {
-                        return "";
-                    }
-
-                    if (forecast_object.has_member ("cod")) {
-                        int cod = 0;
-                        if (type == Enums.ForecastType.PERIOD) {
-                            var cod_string = forecast_object.get_string_member ("cod");
-                            cod = int.parse (cod_string);
-                        } else if (type == Enums.ForecastType.CURRENT) {
-                            cod = (int) forecast_object.get_int_member ("cod");
+                    if (node != null) {
+                        var forecast_object = node.get_object ();
+                        if (forecast_object == null) {
+                            return "";
                         }
 
-                        if (cod == 200) {
-                            return text;
+                        if (forecast_object.has_member ("cod")) {
+                            int cod = 0;
+                            if (type == Enums.ForecastType.PERIOD) {
+                                var cod_string = forecast_object.get_string_member ("cod");
+                                cod = int.parse (cod_string);
+                            } else if (type == Enums.ForecastType.CURRENT) {
+                                cod = (int) forecast_object.get_int_member ("cod");
+                            }
+
+                            if (cod == 200) {
+                                return text;
+                            }
                         }
                     }
+                } catch (Error e) {
+                    warning (e.message);
                 }
-            } catch (Error e) {
-                warning (e.message);
+
+                show_message (_("Couldn't parse the response"));
+            } else {
+                show_message (Utils.parse_code (response_code));
             }
 
             return "";

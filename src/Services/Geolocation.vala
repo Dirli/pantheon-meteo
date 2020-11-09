@@ -86,7 +86,11 @@ namespace Meteo {
             if ("%.3f".printf (lon) != "%.3f".printf (longitude) || "%.3f".printf (lat) != "%.3f".printf (latitude)) {
                 string uri_query = "?lat=" + lat.to_string () + "&lon=" + lon.to_string () + "&APPID=" + api_key;
                 string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
-                string new_idplace = Utils.update_idplace (uri).to_string ();
+                var new_idplace = update_idplace (uri);
+
+                if (new_idplace == 0) {
+                    return;
+                }
 
                 latitude = lat;
                 longitude = lon;
@@ -95,12 +99,40 @@ namespace Meteo {
 
                 loc.location = city;
                 loc.country = country;
-                loc.idplace = new_idplace;
+                loc.idplace = new_idplace.to_string ();
 
                 new_location (loc);
             } else {
                 existing_location ();
             }
+        }
+
+        private int64 update_idplace (string uri) {
+            Soup.Session session = new Soup.Session ();
+            Soup.Message message = new Soup.Message ("GET", uri);
+
+            var response_code = session.send_message (message);
+            if (response_code == 200) {
+                try {
+                    var parser = new Json.Parser ();
+                    parser.load_from_data ((string) message.response_body.flatten ().data, -1);
+                    var root = parser.get_root ();
+                    if (root != null) {
+                        var root_object = root.get_object ();
+                        if (root_object != null) {
+                            return root_object.get_int_member_with_default ("id", 0);
+                        }
+                    }
+                } catch (Error e) {
+                    warning (e.message);
+                }
+
+                show_message (_("Couldn't parse the response"));
+            } else {
+                show_message (Utils.parse_code (response_code));
+            }
+
+            return 0;
         }
 
         private unowned void location_entry_changed () {
