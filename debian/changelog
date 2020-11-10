@@ -1,5 +1,14 @@
+pantheon-meteo (0.10.0-1) testing; urgency=medium
+
+  * improved network tracking with the indicator
+  * requests to the weather server have become more informative
+  * improved location detection (used geoclue)
+  * changed the view of the weather page
+
+ -- dirli <litandrej85@gmail.com>  Tue, 10 Nov 2020 22:10:06 +0300
+
 pantheon-meteo (0.9.0-1) unstable; urgency=medium
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release
 
  -- dirli <litandrej85@gmail.com>  Wed, 14 Aug 2019 23:04:43 +0300
