@@ -1,7 +1,7 @@
 project (
     'io.elementary.meteo',
     ['vala', 'c'],
-    version: '0.9.0'
+    version: '0.10.0'
 )
 
 gnome = import ('gnome')
@@ -38,7 +38,6 @@ common_deps = [
 ]
 
 app_deps = common_deps + [
-    #dependency ('geocode-glib-1.0'),
     dependency ('gweather-3.0'),
     dependency ('granite'),
 ]

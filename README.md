@@ -33,13 +33,12 @@ You'll need the following dependencies to build:
 * libsoup2.4-dev
 * libgranite-dev
 * libjson-glib-dev
-* libgeocode-glib-dev
 * libgeoclue-2-dev
 * libgweather-3-dev
 * meson
 * valac
 
-### How To Build
+How to build
 
     meson build --prefix=/usr
     ninja -C build
