@@ -18,6 +18,7 @@ namespace Meteo {
             Object (modal: true,
                     deletable: false,
                     resizable: false,
+                    title: _("About"),
                     destroy_with_parent: true);
 
             set_default_response (Gtk.ResponseType.CANCEL);

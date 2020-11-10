@@ -1,188 +1,239 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the network-indicator package.
+# This file is distributed under the same license as the pantheon-meteo package.
 #
 # Translators:
-# Dirli <litandrej85@gmail.com>, 2019
+# Dirli <litandrej85@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: io.elementary.meteo\n"
-"POT-Creation-Date: 2019-08-08 02:12+0300\n"
-"PO-Revision-Date: 2019-08-08 02:15+0300\n"
+"POT-Creation-Date: 2020-11-11 00:55+0300\n"
+"PO-Revision-Date: 2020-11-11 01:04+0300\n"
 "Last-Translator: Dirli <litandrej85@gmail.com>\n"
+"Language-Team: \n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 2.4.1\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 "X-Poedit-SearchPath-0: src\n"
 
-#: src/Indicator.vala:51
-msgid "Meteo Indicator"
-msgstr "Метео индикатор"
-
-#: src/Indicator.vala:52
+#: src/Dialogs/About.vala:42
 msgid ""
-"Meteo Indicator displays the current weather and forecast for several days"
-msgstr "Индикатор отображает текущую погоду и прогноз на несколько дней"
+"A weather forecast application that uses the OpenWeatherMap API designed for "
+"Pantheon DE"
+msgstr ""
+"Приложение прогноза погоды использующее API OpenWeatherMap разработанное для "
+"Pantheon DE"
 
-#: src/MainWindow.vala:122
-msgid "Last update:"
-msgstr "Последнее обновление"
+#: src/Dialogs/About.vala:47
+#, c-format
+msgid ""
+"This program is published under the terms of the %s license, it comes with "
+"ABSOLUTELY NO WARRANTY; for details, visit %s"
+msgstr ""
+"Эта программа публикуется на условиях лицензии %s, она поставляется "
+"абсолютно без каких-либо гарантий; для получения более подробной информации "
+"посетите сайт %s"
 
-#: src/Services/Location.vala:42
-msgid "Search for new location"
-msgstr "Поиск нового местоположения"
+#: src/Dialogs/About.vala:59
+msgid "Written by:"
+msgstr "Автор:"
 
-#: src/Utils/Utils.vala:103
-msgid "mph"
-msgstr "миль/час"
+#: src/Dialogs/About.vala:62
+msgid "Donate"
+msgstr "Пожертвовать"
 
-#: src/Utils/Utils.vala:107
-msgid "m/s"
-msgstr "м/c"
-
-#: src/Widgets/About.vala:21
-msgid "A forecast application with OpenWeatherMap API"
-msgstr "Приложение прогноза погоды использующее API OpenWeatherMap"
-
-#: src/Widgets/About.vala:26
-msgid "website"
-msgstr "веб-сайт"
-
-#: src/Widgets/Default.vala:19
-msgid "Weather application"
-msgstr "Погодное приложение"
-
-#: src/Widgets/Default.vala:20
-msgid "Displays the weather forecast for the selected city."
-msgstr "Отображает прогноз погоды для выбранного города."
-
-#: src/Widgets/Forecast.vala:25
-msgid "Forecast"
-msgstr "Прогноз"
-
-#: src/Widgets/Header.vala:28
-msgid "Preferences"
-msgstr "Настройки"
-
-#: src/Widgets/Header.vala:29
-msgid "About"
-msgstr "О Meteo"
-
-#: src/Widgets/Header.vala:43
-msgid "Options"
-msgstr "Опции"
-
-#: src/Widgets/Header.vala:50
-msgid "Update"
-msgstr "Обновить"
-
-#: src/Widgets/Header.vala:56
-msgid "Change location"
-msgstr "Изменить местоположение"
-
-#: src/Widgets/Popover.vala:36 src/Widgets/Today.vala:53
-msgid "Humidity"
-msgstr "Влажность"
-
-#: src/Widgets/Popover.vala:40 src/Widgets/Today.vala:48
-msgid "Pressure"
-msgstr "Давление"
-
-#: src/Widgets/Popover.vala:44 src/Widgets/Today.vala:68
-msgid "Wind"
-msgstr "Ветер"
-
-#: src/Widgets/Popover.vala:48
-msgid "Clouds"
-msgstr "Облачность"
-
-#: src/Widgets/Popover.vala:52 src/Widgets/Today.vala:81
-msgid "Sunrise"
-msgstr "Восход"
-
-#: src/Widgets/Popover.vala:56 src/Widgets/Today.vala:83
-msgid "Sunset"
-msgstr "Закат"
-
-#: src/Widgets/Popover.vala:62
-msgid "Hide indicator"
-msgstr "Скрыть индикатор"
-
-#: src/Widgets/Popover.vala:69
-msgid "Start meteo"
-msgstr "Запустить Meteo"
-
-#: src/Widgets/Preferences.vala:28
-msgid "Interface"
-msgstr "Интерфейс"
-
-#: src/Widgets/Preferences.vala:31
-msgid "General"
-msgstr "Общие"
-
-#: src/Widgets/Preferences.vala:36
-msgid "Symbolic icons"
-msgstr "Символические иконки"
-
-#: src/Widgets/Preferences.vala:42
-msgid "Update conditions every"
-msgstr "Обновлять прогноз каждые"
-
-#: src/Widgets/Preferences.vala:49
-msgid "Units"
-msgstr "Единицы измерения"
-
-#: src/Widgets/Preferences.vala:63
-msgid "Personal api key"
-msgstr "Личный api ключ"
-
-#: src/Widgets/Preferences.vala:67
-msgid "Enter personal api key"
-msgstr "Введите личный api ключ"
-
-#: src/Widgets/Preferences.vala:70
-msgid "Find my location automatically"
-msgstr "Определять местоположение автоматически"
-
-#: src/Widgets/Preferences.vala:90
-msgid "Use System Tray Indicator"
-msgstr "Использовать индикатор"
-
-#: src/Widgets/Preferences.vala:114
+#: src/Dialogs/About.vala:91 src/Dialogs/Preferences.vala:119
 msgid "Close"
 msgstr "Закрыть"
 
-#: src/Widgets/Statusbar.vala:40
+#: src/Dialogs/Preferences.vala:23 src/Widgets/Header.vala:53
+msgid "Preferences"
+msgstr "Настройки"
+
+#: src/Dialogs/Preferences.vala:30
+msgid "Interface"
+msgstr "Интерфейс"
+
+#: src/Dialogs/Preferences.vala:33
+msgid "General"
+msgstr "Общие"
+
+#: src/Dialogs/Preferences.vala:38
+msgid "Symbolic icons"
+msgstr "Символические иконки"
+
+#: src/Dialogs/Preferences.vala:44
+msgid "Update conditions every"
+msgstr "Обновлять прогноз каждые"
+
+#: src/Dialogs/Preferences.vala:51
+msgid "Units"
+msgstr "Единицы измерения"
+
+#: src/Dialogs/Preferences.vala:60
+msgid "Personal api key:"
+msgstr "Личный api ключ:"
+
+#: src/Dialogs/Preferences.vala:64
+msgid "Enter personal api key"
+msgstr "Введите личный api ключ"
+
+#: src/Dialogs/Preferences.vala:82
+msgid "Use System Tray Indicator"
+msgstr "Использовать индикатор"
+
+#: src/Dialogs/Preferences.vala:100
+msgid "Find my location automatically"
+msgstr "Определять местоположение автоматически"
+
+#: src/MainWindow.vala:180
+msgid "Last update: "
+msgstr "Последнее обновление:"
+
+#: src/Services/Connector.vala:135 src/Services/Geolocation.vala:130
+msgid "Couldn't parse the response"
+msgstr "Не удалось разобрать ответ"
+
+#: src/Services/Geolocation.vala:79
+msgid "Search for new location:"
+msgstr "Поиск нового местоположения:"
+
+#: src/Utils.vala:19
 msgid "Check internet connection"
 msgstr "Проверьте подключение к интернету"
 
-#: src/Widgets/Statusbar.vala:44
-msgid "Problems with api-key"
-msgstr "Проблемы с api-ключом"
-
-#: src/Widgets/Statusbar.vala:48
+#: src/Utils.vala:21
 msgid "Data not available"
 msgstr "Данные не доступны"
 
-#: src/Widgets/Statusbar.vala:52
-msgid "No location defined"
-msgstr "Местоположение не определено"
+#: src/Utils.vala:23
+msgid "Problems with api-key"
+msgstr "Проблемы с api-ключом"
 
-#: src/Widgets/Today.vala:26
+#: src/Utils.vala:25
+msgid "Unknown problem yet"
+msgstr "Пока неизвестная проблема"
+
+#: src/Utils.vala:146
+msgid "mph"
+msgstr "миль/час"
+
+#: src/Utils.vala:150
+msgid "m/s"
+msgstr "м/c"
+
+#: src/Views/DefaultPage.vala:18
+msgid "Weather application"
+msgstr "Погодное приложение"
+
+#: src/Views/DefaultPage.vala:19
+msgid "Displays the weather forecast for the selected city."
+msgstr "Отображает прогноз погоды для выбранного города."
+
+#: src/Views/DefaultPage.vala:23
+msgid "Auto location"
+msgstr "Автоматическое местоположения"
+
+#: src/Views/DefaultPage.vala:23
+msgid "Determine automatically location"
+msgstr "Автоматическое определение местоположения"
+
+#: src/Views/DefaultPage.vala:24
+msgid "Manual location"
+msgstr "Ручное расположение"
+
+#: src/Views/DefaultPage.vala:24
+msgid "Determine the location manually"
+msgstr "Определите местоположение вручную"
+
+#: src/Views/WeatherPage.vala:34
 msgid "Today"
 msgstr "Сейчас"
 
-#: src/Widgets/Today.vala:74
-msgid "Cloudiness"
+#: src/Views/WeatherPage.vala:54
+msgid "Pressure:"
+msgstr "Давление:"
+
+#: src/Views/WeatherPage.vala:59
+msgid "Humidity:"
+msgstr "Влажность:"
+
+#: src/Views/WeatherPage.vala:64
+msgid "Wind:"
+msgstr "Ветер:"
+
+#: src/Views/WeatherPage.vala:69
+msgid "Cloudiness:"
+msgstr "Облачность:"
+
+#: src/Widgets/Header.vala:46
+msgid "About"
+msgstr "О Meteo"
+
+#: src/Widgets/Header.vala:68
+msgid "Options"
+msgstr "Опции"
+
+#: src/Widgets/Header.vala:74
+msgid "Update"
+msgstr "Обновить"
+
+#: src/Widgets/Header.vala:80
+msgid "Change location"
+msgstr "Изменить местоположение"
+
+#: src/Widgets/Popover.vala:41
+msgid "Humidity"
+msgstr "Влажность"
+
+#: src/Widgets/Popover.vala:45
+msgid "Pressure"
+msgstr "Давление"
+
+#: src/Widgets/Popover.vala:49
+msgid "Wind"
+msgstr "Ветер"
+
+#: src/Widgets/Popover.vala:53
+msgid "Clouds"
 msgstr "Облачность"
+
+#: src/Widgets/Popover.vala:57
+msgid "Sunrise"
+msgstr "Восход"
+
+#: src/Widgets/Popover.vala:61
+msgid "Sunset"
+msgstr "Закат"
+
+#: src/Widgets/Popover.vala:67
+msgid "Hide indicator"
+msgstr "Скрыть индикатор"
+
+#: src/Widgets/Popover.vala:74
+msgid "Start meteo"
+msgstr "Запустить Meteo"
+
+#~ msgid "Meteo Indicator"
+#~ msgstr "Метео индикатор"
+
+#~ msgid ""
+#~ "Meteo Indicator displays the current weather and forecast for several days"
+#~ msgstr "Индикатор отображает текущую погоду и прогноз на несколько дней"
+
+#~ msgid "website"
+#~ msgstr "веб-сайт"
+
+#~ msgid "Forecast"
+#~ msgstr "Прогноз"
+
+#~ msgid "No location defined"
+#~ msgstr "Местоположение не определено"
 
 #~ msgid "Update conditions"
 #~ msgstr "Обновить"
-
-#~ msgid "Not determine location"
-#~ msgstr "Не определено местоположение"
