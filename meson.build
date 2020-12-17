@@ -106,4 +106,4 @@ if get_option ('indicator')
     )
 endif
 
-meson.add_install_script ('meson/post_install.py')
+meson.add_install_script ('meson_post_install.py')
