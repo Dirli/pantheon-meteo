@@ -60,7 +60,7 @@ namespace Meteo {
             sunset_item.halign = Gtk.Align.START;
             Gtk.Box sunset_box = create_box (sunset_item, create_icon ("daytime-sunset", _("Sunset")));
 
-            var separator = new Wingpanel.Widgets.Separator ();
+            var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
             separator.hexpand = true;
 
             var hide_button = new Gtk.ModelButton ();
