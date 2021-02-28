@@ -83,7 +83,7 @@ executable (
 )
 
 if get_option ('indicator')
-    wingpanel_dep = dependency ('wingpanel-2.0')
+    wingpanel_dep = dependency ('wingpanel')
 
     indicator_deps = common_deps + [
         dependency ('gio-unix-2.0'),

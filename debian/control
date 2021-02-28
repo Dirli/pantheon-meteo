@@ -9,7 +9,7 @@ Build-Depends: debhelper-compat (= 13),
                libjson-glib-dev,
                libgweather-3-dev,
                libgeoclue-2-dev,
-               libwingpanel-2.0-dev,
+               libwingpanel-dev,
                meson,
                valac
 Standards-Version: 4.5.0
