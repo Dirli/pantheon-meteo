@@ -35,6 +35,7 @@ common_deps = [
     dependency ('libsoup-2.4'),
     dependency ('json-glib-1.0'),
     meson.get_compiler ('c').find_library ('m'),
+    meson.get_compiler ('vala').find_library ('posix'),
 ]
 
 app_deps = common_deps + [
@@ -65,6 +66,8 @@ executable (
     'src/Utils.vala',
     'src/Dialogs/About.vala',
     'src/Dialogs/Preferences.vala',
+    'src/Providers/AbstractProvider.vala',
+    'src/Providers/OWMProvider.vala',
     'src/Services/AbstractService.vala',
     'src/Services/Connector.vala',
     'src/Services/Geolocation.vala',
