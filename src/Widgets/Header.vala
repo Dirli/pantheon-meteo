@@ -16,14 +16,13 @@ namespace Meteo {
     public class Widgets.Header : Gtk.HeaderBar {
         public signal void show_preferences ();
         public signal void change_location ();
+        public signal void changed_location (Structs.LocationStruct new_location);
         public signal void update_data ();
 
         private Gtk.Button loc_button;
         private Gtk.Button upd_button;
 
-        public bool auto_location {
-            get; set;
-        }
+        public bool auto_location { get; set; }
 
         public string idplace {
             set {
@@ -85,6 +84,43 @@ namespace Meteo {
             pack_start (loc_button);
             pack_end (app_button);
             pack_end (upd_button);
+        }
+
+        public void manual_detect () {
+            var location_entry = new GWeather.LocationEntry (GWeather.Location.get_world ());
+            location_entry.placeholder_text = _("Search for new location:");
+            location_entry.width_chars = 30;
+
+            location_entry.activate.connect (() => {
+                GWeather.Location? location = location_entry.get_location ();
+
+                if (location != null) {
+                    double lon;
+                    double lat;
+                    location.get_coords (out lat, out lon);
+
+                    Structs.LocationStruct new_loc = {};
+                    new_loc.country = location.get_country_name ();
+                    new_loc.city = location.get_city_name ();
+                    new_loc.latitude = lat;
+                    new_loc.longitude = lon;
+
+                    changed_location (new_loc);
+                } else {
+                    // show_message ("location could not be determined");
+                }
+
+                location_entry = null;
+            });
+
+            set_custom_title (location_entry);
+            show_all ();
+        }
+
+        public void remove_custome_title () {
+            if (get_custom_title () != null) {
+                custom_title = null;
+            }
         }
     }
 }

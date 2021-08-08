@@ -49,20 +49,11 @@ namespace Meteo {
             set_default_size (750, 400);
 
             settings = new GLib.Settings (Constants.APP_NAME);
-            settings.changed["idplace"].connect (fetch_data);
             settings.changed["auto"].connect (determine_loc);
 
             con_service = new Services.Connector ();
             geo_service = new Services.Geolocation (api_key);
-            geo_service.existing_location.connect (() => {
-                fetch_data ();
-            });
-            geo_service.new_location.connect ((loc) => {
-                Utils.clear_cache ();
-                settings.set_string ("location", loc.location);
-                settings.set_string ("country", loc.country);
-                settings.set_string ("idplace", loc.idplace);
-            });
+            geo_service.changed_location.connect (on_changed_location);
 
             build_ui ();
 
@@ -71,34 +62,25 @@ namespace Meteo {
 
             settings.bind ("auto", header, "auto-location", GLib.SettingsBindFlags.GET);
             settings.bind ("idplace", header, "idplace", GLib.SettingsBindFlags.GET);
-            settings.bind ("longitude", geo_service, "longitude", GLib.SettingsBindFlags.DEFAULT);
-            settings.bind ("latitude", geo_service, "latitude", GLib.SettingsBindFlags.DEFAULT);
             settings.bind ("symbolic", con_service, "use-symbolic", GLib.SettingsBindFlags.GET);
-            // settings.bind ("forecast-update", con_service, "period-update", GLib.SettingsBindFlags.DEFAULT);
 
             if (settings.get_boolean ("auto")) {
-                if (settings.get_string ("idplace") == "") {
-                    reset_location ();
-                }
-
-                if (!geo_service.auto_detect ()) {
-                    settings.set_boolean ("auto", false);
-                }
+                geo_service.auto_detect ();
             } else {
+                init_location ();
                 fetch_data ();
             }
         }
 
         private void build_ui () {
             header = new Widgets.Header ();
-            header.update_data.connect (() => {
-                fetch_data ();
-            });
+            header.update_data.connect (fetch_data);
+            header.changed_location.connect (on_changed_location);
+            header.change_location.connect (determine_loc);
             header.show_preferences.connect (() => {
                 var preferences = new Dialogs.Preferences (this);
                 preferences.run ();
             });
-            header.change_location.connect (determine_loc);
 
             set_titlebar (header);
 
@@ -108,13 +90,14 @@ namespace Meteo {
 
             var default_page = new Views.DefaultPage ();
             default_page.activated.connect ((index) => {
-                remove_custome_title ();
+                header.remove_custome_title ();
                 settings.set_boolean ("auto", index == 0 ? true : false);
             });
             weather_page = new Views.WeatherPage ();
 
             main_stack.add_named (default_page, "default");
             main_stack.add_named (weather_page, "weather");
+            main_stack.set_visible_child_name ("default");
 
             statusbar = new Widgets.Statusbar ();
             statusbar.mod_provider_label (settings.get_string ("personal-key").replace ("/", "") != "");
@@ -127,49 +110,61 @@ namespace Meteo {
             add (view_box);
         }
 
-        public void remove_custome_title () {
-            if (header.get_custom_title () != null) {
-                header.custom_title = null;
-            }
+        private void on_changed_location (Structs.LocationStruct loc) {
+            reset_location ();
+            Utils.clear_cache ();
+
+            settings.set_string ("city", loc.city);
+            settings.set_string ("country", loc.country);
+            settings.set_double ("latitude", loc.latitude);
+            settings.set_double ("longitude", loc.longitude);
+
+            var idplace = geo_service.determine_id (loc.longitude, loc.latitude, api_key);
+            settings.set_string ("idplace", idplace.to_string ());
+
+            init_location ();
         }
 
         private void reset_location () {
+            main_stack.set_visible_child_name ("default");
+
             settings.reset ("longitude");
             settings.reset ("latitude");
-            settings.reset ("location");
+            settings.reset ("city");
             settings.reset ("country");
+
+            settings.set_string ("idplace", "");
 
             weather_page.reset_today ();
         }
 
         private void determine_loc () {
-            reset_location ();
-
-            settings.set_string ("idplace", "");
-
             if (settings.get_boolean ("auto")) {
-                if (geo_service.auto_detect ()) {
-                    return;
-                }
+                geo_service.auto_detect ();
+            } else {
+                header.manual_detect ();
             }
+        }
 
-            geo_service.manually_detect ();
-            header.set_custom_title (geo_service.location_entry);
-            header.show_all ();
+        private void init_location () {
+            var city = settings.get_string ("city");
+            var country = settings.get_string ("country");
+
+            header.remove_custome_title ();
+            if (city == "" || country == "") {
+                header.set_title ("Meteo");
+            } else {
+                header.set_title (@"$(settings.get_string ("city")), $(settings.get_string ("country"))");
+            }
         }
 
         public void fetch_data () {
             string idplace = settings.get_string ("idplace");
             if (idplace == "") {
-                header.set_title ("Meteo");
-                main_stack.set_visible_child_name ("default");
                 return;
             }
 
             var weather_provider = con_service.get_weather_provider (api_key, settings.get_string ("idplace"));
-
-            remove_custome_title ();
-            header.set_title (settings.get_string ("location") + ", " + settings.get_string ("country"));
 
             var units = settings.get_string ("units");
 

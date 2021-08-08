@@ -11,8 +11,10 @@ namespace Meteo.Structs {
     }
 
     public struct LocationStruct {
-        public string location;
+        public string city;
         public string country;
         public string idplace;
+        public double latitude;
+        public double longitude;
     }
 }

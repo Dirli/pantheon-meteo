@@ -1,23 +1,11 @@
 namespace Meteo {
     public class Services.Geolocation : Services.AbstractService {
-        public signal void new_location (Structs.LocationStruct location_struct);
+        public signal void changed_location (Structs.LocationStruct location_struct);
         public signal void existing_location ();
 
-        public string api_key {
-            get; construct set;
-        }
-
-        public double latitude {
-            get; set;
-        }
-
-        public double longitude {
-            get; set;
-        }
-
-        public GWeather.LocationEntry? location_entry {
-            get; private set;
-        }
+        public string api_key { get; construct set; }
+        public double latitude { get; set; }
+        public double longitude { get; set; }
 
 #if GEOCLUE_EXIST
         private GClue.Simple? gclue_simple;
@@ -38,8 +26,6 @@ namespace Meteo {
                 return;
             }
 
-            location_entry = null;
-
             try {
                 gclue_simple = yield new GClue.Simple ("io.elementary.meteo", GClue.AccuracyLevel.CITY, null);
                 gclue_simple.notify["location"].connect (() => {
@@ -58,56 +44,24 @@ namespace Meteo {
             var location = GWeather.Location.get_world ();
             location = location.find_nearest_city (lat, lon);
 
-            determine_id (lon, lat, location.get_city_name (), location.get_country_name ());
+            Structs.LocationStruct loc = {};
+
+            loc.city = location.get_city_name ();
+            loc.country = location.get_country_name ();
+            loc.latitude = lat;
+            loc.longitude = lon;
+
+            changed_location (loc);
         }
 #else
             return false;
         }
 #endif
 
+        public int64 determine_id (double lon, double lat, string api_key) {
+            string uri_query = "?lat=" + lat.to_string () + "&lon=" + lon.to_string () + "&APPID=" + api_key;
+            string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
 
-        public void manually_detect () {
-            if (location_entry != null) {
-                return;
-            }
-
-#if GEOCLUE_EXIST
-            gclue_simple = null;
-#endif
-            location_entry = new GWeather.LocationEntry (GWeather.Location.get_world ());
-
-            location_entry.placeholder_text = _("Search for new location:");
-            location_entry.width_chars = 30;
-
-            location_entry.activate.connect (location_entry_changed);
-        }
-
-        private void determine_id (double lon, double lat, string city, string country) {
-            if ("%.3f".printf (lon) != "%.3f".printf (longitude) || "%.3f".printf (lat) != "%.3f".printf (latitude)) {
-                string uri_query = "?lat=" + lat.to_string () + "&lon=" + lon.to_string () + "&APPID=" + api_key;
-                string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
-                var new_idplace = update_idplace (uri);
-
-                if (new_idplace == 0) {
-                    return;
-                }
-
-                latitude = lat;
-                longitude = lon;
-
-                Structs.LocationStruct loc = {};
-
-                loc.location = city;
-                loc.country = country;
-                loc.idplace = new_idplace.to_string ();
-
-                new_location (loc);
-            } else {
-                existing_location ();
-            }
-        }
-
-        private int64 update_idplace (string uri) {
             Soup.Session session = new Soup.Session ();
             Soup.Message message = new Soup.Message ("GET", uri);
 
@@ -133,23 +87,6 @@ namespace Meteo {
             }
 
             return 0;
-        }
-
-        private unowned void location_entry_changed () {
-            location_entry.activate.disconnect (location_entry_changed);
-            GWeather.Location? location = location_entry.get_location ();
-
-            if (location != null) {
-                double lon;
-                double lat;
-                location.get_coords (out lat, out lon);
-
-                determine_id (lon, lat, location.get_city_name (), location.get_country_name ());
-            } else {
-                show_message ("location could not be determined");
-            }
-
-            location_entry = null;
         }
     }
 }
