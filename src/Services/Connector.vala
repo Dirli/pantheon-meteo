@@ -18,10 +18,17 @@ namespace Meteo {
 
         public Connector () {}
 
-        public Providers.AbstractProvider? get_weather_provider (string api, string id) {
-            var provider = new Providers.OWMProvider (api, id, use_symbolic);
+        public Providers.AbstractProvider? get_weather_provider (Enums.Provider provider_type, Structs.LocationStruct loc, string api) {
+            if (provider_type == Enums.Provider.OWM) {
+                if (api == "" || loc.idplace == "") {
+                    return null;
+                }
+                return new Providers.OWMProvider (api, loc.idplace, use_symbolic);
 
-            return provider;
+            }
+
+
+            return null;
         }
 
 

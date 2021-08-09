@@ -119,10 +119,13 @@ namespace Meteo {
             settings.set_double ("latitude", loc.latitude);
             settings.set_double ("longitude", loc.longitude);
 
-            var idplace = geo_service.determine_id (loc.longitude, loc.latitude, api_key);
-            settings.set_string ("idplace", idplace.to_string ());
+            if (settings.get_enum ("provider") == Enums.Provider.OWM) {
+                var idplace = geo_service.determine_id (loc.longitude, loc.latitude, api_key);
+                settings.set_string ("idplace", idplace.to_string ());
+            }
 
             init_location ();
+            fetch_data ();
         }
 
         private void reset_location () {
@@ -158,13 +161,26 @@ namespace Meteo {
             }
         }
 
+        private Structs.LocationStruct get_location () {
+            Structs.LocationStruct location = {};
+
+            location.city = settings.get_string ("city");
+            location.country = settings.get_string ("country");
+            location.latitude = settings.get_double ("latitude");
+            location.longitude = settings.get_double ("longitude");
+            location.idplace = settings.get_string ("idplace");
+
+            return location;
+        }
+
         public void fetch_data () {
-            string idplace = settings.get_string ("idplace");
-            if (idplace == "") {
+            var weather_provider = con_service.get_weather_provider ((Enums.Provider) settings.get_enum ("provider"),
+                                                                     get_location (),
+                                                                     api_key);
+
+            if (weather_provider == null) {
                 return;
             }
-
-            var weather_provider = con_service.get_weather_provider (api_key, settings.get_string ("idplace"));
 
             var units = settings.get_string ("units");
 

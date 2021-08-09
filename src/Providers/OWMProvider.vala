@@ -77,7 +77,6 @@ namespace Meteo {
             return weather_struct;
         }
 
-
         public override Gee.ArrayList<Structs.WeatherStruct?> get_long_forecast (string units) {
             query_type = Enums.ForecastType.PERIOD;
 
@@ -110,13 +109,12 @@ namespace Meteo {
         private bool update_mtime (string cache_path) {
             try {
                 var cache_file = GLib.File.new_for_path (cache_path);
-                var info = cache_file.query_info (GLib.FileAttribute.TIME_MODIFIED, GLib.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
-                var mtime = (int64) info.get_attribute_uint64 (GLib.FileAttribute.TIME_MODIFIED);
+                if (!cache_file.query_exists ()) {
+                    return false;
+                }
 
-                // var stat = Posix.Stat (cache_path);
-                var mod_dt = new GLib.DateTime.from_unix_local (mtime);
-                warning ("Modified time: " + mod_dt.format ("%R"));
-                update_time = mtime;
+                var info = cache_file.query_info (GLib.FileAttribute.TIME_MODIFIED, GLib.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
+                update_time = (int64) info.get_attribute_uint64 (GLib.FileAttribute.TIME_MODIFIED);
             } catch (Error e) {
                 warning (e.message);
                 return false;
@@ -141,7 +139,6 @@ namespace Meteo {
                 if (!update_mtime (cache_json) || need_update ()) {
                     string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
                     var url_query = @"$(query_type == Enums.ForecastType.CURRENT ? "weather" : "forecast")?id=$(id_place)&APPID=$(api_key)&units=$(units)&lang=$(lang)";
-                    warning (@"uri query $(url_query)");
 
                     var url = Constants.OWM_API_ADDR + url_query;
                     text = fetch_forecast (url);

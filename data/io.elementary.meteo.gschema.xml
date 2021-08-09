@@ -1,4 +1,8 @@
 <schemalist>
+    <enum id="io.elementary.meteo.providers">
+        <value value="0" nick="owm"/>
+    </enum>
+
     <schema id="io.elementary.meteo" path="/io/elementary/meteo/">
         <key name="auto" type="b">
             <default>false</default>
@@ -30,23 +34,17 @@
             <description>Longitude</description>
         </key>
 
+        <key enum="io.elementary.meteo.providers" name="provider">
+            <default>'owm'</default>
+            <summary>Selected weather forecast provider</summary>
+            <description>Selected weather forecast provider</description>
+        </key>
+
         <key name="idplace" type="s">
             <default>""</default>
             <summary>City ID</summary>
             <description>City ID from OpenWeatherMap</description>
         </key>
-
-        <!-- <key name="current-update" type="x">
-            <default>0</default>
-            <summary>Last Update Timestamp</summary>
-            <description>Timestamp for last update</description>
-        </key> -->
-
-        <!-- <key name="forecast-update" type="x">
-            <default>0</default>
-            <summary>Last Update Timestamp</summary>
-            <description>Timestamp for last update</description>
-        </key> -->
 
         <key name="indicator" type="b">
             <default>false</default>
