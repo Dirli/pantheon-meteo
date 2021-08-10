@@ -1,17 +1,12 @@
 namespace Meteo {
     public class Providers.OWMProvider : Providers.AbstractProvider {
+        private string units;
         public bool use_symbolic { get; construct set; }
 
         public string id_place {get; construct set;}
         public string api_key {get; construct set;}
 
         public int64 update_time = 0;
-
-        private uint response_code;
-
-        private Enums.ForecastType query_type = Enums.ForecastType.CURRENT;
-
-        private GLib.DateTime now_dt = new DateTime.now_local ();
 
         private Json.Parser parser;
 
@@ -21,14 +16,29 @@ namespace Meteo {
                     use_symbolic: s);
         }
 
-        public override Structs.WeatherStruct? get_today_forecast (string units) {
-            query_type = Enums.ForecastType.CURRENT;
+        public override void update_forecast (bool advanced, string u) {
+            units = u;
+            get_forecast (Enums.ForecastType.CURRENT);
 
-            var json_object = get_forecast (units);
-            if (json_object == null) {
-                return null;
+            if (advanced) {
+                get_forecast (Enums.ForecastType.PERIOD);
             }
+        }
 
+        private void parse_json_response (Json.Node? node, Enums.ForecastType query_type) {
+            if (node != null) {
+                var json_object = node.get_object ();
+                if (json_object != null) {
+                    if (query_type == Enums.ForecastType.CURRENT) {
+                        parse_today_forecast (json_object);
+                    } else {
+                        parse_long_forecast (json_object);
+                    }
+                }
+            }
+        }
+
+        private void parse_today_forecast (Json.Object json_object) {
             var sys = json_object.get_object_member ("sys");
             if (sys != null) {
                 sunrise = sys.get_int_member ("sunrise");
@@ -37,7 +47,7 @@ namespace Meteo {
 
             var main_data = json_object.get_object_member ("main");
             if (main_data == null) {
-                return null;
+                return;
             }
 
             Structs.WeatherStruct weather_struct = {};
@@ -60,50 +70,48 @@ namespace Meteo {
 
             Json.Object wind = json_object.get_object_member ("wind");
             double? wind_speed = null;
-            if (wind.has_member ("speed")) {
-                wind_speed = wind.get_double_member ("speed");
-            }
-
             double? wind_deg = null;
-            if (wind.has_member ("deg")) {
-                wind_deg = wind.get_double_member ("deg");
-            }
+            if (wind != null) {
+                if (wind.has_member ("speed")) {
+                    wind_speed = wind.get_double_member ("speed");
+                }
 
+                if (wind.has_member ("deg")) {
+                    wind_deg = wind.get_double_member ("deg");
+                }
+            }
             weather_struct.wind = Utils.wind_format (units, wind_speed, wind_deg);
 
             var clouds = json_object.get_object_member ("clouds");
-            weather_struct.clouds = "%d %%".printf ((int) clouds.get_int_member ("all"));
-
-            return weather_struct;
-        }
-
-        public override Gee.ArrayList<Structs.WeatherStruct?> get_long_forecast (string units) {
-            query_type = Enums.ForecastType.PERIOD;
-
-            var struct_array = new Gee.ArrayList<Structs.WeatherStruct?> ();
-
-            var json_object = get_forecast (units);
-            if (json_object != null) {
-                Json.Array forecast_list = json_object.get_array_member ("list");
-                forecast_list.foreach_element ((json_array, i, element_node) => {
-                    var el_object = element_node.get_object ();
-                    if (el_object != null) {
-                        Structs.WeatherStruct weather_struct = {};
-                        weather_struct.date = el_object.get_int_member ("dt");
-                        weather_struct.temp = Utils.temp_format (units, el_object.get_object_member ("main").get_double_member ("temp"));
-
-                        var icon_name = Utils.get_icon_name (el_object.get_array_member ("weather").get_object_element (0).get_string_member ("icon"));
-                        if (use_symbolic) {
-                            icon_name += "-symbolic";
-                        }
-                        weather_struct.icon_name = icon_name;
-
-                        struct_array.add (weather_struct);
-                    }
-                });
+            if (clouds != null) {
+                weather_struct.clouds = "%d %%".printf ((int) clouds.get_int_member ("all"));
             }
 
-            return struct_array;
+            updated_today (weather_struct);
+        }
+
+        private void parse_long_forecast (Json.Object json_object) {
+            var struct_array = new Gee.ArrayList<Structs.WeatherStruct?> ();
+
+            Json.Array forecast_list = json_object.get_array_member ("list");
+            forecast_list.foreach_element ((json_array, i, element_node) => {
+                var el_object = element_node.get_object ();
+                if (el_object != null) {
+                    Structs.WeatherStruct weather_struct = {};
+                    weather_struct.date = el_object.get_int_member ("dt");
+                    weather_struct.temp = Utils.temp_format (units, el_object.get_object_member ("main").get_double_member ("temp"));
+
+                    var icon_name = Utils.get_icon_name (el_object.get_array_member ("weather").get_object_element (0).get_string_member ("icon"));
+                    if (use_symbolic) {
+                        icon_name += "-symbolic";
+                    }
+                    weather_struct.icon_name = icon_name;
+
+                    struct_array.add (weather_struct);
+                }
+            });
+
+            updated_long (struct_array);
         }
 
         private bool update_mtime (string cache_path) {
@@ -123,50 +131,12 @@ namespace Meteo {
             return true;
         }
 
-        public Json.Object? get_forecast (string units) {
-            now_dt = new DateTime.now_local();
-            try {
-                var cache_json = GLib.Path.build_path (GLib.Path.DIR_SEPARATOR_S,
-                                                       GLib.Environment.get_user_cache_dir (),
-                                                       Constants.APP_NAME,
-                                                       @"$(query_type == Enums.ForecastType.CURRENT ? "current" : "forecast").json");
-
-                parser = new Json.Parser ();
-
-
-
-                string text = "";
-                if (!update_mtime (cache_json) || need_update ()) {
-                    string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
-                    var url_query = @"$(query_type == Enums.ForecastType.CURRENT ? "weather" : "forecast")?id=$(id_place)&APPID=$(api_key)&units=$(units)&lang=$(lang)";
-
-                    var url = Constants.OWM_API_ADDR + url_query;
-                    text = fetch_forecast (url);
-                    if (text == "") {
-                        return null;
-                    }
-
-                    update_time = 0;
-                    Utils.save_cache (cache_json, text);
-                } else {
-                    parser.load_from_file (cache_json);
-                }
-
-                Json.Node? node = parser.get_root ();
-                if (node != null) {
-                    return node.get_object ();
-                }
-            } catch (Error e) {
-                warning (e.message);
-            }
-
-            return null;
-        }
-
-        private bool need_update () {
+        private bool need_update (Enums.ForecastType query_type) {
             if (update_time == 0) {
                 return true;
             }
+
+            var now_dt = new DateTime.now_local ();
 
             var last_update = new GLib.DateTime.from_unix_local (update_time);
             if (last_update.get_day_of_year () != now_dt.get_day_of_year ()) {
@@ -191,47 +161,54 @@ namespace Meteo {
             return false;
         }
 
-        private string fetch_forecast (string url) {
+        private void get_forecast (Enums.ForecastType query_type) {
+            try {
+                var cache_json = GLib.Path.build_path (GLib.Path.DIR_SEPARATOR_S,
+                                                       GLib.Environment.get_user_cache_dir (),
+                                                       Constants.APP_NAME,
+                                                       @"$(query_type == Enums.ForecastType.CURRENT ? "current" : "forecast").json");
+
+                parser = new Json.Parser ();
+                if (!update_mtime (cache_json) || need_update (query_type)) {
+                    string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
+                    var url_query = @"$(query_type == Enums.ForecastType.CURRENT ? "weather" : "forecast")?id=$(id_place)&APPID=$(api_key)&units=$(units)&lang=$(lang)";
+
+                    update_time = 0;
+                    var url = Constants.OWM_API_ADDR + url_query;
+                    fetch_forecast (url, query_type, cache_json);
+                } else {
+                    parser.load_from_file (cache_json);
+                    parse_json_response (parser.get_root (), query_type);
+                }
+            } catch (Error e) {
+                warning (e.message);
+            }
+        }
+
+        private void fetch_forecast (string url, Enums.ForecastType query_type, string cache_path) {
             var session = new Soup.Session ();
             var message = new Soup.Message ("GET", url);
 
-            var r_code = session.send_message (message);
-            if (r_code == 200) {
+            session.queue_message (message, (sess, mess) => {
+                if (mess.status_code != 200) {
+                    //
+                    return;
+                }
+
                 try {
-                    string text = (string) message.response_body.flatten ().data;
-                    parser.load_from_data (text, -1);
-                    Json.Node? node = parser.get_root ();
-
-                    if (node != null) {
-                        var forecast_object = node.get_object ();
-                        if (forecast_object == null) {
-                            return "";
-                        }
-
-                        if (forecast_object.has_member ("cod")) {
-                            int cod = 0;
-                            if (query_type == Enums.ForecastType.PERIOD) {
-                                var cod_string = forecast_object.get_string_member ("cod");
-                                cod = int.parse (cod_string);
-                            } else if (query_type == Enums.ForecastType.CURRENT) {
-                                cod = (int) forecast_object.get_int_member ("cod");
-                            }
-
-                            if (cod == 200) {
-                                return text;
-                            }
-                        }
+                    string text = (string) mess.response_body.flatten ().data;
+                    if (text == "") {
+                        return;
                     }
+
+                    parser.load_from_data (text, -1);
+                    Utils.save_cache (cache_path, text);
                 } catch (Error e) {
                     warning (e.message);
                 }
 
-                // show_message (_("Couldn't parse the response"));
-            } else {
-                response_code = r_code;
-            }
-
-            return "";
+                parse_json_response (parser.get_root (), query_type);
+            });
         }
     }
 }

@@ -20,17 +20,12 @@ namespace Meteo {
 
         public Providers.AbstractProvider? get_weather_provider (Enums.Provider provider_type, Structs.LocationStruct loc, string api) {
             if (provider_type == Enums.Provider.OWM) {
-                if (api == "" || loc.idplace == "") {
-                    return null;
+                if (api != "" && loc.idplace != "") {
+                    return new Providers.OWMProvider (api, loc.idplace, use_symbolic);
                 }
-                return new Providers.OWMProvider (api, loc.idplace, use_symbolic);
-
             }
-
 
             return null;
         }
-
-
     }
 }

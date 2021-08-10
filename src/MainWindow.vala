@@ -24,6 +24,7 @@ namespace Meteo {
 
         private Services.Geolocation geo_service;
         private Services.Connector con_service;
+        private Providers.AbstractProvider? weather_provider;
 
         public string api_key {
             owned get {
@@ -49,7 +50,6 @@ namespace Meteo {
             set_default_size (750, 400);
 
             settings = new GLib.Settings (Constants.APP_NAME);
-            settings.changed["auto"].connect (determine_loc);
 
             con_service = new Services.Connector ();
             geo_service = new Services.Geolocation (api_key);
@@ -57,12 +57,17 @@ namespace Meteo {
 
             build_ui ();
 
-            geo_service.show_message.connect (statusbar.add_msg);
-            // con_service.show_message.connect (statusbar.add_msg);
-
             settings.bind ("auto", header, "auto-location", GLib.SettingsBindFlags.GET);
             settings.bind ("idplace", header, "idplace", GLib.SettingsBindFlags.GET);
             settings.bind ("symbolic", con_service, "use-symbolic", GLib.SettingsBindFlags.GET);
+
+            on_changed_provider ();
+
+            settings.changed["auto"].connect (determine_loc);
+            settings.changed["provider"].connect (on_changed_provider);
+
+            geo_service.show_message.connect (statusbar.add_msg);
+            // con_service.show_message.connect (statusbar.add_msg);
 
             if (settings.get_boolean ("auto")) {
                 geo_service.auto_detect ();
@@ -108,6 +113,20 @@ namespace Meteo {
             view_box.show_all ();
 
             add (view_box);
+        }
+
+        private void on_changed_provider () {
+            weather_provider = null;
+
+            weather_provider = con_service.get_weather_provider ((Enums.Provider) settings.get_enum ("provider"),
+                                                                 get_location (),
+                                                                 api_key);
+
+            if (weather_provider != null) {
+                weather_provider.updated_today.connect (fill_today);
+                weather_provider.updated_long.connect (fill_forecast);
+                weather_provider.show_message.connect (statusbar.add_msg);
+            }
         }
 
         private void on_changed_location (Structs.LocationStruct loc) {
@@ -174,34 +193,27 @@ namespace Meteo {
         }
 
         public void fetch_data () {
-            var weather_provider = con_service.get_weather_provider ((Enums.Provider) settings.get_enum ("provider"),
-                                                                     get_location (),
-                                                                     api_key);
-
             if (weather_provider == null) {
                 return;
             }
 
-            var units = settings.get_string ("units");
+            weather_provider.update_forecast (true, settings.get_string ("units"));
+        }
 
-            var today_weather = weather_provider.get_today_forecast (units);
-            if (today_weather != null) {
-                GLib.DateTime upd_dt = new GLib.DateTime.from_unix_local (today_weather.date);
-                statusbar.add_msg (_("Last update: ") + upd_dt.format ("%a, %e  %b %R"));
+        private void fill_today (Structs.WeatherStruct today_weather) {
+            GLib.DateTime upd_dt = new GLib.DateTime.from_unix_local (today_weather.date);
+            statusbar.add_msg (_("Last update: ") + upd_dt.format ("%a, %e  %b %R"));
 
-                weather_page.set_sun_state (weather_provider.sunrise, weather_provider.sunset);
-                weather_page.update_today (today_weather);
-            }
-
-            var forecast_array = weather_provider.get_long_forecast (units);
-            if (forecast_array.size > 0) {
-                fill_forecast (forecast_array);
-            }
-
+            weather_page.set_sun_state (weather_provider.sunrise, weather_provider.sunset);
+            weather_page.update_today (today_weather);
             main_stack.set_visible_child_name ("weather");
         }
 
         private void fill_forecast (Gee.ArrayList<Structs.WeatherStruct?> struct_list) {
+            if (struct_list.size == 0) {
+                return;
+            }
+
             weather_page.clear_forecast ();
 
             int periods = Utils.get_forecast_periods (struct_list.@get (0).date);
