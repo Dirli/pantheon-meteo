@@ -8,208 +8,208 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.elementary.meteo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-11 00:54+0300\n"
+"POT-Creation-Date: 2021-08-17 01:52+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.1\n"
+"X-Generator: Poedit 2.4.2\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 "X-Poedit-SearchPath-0: src\n"
 
-#: src/Dialogs/About.vala:42
+#: src/Dialogs/About.vala:25 src/Widgets/Header.vala:49
+msgid "About"
+msgstr ""
+
+#: src/Dialogs/About.vala:47
 msgid ""
 "A weather forecast application that uses the OpenWeatherMap API designed "
 "for Pantheon DE"
 msgstr ""
 
-#: src/Dialogs/About.vala:47
+#: src/Dialogs/About.vala:52
 #, c-format
 msgid ""
 "This program is published under the terms of the %s license, it comes "
 "with ABSOLUTELY NO WARRANTY; for details, visit %s"
 msgstr ""
 
-#: src/Dialogs/About.vala:59
+#: src/Dialogs/About.vala:64
 msgid "Written by:"
 msgstr ""
 
-#: src/Dialogs/About.vala:62
+#: src/Dialogs/About.vala:67
 msgid "Donate"
 msgstr ""
 
-#: src/Dialogs/About.vala:91 src/Dialogs/Preferences.vala:119
+#: src/Dialogs/About.vala:96 src/Dialogs/Preferences.vala:123
 msgid "Close"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:23 src/Widgets/Header.vala:53
+#: src/Dialogs/Preferences.vala:27 src/Widgets/Header.vala:56
 msgid "Preferences"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:30
+#: src/Dialogs/Preferences.vala:34
 msgid "Interface"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:33
+#: src/Dialogs/Preferences.vala:37
 msgid "General"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:38
+#: src/Dialogs/Preferences.vala:42
 msgid "Symbolic icons"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:44
+#: src/Dialogs/Preferences.vala:48
 msgid "Update conditions every"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:51
+#: src/Dialogs/Preferences.vala:55
 msgid "Units"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:60
+#: src/Dialogs/Preferences.vala:64
 msgid "Personal api key:"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:64
+#: src/Dialogs/Preferences.vala:68
 msgid "Enter personal api key"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:82
+#: src/Dialogs/Preferences.vala:86
 msgid "Use System Tray Indicator"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:100
+#: src/Dialogs/Preferences.vala:104
 msgid "Find my location automatically"
 msgstr ""
 
-#: src/MainWindow.vala:180
+#: src/MainWindow.vala:209
 msgid "Last update: "
 msgstr ""
 
-#: src/Services/Connector.vala:135 src/Services/Geolocation.vala:130
+#: src/Services/Geolocation.vala:102
 msgid "Couldn't parse the response"
 msgstr ""
 
-#: src/Services/Geolocation.vala:79
-msgid "Search for new location:"
-msgstr ""
-
-#: src/Utils.vala:19
+#: src/Utils.vala:23
 msgid "Check internet connection"
 msgstr ""
 
-#: src/Utils.vala:21
+#: src/Utils.vala:25
 msgid "Data not available"
 msgstr ""
 
-#: src/Utils.vala:23
+#: src/Utils.vala:27
 msgid "Problems with api-key"
 msgstr ""
 
-#: src/Utils.vala:25
+#: src/Utils.vala:29
 msgid "Unknown problem yet"
 msgstr ""
 
-#: src/Utils.vala:146
+#: src/Utils.vala:129
 msgid "mph"
 msgstr ""
 
-#: src/Utils.vala:150
+#: src/Utils.vala:133
 msgid "m/s"
 msgstr ""
 
-#: src/Views/DefaultPage.vala:18
+#: src/Views/DefaultPage.vala:22
 msgid "Weather application"
 msgstr ""
 
-#: src/Views/DefaultPage.vala:19
+#: src/Views/DefaultPage.vala:23
 msgid "Displays the weather forecast for the selected city."
 msgstr ""
 
-#: src/Views/DefaultPage.vala:23
+#: src/Views/DefaultPage.vala:27
 msgid "Auto location"
 msgstr ""
 
-#: src/Views/DefaultPage.vala:23
+#: src/Views/DefaultPage.vala:27
 msgid "Determine automatically location"
 msgstr ""
 
-#: src/Views/DefaultPage.vala:24
+#: src/Views/DefaultPage.vala:28
 msgid "Manual location"
 msgstr ""
 
-#: src/Views/DefaultPage.vala:24
+#: src/Views/DefaultPage.vala:28
 msgid "Determine the location manually"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:34
+#: src/Views/WeatherPage.vala:52
 msgid "Today"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:54
+#: src/Views/WeatherPage.vala:72
 msgid "Pressure:"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:59
+#: src/Views/WeatherPage.vala:77
 msgid "Humidity:"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:64
+#: src/Views/WeatherPage.vala:82
 msgid "Wind:"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:69
+#: src/Views/WeatherPage.vala:87
 msgid "Cloudiness:"
 msgstr ""
 
-#: src/Widgets/Header.vala:46
-msgid "About"
-msgstr ""
-
-#: src/Widgets/Header.vala:68
+#: src/Widgets/Header.vala:71
 msgid "Options"
 msgstr ""
 
-#: src/Widgets/Header.vala:74
+#: src/Widgets/Header.vala:77
 msgid "Update"
 msgstr ""
 
-#: src/Widgets/Header.vala:80
+#: src/Widgets/Header.vala:83
 msgid "Change location"
 msgstr ""
 
-#: src/Widgets/Popover.vala:41
-msgid "Humidity"
+#: src/Widgets/Header.vala:95
+msgid "Search for new location:"
 msgstr ""
 
 #: src/Widgets/Popover.vala:45
-msgid "Pressure"
+msgid "Humidity"
 msgstr ""
 
 #: src/Widgets/Popover.vala:49
-msgid "Wind"
+msgid "Pressure"
 msgstr ""
 
 #: src/Widgets/Popover.vala:53
-msgid "Clouds"
+msgid "Wind"
 msgstr ""
 
 #: src/Widgets/Popover.vala:57
-msgid "Sunrise"
+msgid "Clouds"
 msgstr ""
 
 #: src/Widgets/Popover.vala:61
+msgid "Sunrise"
+msgstr ""
+
+#: src/Widgets/Popover.vala:65
 msgid "Sunset"
 msgstr ""
 
-#: src/Widgets/Popover.vala:67
+#: src/Widgets/Popover.vala:71
 msgid "Hide indicator"
 msgstr ""
 
-#: src/Widgets/Popover.vala:74
+#: src/Widgets/Popover.vala:78
 msgid "Start meteo"
 msgstr ""
