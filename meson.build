@@ -67,6 +67,7 @@ executable (
     'src/Dialogs/About.vala',
     'src/Dialogs/Preferences.vala',
     'src/Providers/AbstractProvider.vala',
+    'src/Providers/GWeatherProvider.vala',
     'src/Providers/OWMProvider.vala',
     'src/Services/AbstractService.vala',
     'src/Services/Connector.vala',

@@ -118,7 +118,7 @@ namespace Meteo {
         private void on_changed_provider () {
             weather_provider = null;
 
-            weather_provider = con_service.get_weather_provider ((Enums.Provider) settings.get_enum ("provider"),
+            weather_provider = con_service.get_weather_provider ((Enums.ForecastProvider) settings.get_enum ("provider"),
                                                                  get_location (),
                                                                  api_key);
 
@@ -138,7 +138,7 @@ namespace Meteo {
             settings.set_double ("latitude", loc.latitude);
             settings.set_double ("longitude", loc.longitude);
 
-            if (settings.get_enum ("provider") == Enums.Provider.OWM) {
+            if (settings.get_enum ("provider") == Enums.ForecastProvider.OWM) {
                 var idplace = geo_service.determine_id (loc.longitude, loc.latitude, api_key);
                 settings.set_string ("idplace", idplace.to_string ());
             }

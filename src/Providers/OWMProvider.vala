@@ -66,7 +66,7 @@ namespace Meteo {
 
             weather_struct.temp = Utils.temp_format (units, main_data.get_double_member ("temp"));
             weather_struct.pressure = Utils.pressure_format ((int) main_data.get_int_member ("pressure"));
-            weather_struct.humidity = "%d %%".printf ((int) main_data.get_int_member ("humidity"));
+            weather_struct.humidity = "%d%%".printf ((int) main_data.get_int_member ("humidity"));
 
             Json.Object wind = json_object.get_object_member ("wind");
             double? wind_speed = null;

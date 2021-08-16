@@ -3,7 +3,8 @@ namespace Meteo.Enums {
         CURRENT,
         PERIOD,
     }
-    public enum Provider {
+    public enum ForecastProvider {
+        GWEATHER,
         OWM,
     }
 }

@@ -90,7 +90,7 @@ namespace Meteo.Utils {
         if (temp2 != null) {
             tempformat += "...%.0f".printf(temp2);
         }
-        tempformat += "\u00B0";
+        tempformat += " \u00B0";
         switch (units) {
             case "imperial":
                 tempformat += "F";

@@ -18,8 +18,10 @@ namespace Meteo {
 
         public Connector () {}
 
-        public Providers.AbstractProvider? get_weather_provider (Enums.Provider provider_type, Structs.LocationStruct loc, string api) {
-            if (provider_type == Enums.Provider.OWM) {
+        public Providers.AbstractProvider? get_weather_provider (Enums.ForecastProvider provider_type, Structs.LocationStruct loc, string api) {
+            if (provider_type == Enums.ForecastProvider.GWEATHER) {
+                return new Providers.GWeatherProvider (loc.city, loc.latitude, loc.longitude);
+            } else if (provider_type == Enums.ForecastProvider.OWM) {
                 if (api != "" && loc.idplace != "") {
                     return new Providers.OWMProvider (api, loc.idplace, use_symbolic);
                 }

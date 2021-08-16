@@ -1,6 +1,7 @@
 <schemalist>
     <enum id="io.elementary.meteo.providers">
-        <value value="0" nick="owm"/>
+        <value value="0" nick="gweather"/>
+        <value value="1" nick="owm"/>
     </enum>
 
     <schema id="io.elementary.meteo" path="/io/elementary/meteo/">
@@ -35,7 +36,7 @@
         </key>
 
         <key enum="io.elementary.meteo.providers" name="provider">
-            <default>'owm'</default>
+            <default>'gweather'</default>
             <summary>Selected weather forecast provider</summary>
             <description>Selected weather forecast provider</description>
         </key>
