@@ -210,38 +210,15 @@ namespace Meteo {
         }
 
         private void fill_forecast (Gee.ArrayList<Structs.WeatherStruct?> struct_list) {
-            if (struct_list.size == 0) {
-                return;
-            }
-
             weather_page.clear_forecast ();
 
-            int periods = Utils.get_forecast_periods (struct_list.@get (0).date);
-            int days_count = (int) GLib.Math.round (struct_list.size / 8.0);
-            days_count = days_count < 5 ? days_count : periods == 0 ? 5 : 6;
+            struct_list.@foreach ((weather_iter) => {
+                weather_page.add_forecast_time (new GLib.DateTime.from_unix_local (weather_iter.date),
+                                                weather_iter.icon_name,
+                                                weather_iter.temp);
 
-            int elem_index;
-            GLib.DateTime date;
-
-            for (int day_index = 0; day_index < days_count; day_index++) {
-                for (int time_index = 0; time_index < 8; time_index++) {
-                    elem_index = Utils.get_time_index (periods, day_index, time_index);
-
-                    var weather_struct = struct_list.@get (elem_index);
-                    date = new GLib.DateTime.from_unix_local (weather_struct.date);
-
-                    if (time_index == 0) {
-                        weather_page.add_day_label (date, day_index);
-                    }
-
-                    if (!weather_page.add_forecast_time (day_index, date, weather_struct.icon_name, weather_struct.temp)) {
-                        break;
-                    }
-
-                    if (day_index == 0 && periods != 0 && periods == (time_index + 1) ) {break;}
-                    if ((day_index + 1) == days_count && periods != 0 && (8 - periods) == time_index + 1 ) {break;}
-                }
-            }
+                return true;
+            });
 
             weather_page.show_all ();
         }

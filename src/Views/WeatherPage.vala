@@ -130,19 +130,21 @@ namespace Meteo {
             weather_main.label = weather_struct.description;
         }
 
-        public void add_day_label (GLib.DateTime date, int day_index) {
+        private Gtk.Widget add_day_label (GLib.DateTime date) {
             var forecast_day = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             forecast_day.halign = Gtk.Align.CENTER;
-            forecast_stack.add_titled (forecast_day, @"$day_index", date.format ("%a, %d %b"));
+            forecast_stack.add_titled (forecast_day, @"$(date.get_day_of_year ())", date.format ("%a, %d %b"));
+
+            return forecast_day;
         }
 
-        public bool add_forecast_time (int day_index, GLib.DateTime forecast_time, string icon_name, string forecast_temp) {
-            var forecast_day = forecast_stack.get_child_by_name (@"$day_index");
+        public void add_forecast_time (GLib.DateTime forecast_time, string icon_name, string forecast_temp) {
+            var forecast_day = forecast_stack.get_child_by_name (@"$(forecast_time.get_day_of_year ())");
             if (forecast_day == null) {
-                return false;
+                forecast_day = add_day_label (forecast_time);
             }
 
-            if (!sunrise_added && sunrise_time.get_day_of_year () == forecast_time.get_day_of_year ()) {
+            if (!sunrise_added && sunrise_time != null && sunrise_time.get_day_of_year () == forecast_time.get_day_of_year ()) {
                 if (forecast_time.get_hour () > sunrise_time.get_hour () && (forecast_time.get_hour () - 3) <= sunrise_time.get_hour ()) {
                     sunrise_added = true;
 
@@ -154,7 +156,7 @@ namespace Meteo {
                 }
             }
 
-            if (!sunset_added && sunset_time.get_day_of_year () == forecast_time.get_day_of_year ()) {
+            if (!sunset_added && sunset_time != null && sunset_time.get_day_of_year () == forecast_time.get_day_of_year ()) {
                 if (forecast_time.get_hour () > sunset_time.get_hour () && (forecast_time.get_hour () - 3) <= sunset_time.get_hour ()) {
                     sunset_added = true;
 
@@ -175,8 +177,6 @@ namespace Meteo {
             hour_box.add (new Gtk.Label (forecast_temp));
 
             ((Gtk.Box) forecast_day).add (hour_box);
-
-            return true;
         }
     }
 }
