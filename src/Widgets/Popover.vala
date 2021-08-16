@@ -99,20 +99,21 @@ namespace Meteo {
             attach (app_button,   0, 9, 1, 1);
         }
 
-        public void update_state (string city_name,
-                                  string humidity_str,
-                                  string pressure_str,
-                                  string wind_str,
-                                  string cloud_str,
-                                  string sunrise_str,
-                                  string sunset_str) {
+        public void update_state (string city_name, Structs.WeatherStruct w, int64 sunrise, int64 sunset) {
             city_item.label = city_name;
-            humidity_item.label = humidity_str;
-            pressure_item.label = pressure_str;
-            wind_item.label = wind_str;
-            cloud_item.label = cloud_str;
-            sunrise_item.label = sunrise_str;
-            sunset_item.label = sunset_str;
+
+            humidity_item.label = w.humidity;
+            pressure_item.label = w.pressure;
+            wind_item.label = w.wind;
+            cloud_item.label = w.clouds;
+
+            if (sunrise > 0) {
+                sunrise_item.label = Utils.time_format (new DateTime.from_unix_local (sunrise));
+            }
+
+            if (sunset > 0) {
+                sunset_item.label = Utils.time_format (new DateTime.from_unix_local (sunset));
+            }
         }
 
         private Gtk.Image create_icon (string icon_name, string tooltip) {

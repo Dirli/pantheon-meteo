@@ -91,6 +91,7 @@ if get_option ('indicator')
 
     indicator_deps = common_deps + [
         dependency ('gio-unix-2.0'),
+        dependency ('gweather-3.0'),
         wingpanel_dep
     ]
 
@@ -99,11 +100,18 @@ if get_option ('indicator')
         'src/Indicator.vala',
         'src/Constants.vala',
         'src/Enums.vala',
+        'src/Structs.vala',
         'src/Utils.vala',
+        'src/Providers/AbstractProvider.vala',
+        'src/Providers/GWeatherProvider.vala',
+        'src/Providers/OWMProvider.vala',
         'src/Services/AbstractService.vala',
         'src/Services/Connector.vala',
         'src/Widgets/Panel.vala',
         'src/Widgets/Popover.vala',
+        c_args: [
+            '-DGWEATHER_I_KNOW_THIS_IS_UNSTABLE',
+        ],
         dependencies: indicator_deps,
         install: true,
         install_dir: wingpanel_dep.get_pkgconfig_variable ('indicatorsdir'),

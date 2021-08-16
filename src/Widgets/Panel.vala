@@ -28,9 +28,9 @@ namespace Meteo {
             pack_start (temp, false, false, 0);
         }
 
-        public void update_state (string temp_str, string icon_num) {
+        public void update_state (string temp_str, string icon_name) {
             temp.label = temp_str;
-            weather_icon.set_from_icon_name (Utils.get_icon_name (icon_num), Gtk.IconSize.SMALL_TOOLBAR);
+            weather_icon.set_from_icon_name (icon_name, Gtk.IconSize.SMALL_TOOLBAR);
         }
     }
 }

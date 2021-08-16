@@ -4,8 +4,8 @@ namespace Meteo {
         public signal void updated_today (Structs.WeatherStruct w);
         public signal void updated_long (Gee.ArrayList<Structs.WeatherStruct?> f);
 
-        public int64 sunrise { get; set; }
-        public int64 sunset { get; set; }
+        public int64 sunrise { get; set; default = 0; }
+        public int64 sunset { get; set; default = 0; }
 
         public abstract void update_forecast (bool advanced, string units);
     }

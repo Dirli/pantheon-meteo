@@ -35,6 +35,8 @@ namespace Meteo {
         private Services.Connector con_service;
         private GLib.NetworkMonitor network_monitor;
 
+        private Providers.AbstractProvider? weather_provider;
+
         public Indicator () {
             Object (code_name : "meteo-indicator");
 
@@ -44,8 +46,7 @@ namespace Meteo {
             network_monitor = GLib.NetworkMonitor.get_default ();
             con_service = new Services.Connector ();
 
-            settings.bind ("current-update", con_service, "current-update", GLib.SettingsBindFlags.DEFAULT);
-            settings.bind ("forecast-update", con_service, "period-update", GLib.SettingsBindFlags.DEFAULT);
+            init_provider ();
 
             try {
                 var provider = new Gtk.CssProvider ();
@@ -97,60 +98,12 @@ namespace Meteo {
         }
 
         private bool fetch_data () {
-            string idplace = settings.get_string ("idplace");
-            if (idplace == "" || idplace == "0" || network_monitor.get_connectivity () != NetworkConnectivity.FULL) {
+            if (weather_provider == null || network_monitor.get_connectivity () != NetworkConnectivity.FULL) {
                 timeout_id = 0;
                 return false;
             }
 
-            string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
-            string units = settings.get_string ("units");
-
-            string api_key = settings.get_string ("personal-key").replace ("/", "");
-            if (api_key == "") {
-                api_key = Constants.API_KEY;
-            }
-
-            string uri_query = "?id=" + idplace + "&APPID=" + api_key + "&units=" + units + "&lang=" + lang;
-
-            Json.Object? today_obj = con_service.get_owm_data ("weather" + uri_query, Enums.ForecastType.CURRENT);
-            if (today_obj != null) {
-                var weather = today_obj.get_array_member ("weather");
-                string icon_num = weather.get_object_element (0).get_string_member ("icon");
-
-                var main_data = today_obj.get_object_member ("main");
-                if (panel_wid != null && main_data != null) {
-                    double temp_new = main_data.get_double_member ("temp");
-                    panel_wid.update_state (Utils.temp_format (units, temp_new), icon_num);
-
-                    if (popover_wid != null) {
-                        var wind = today_obj.get_object_member ("wind");
-                        var clouds = today_obj.get_object_member ("clouds");
-                        var sys = today_obj.get_object_member ("sys");
-
-                        double? wind_speed = null;
-                        double? wind_deg = null;
-
-                        if (wind.has_member ("speed")) {
-                            wind_speed = wind.get_double_member ("speed");
-                        }
-
-                        if (wind.has_member ("deg")) {
-                            wind_deg = wind.get_double_member ("deg");
-                        }
-
-                        popover_wid.update_state (
-                            settings.get_string ("location"),
-                            "%d %%".printf ((int) main_data.get_int_member ("humidity")),
-                            Utils.pressure_format ((int) main_data.get_int_member ("pressure")),
-                            Utils.wind_format (units, wind_speed, wind_deg),
-                            "%d %%".printf ((int) clouds.get_int_member ("all")),
-                            Utils.time_format (new DateTime.from_unix_local (sys.get_int_member ("sunrise"))),
-                            Utils.time_format (new DateTime.from_unix_local (sys.get_int_member ("sunset")))
-                        );
-                    }
-                }
-            }
+            weather_provider.update_forecast (false, settings.get_string ("units"));
 
             return true;
         }
@@ -178,6 +131,36 @@ namespace Meteo {
         private void on_network_changed (bool availabe) {
             if (network_monitor.get_connectivity () == NetworkConnectivity.FULL && timeout_id == 0) {
                 start_watcher ();
+            }
+        }
+
+        private void init_provider () {
+            Structs.LocationStruct location = {};
+
+            location.city = settings.get_string ("city");
+            location.country = settings.get_string ("country");
+            location.latitude = settings.get_double ("latitude");
+            location.longitude = settings.get_double ("longitude");
+            location.idplace = settings.get_string ("idplace");
+
+            weather_provider = con_service.get_weather_provider (Enums.ForecastProvider.GWEATHER,
+                                                                 location,
+                                                                 settings.get_string ("personal-key").replace ("/", ""));
+            if (weather_provider != null) {
+                weather_provider.updated_today.connect (update_today);
+            }
+        }
+
+        private void update_today (Structs.WeatherStruct weather_struct) {
+            if (panel_wid != null) {
+                panel_wid.update_state (weather_struct.temp, weather_struct.icon_name);
+
+                if (popover_wid != null) {
+                    popover_wid.update_state (settings.get_string ("city"),
+                                              weather_struct,
+                                              weather_provider.sunrise,
+                                              weather_provider.sunset);
+                }
             }
         }
 
