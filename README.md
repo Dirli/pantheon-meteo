@@ -1,5 +1,5 @@
 # Pantheon-meteo
-Know the forecast of the next hours & days using OpenWeatherMap API (https://openweathermap.org/)
+Know the forecast of the next hours & days using OpenWeatherMap API (https://openweathermap.org/) or GWeather
 
 <p align="left">
     <a href="https://paypal.me/Dirli85">
@@ -7,12 +7,14 @@ Know the forecast of the next hours & days using OpenWeatherMap API (https://ope
     </a>
 </p>
 
-### Features:
+----
 
+### Features:
 * Current weather, with information about temperature, pressure, wind speed and direction, sunrise & sunset.
 * Forecast for next 18 hours.
 * Forecast for next five days.
 * Choose your units (metric or imperial).
+* Choosing a forecast provider
 * Wingpanel indicator.
 
 ----
@@ -27,19 +29,18 @@ Know the forecast of the next hours & days using OpenWeatherMap API (https://ope
 
 ## Building and Installation
 
-You'll need the following dependencies to build:
-
-* libgtk-3-dev
-* libsoup2.4-dev
-* libgranite-dev
-* libjson-glib-dev
+### You'll need the following dependencies to build:
 * libgeoclue-2-dev
+* libgranite-dev
+* libgtk-3-dev
 * libgweather-3-dev
+* libjson-glib-dev
+* libsoup2.4-dev
+* libwingpanel-dev
 * meson
 * valac
 
-How to build
-
+### How to build
     meson build --prefix=/usr
     ninja -C build
     sudo ninja -C build install
