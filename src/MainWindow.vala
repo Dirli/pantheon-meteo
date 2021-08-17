@@ -22,6 +22,7 @@ namespace Meteo {
 
         private Gtk.Stack main_stack;
         private Views.WeatherPage weather_page;
+        private Views.WaitingPage waiting_page;
 
         private Widgets.Header header;
         private Widgets.Statusbar statusbar;
@@ -93,19 +94,22 @@ namespace Meteo {
 
             set_titlebar (header);
 
-            main_stack = new Gtk.Stack ();
-            main_stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT_RIGHT;
-            main_stack.expand = true;
-
             var default_page = new Views.DefaultPage ();
             default_page.activated.connect ((index) => {
                 header.remove_custome_title ();
                 settings.set_boolean ("auto", index == 0 ? true : false);
             });
+            waiting_page = new Views.WaitingPage ();
             weather_page = new Views.WeatherPage ();
 
+            main_stack = new Gtk.Stack ();
+            main_stack.transition_type = Gtk.StackTransitionType.SLIDE_LEFT_RIGHT;
+            main_stack.expand = true;
+
             main_stack.add_named (default_page, "default");
+            main_stack.add_named (waiting_page, "waiting");
             main_stack.add_named (weather_page, "weather");
+
             main_stack.set_visible_child_name ("default");
 
             statusbar = new Widgets.Statusbar ();
@@ -114,8 +118,10 @@ namespace Meteo {
             var view_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
             view_box.add (main_stack);
             view_box.add (statusbar);
+
             view_box.show_all ();
 
+            main_stack.notify["visible-child-name"].connect (on_changed_child);
             add (view_box);
         }
 
@@ -130,6 +136,13 @@ namespace Meteo {
                 weather_provider.updated_today.connect (fill_today);
                 weather_provider.updated_long.connect (fill_forecast);
                 weather_provider.show_message.connect (statusbar.add_msg);
+            }
+        }
+
+        private void on_changed_child () {
+            var view_name = main_stack.get_visible_child_name ();
+            if (view_name != null) {
+                waiting_page.start_spinner (view_name == "waiting" ? true : false);
             }
         }
 
@@ -201,6 +214,8 @@ namespace Meteo {
                 return;
             }
 
+            waiting_page.update_page_label (_("Loading forecast..."));
+            main_stack.set_visible_child_name ("waiting");
             weather_provider.update_forecast (true, settings.get_string ("units"));
         }
 
@@ -210,6 +225,7 @@ namespace Meteo {
 
             weather_page.set_sun_state (weather_provider.sunrise, weather_provider.sunset);
             weather_page.update_today (today_weather);
+
             main_stack.set_visible_child_name ("weather");
         }
 

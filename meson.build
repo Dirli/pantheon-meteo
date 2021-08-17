@@ -73,6 +73,7 @@ executable (
     'src/Services/Connector.vala',
     'src/Services/Geolocation.vala',
     'src/Views/DefaultPage.vala',
+    'src/Views/WaitingPage.vala',
     'src/Views/WeatherPage.vala',
     'src/Widgets/Header.vala',
     'src/Widgets/Statusbar.vala',
