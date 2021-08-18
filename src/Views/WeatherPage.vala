@@ -32,6 +32,8 @@ namespace Meteo {
         private Gtk.Label today_clouds;
         private Gtk.Label weather_main;
 
+        private Gtk.Label update_label;
+
         private Gtk.Stack forecast_stack;
 
         public WeatherPage () {
@@ -113,12 +115,13 @@ namespace Meteo {
             forecast_box.add (forecast_stack);
             forecast_box.add (stack_switcher);
 
-            var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
-            separator.valign = Gtk.Align.END;
+            update_label = new Gtk.Label (null);
 
             add (today_grid);
-            add (separator);
+            add (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
             add (forecast_box);
+            add (new Gtk.Separator (Gtk.Orientation.HORIZONTAL));
+            add (update_label);
         }
 
         public void set_sun_state (int64 sunrise_unix, int64 sunset_unix) {
@@ -138,6 +141,9 @@ namespace Meteo {
         }
 
         public void update_today (Structs.WeatherStruct weather_struct) {
+            GLib.DateTime upd_dt = new GLib.DateTime.from_unix_local (weather_struct.date);
+            update_label.set_label (_("Last update: ") + upd_dt.format ("%a, %e  %b %R"));
+
             today_icon.set_from_icon_name (weather_struct.icon_name, Gtk.IconSize.DIALOG);
 
             today_temp.label = weather_struct.temp;

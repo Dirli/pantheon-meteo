@@ -65,6 +65,7 @@ namespace Meteo {
 
             var main_data = json_object.get_object_member ("main");
             if (main_data == null) {
+                show_alert (1002);
                 return;
             }
 
@@ -201,6 +202,8 @@ namespace Meteo {
             } catch (Error e) {
                 warning (e.message);
             }
+
+            show_alert (1000);
         }
 
         private void fetch_forecast (string url, Enums.ForecastType query_type, string cache_path) {
@@ -209,23 +212,24 @@ namespace Meteo {
 
             session.queue_message (message, (sess, mess) => {
                 if (mess.status_code != 200) {
-                    //
+                    show_alert (mess.status_code);
                     return;
                 }
 
                 try {
                     string text = (string) mess.response_body.flatten ().data;
-                    if (text == "") {
+                    if (text != "") {
+                        parser.load_from_data (text, -1);
+                        Utils.save_cache (cache_path, text);
+                        parse_json_response (parser.get_root (), query_type);
+
                         return;
                     }
-
-                    parser.load_from_data (text, -1);
-                    Utils.save_cache (cache_path, text);
                 } catch (Error e) {
                     warning (e.message);
                 }
 
-                parse_json_response (parser.get_root (), query_type);
+                show_alert (1001);
             });
         }
     }

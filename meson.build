@@ -76,7 +76,6 @@ executable (
     'src/Views/WaitingPage.vala',
     'src/Views/WeatherPage.vala',
     'src/Widgets/Header.vala',
-    'src/Widgets/Statusbar.vala',
     asresources,
     config_header,
     vala_args: vala_args,

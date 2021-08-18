@@ -47,6 +47,7 @@ namespace Meteo {
 
         private void parse_response () {
             if (!gweather_info.is_valid ()) {
+                show_alert (1002);
                 return;
             }
 

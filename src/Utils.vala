@@ -25,6 +25,12 @@ namespace Meteo.Utils {
                 return _("Data not available");
             case 426:
                 return _("Problems with api-key");
+            case 1000:
+                return _("Couldn't fetch a forecast");
+            case 1001:
+                return _("Couldn't read the response");
+            case 1002:
+                return _("Couldn't parse the response");
             default:
                 return _("Unknown problem yet");
         }

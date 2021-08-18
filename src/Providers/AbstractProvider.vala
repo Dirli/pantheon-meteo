@@ -18,7 +18,7 @@
 
 namespace Meteo {
     public abstract class Providers.AbstractProvider : GLib.Object {
-        public signal void show_message (string msg);
+        public signal void show_alert (uint code);
         public signal void updated_today (Structs.WeatherStruct w);
         public signal void updated_long (Gee.ArrayList<Structs.WeatherStruct?> f);
 

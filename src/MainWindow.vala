@@ -23,13 +23,15 @@ namespace Meteo {
         private Gtk.Stack main_stack;
         private Views.WeatherPage weather_page;
         private Views.WaitingPage waiting_page;
+        private Granite.Widgets.AlertView alert_page;
 
         private Widgets.Header header;
-        private Widgets.Statusbar statusbar;
 
         private Services.Geolocation geo_service;
         private Services.Connector con_service;
         private Providers.AbstractProvider? weather_provider;
+
+        private Gtk.Label provider_label;
 
         public string api_key {
             owned get {
@@ -71,8 +73,7 @@ namespace Meteo {
             settings.changed["auto"].connect (determine_loc);
             settings.changed["provider"].connect (on_changed_provider);
 
-            geo_service.show_message.connect (statusbar.add_msg);
-            // con_service.show_message.connect (statusbar.add_msg);
+            // geo_service.show_message.connect (statusbar.add_msg);
 
             if (settings.get_boolean ("auto")) {
                 geo_service.auto_detect ();
@@ -99,6 +100,7 @@ namespace Meteo {
                 header.remove_custome_title ();
                 settings.set_boolean ("auto", index == 0 ? true : false);
             });
+            alert_page = new Granite.Widgets.AlertView (_("Something went wrong"), "", "process-error");
             waiting_page = new Views.WaitingPage ();
             weather_page = new Views.WeatherPage ();
 
@@ -108,16 +110,17 @@ namespace Meteo {
 
             main_stack.add_named (default_page, "default");
             main_stack.add_named (waiting_page, "waiting");
+            main_stack.add_named (alert_page, "alert");
             main_stack.add_named (weather_page, "weather");
 
             main_stack.set_visible_child_name ("default");
 
-            statusbar = new Widgets.Statusbar ();
-            statusbar.mod_provider_label (settings.get_string ("personal-key").replace ("/", "") != "");
+            provider_label = new Gtk.Label (null);
+            provider_label.margin_bottom = 12;
 
             var view_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 6);
             view_box.add (main_stack);
-            view_box.add (statusbar);
+            view_box.add (provider_label);
 
             view_box.show_all ();
 
@@ -128,14 +131,15 @@ namespace Meteo {
         private void on_changed_provider () {
             weather_provider = null;
 
-            weather_provider = con_service.get_weather_provider ((Enums.ForecastProvider) settings.get_enum ("provider"),
-                                                                 get_location (),
-                                                                 api_key);
+            var provider_type = (Enums.ForecastProvider) settings.get_enum ("provider");
+            weather_provider = con_service.get_weather_provider (provider_type, get_location (), api_key);
 
             if (weather_provider != null) {
                 weather_provider.updated_today.connect (fill_today);
                 weather_provider.updated_long.connect (fill_forecast);
-                weather_provider.show_message.connect (statusbar.add_msg);
+                weather_provider.show_alert.connect (on_show_alert);
+
+                provider_label.set_label (_("Provider: ") + provider_type.to_string ());
             }
         }
 
@@ -162,6 +166,11 @@ namespace Meteo {
 
             init_location ();
             fetch_data ();
+        }
+
+        private void on_show_alert (uint alert_code) {
+            alert_page.description = Utils.parse_code (alert_code);
+            main_stack.set_visible_child_name ("alert");
         }
 
         private void reset_location () {
@@ -220,9 +229,6 @@ namespace Meteo {
         }
 
         private void fill_today (Structs.WeatherStruct today_weather) {
-            GLib.DateTime upd_dt = new GLib.DateTime.from_unix_local (today_weather.date);
-            statusbar.add_msg (_("Last update: ") + upd_dt.format ("%a, %e  %b %R"));
-
             weather_page.set_sun_state (weather_provider.sunrise, weather_provider.sunset);
             weather_page.update_today (today_weather);
 
