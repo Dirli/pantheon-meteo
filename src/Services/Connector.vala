@@ -28,8 +28,8 @@ namespace Meteo {
                     return new Providers.GWeatherProvider (loc.city, loc.latitude, loc.longitude);
                 }
             } else if (provider_type == Enums.ForecastProvider.OWM) {
-                if (api != "" && loc.idplace != "") {
-                    return new Providers.OWMProvider (api, loc.idplace, use_symbolic);
+                if (api != "") {
+                    return new Providers.OWMProvider (api, loc, use_symbolic);
                 }
             }
 

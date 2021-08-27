@@ -18,6 +18,8 @@
 
 namespace Meteo {
     public class Dialogs.Preferences : Gtk.Dialog {
+        public GLib.Settings settings {get;  construct set; }
+
         public Preferences (MainWindow main_window) {
             Object (border_width: 6,
                     modal: true,
@@ -26,46 +28,23 @@ namespace Meteo {
                     resizable: false,
                     title: _("Preferences"),
                     transient_for: main_window,
+                    settings: main_window.settings,
                     window_position: Gtk.WindowPosition.CENTER_ON_PARENT);
+        }
 
+        construct {
             set_default_response (Gtk.ResponseType.CLOSE);
 
-            //Define sections
-            var tit1_pref = new Gtk.Label (_("Interface"));
-            tit1_pref.get_style_context ().add_class ("preferences");
-            tit1_pref.halign = Gtk.Align.START;
-            var tit2_pref = new Gtk.Label (_("General"));
-            tit2_pref.get_style_context ().add_class ("preferences");
-            tit2_pref.halign = Gtk.Align.START;
+            //Interface sections
+            var interface_title = new Gtk.Label (_("Interface"));
+            interface_title.get_style_context ().add_class ("preferences");
+            interface_title.halign = Gtk.Align.START;
 
             //Select type of icons:symbolic or realistic
             Gtk.Label icon_label = new Gtk.Label (_("Symbolic icons") + ":");
             icon_label.halign = Gtk.Align.END;
             Gtk.Switch icon = new Gtk.Switch ();
             icon.halign = Gtk.Align.START;
-
-            //Update interval
-            Gtk.Label update_lab = new Gtk.Label (_("Update conditions every") + " :");
-            update_lab.halign = Gtk.Align.END;
-            Gtk.SpinButton update_box = new Gtk.SpinButton.with_range (1, 24, 1);
-            update_box.set_halign (Gtk.Align.END);
-            update_box.set_width_chars (4);
-
-            //System units
-            Gtk.Label unit_lab = new Gtk.Label (_("Units") + ":");
-            unit_lab.halign = Gtk.Align.CENTER;
-
-            var unit_box = new Granite.Widgets.ModeButton ();
-            unit_box.append_text ("\u00B0" + "C - m/s");
-            unit_box.append_text ("\u00B0" + "F - mph");
-            unit_box.selected = main_window.settings.get_string ("units") == "metric" ? 0 : 1;
-
-            // local api ley
-            Gtk.Label api_key_label = new Gtk.Label (_("Personal api key:"));
-            api_key_label.halign = Gtk.Align.START;
-            var local_key = new Gtk.Entry ();
-            local_key.hexpand = true;
-            local_key.placeholder_text = _("Enter personal api key");
 
             //Create UI
             var layout = new Gtk.Grid ();
@@ -76,43 +55,88 @@ namespace Meteo {
             layout.margin_top = 0;
 
             var top = 0;
-            layout.attach (tit1_pref,  0, top++, 2, 1);
-
-            layout.attach (icon_label, 0, top, 1, 1);
-            layout.attach (icon,       1, top++, 1, 1);
+            layout.attach (interface_title, 0, top++, 2);
+            layout.attach (icon_label,      0, top);
+            layout.attach (icon,            1, top++);
 
             //Select indicator
 #if INDICATOR_EXIST
             Gtk.Label ind_label = new Gtk.Label (_("Use System Tray Indicator") + ":");
             ind_label.halign = Gtk.Align.END;
-            Gtk.Switch ind = new Gtk.Switch ();
-            ind.halign = Gtk.Align.START;
-            layout.attach (ind_label,  0, top, 1, 1);
-            layout.attach (ind,        1, top++, 1, 1);
+            Gtk.Switch ind_switch = new Gtk.Switch ();
+            ind_switch.halign = Gtk.Align.START;
 
-            main_window.settings.bind ("indicator", ind, "active", GLib.SettingsBindFlags.DEFAULT);
+            layout.attach (ind_label,  0, top);
+            layout.attach (ind_switch, 1, top++);
+
+            settings.bind ("indicator", ind_switch, "active", GLib.SettingsBindFlags.DEFAULT);
 #endif
+            layout.attach (new Gtk.Separator (Gtk.Orientation.HORIZONTAL), 0, top++, 2, 1);
 
-            layout.attach (tit2_pref,  0, top++, 2, 1);
-            layout.attach (unit_lab,   0, top++, 2, 1);
-            layout.attach (unit_box,   0, top++, 2, 1);
-            layout.attach (update_lab, 0, top, 1, 1);
-            layout.attach (update_box, 1, top++, 1, 1);
+            // General section
+            var general_title = new Gtk.Label (_("General"));
+            general_title.get_style_context ().add_class ("preferences");
+            general_title.halign = Gtk.Align.START;
 
-#if GEOCLUE_EXIST
+            //System units
+            var unit_label = new Gtk.Label (_("Units") + ":");
+            unit_label.halign = Gtk.Align.CENTER;
+            var unit_box = new Granite.Widgets.ModeButton ();
+            unit_box.append_text ("\u00B0" + "C - m/s");
+            unit_box.append_text ("\u00B0" + "F - mph");
+            unit_box.selected = settings.get_string ("units") == "metric" ? 0 : 1;
+
+            //Update interval
+            var update_label = new Gtk.Label (_("Update conditions every") + " :");
+            update_label.halign = Gtk.Align.END;
+            var update_box = new Gtk.SpinButton.with_range (1, 24, 1);
+            update_box.set_halign (Gtk.Align.END);
+            update_box.set_width_chars (4);
+
             //Automatic location
-            Gtk.Label loc_label = new Gtk.Label (_("Find my location automatically") + ":");
-            loc_label.halign = Gtk.Align.END;
+            var location_label = new Gtk.Label (_("Find my location automatically") + ":");
+            location_label.halign = Gtk.Align.END;
             Gtk.Switch loc = new Gtk.Switch ();
+            loc.tooltip_text = _("Need to install the geoclue service");
             loc.halign = Gtk.Align.START;
 
-            main_window.settings.bind ("auto", loc, "active", GLib.SettingsBindFlags.DEFAULT);
-            layout.attach (loc_label,  0, top, 1, 1);
-            layout.attach (loc,        1, top++, 1, 1);
-#endif
+            layout.attach (general_title,  0, top++, 2, 1);
+            layout.attach (unit_label,     0, top++, 2, 1);
+            layout.attach (unit_box,       0, top++, 2, 1);
+            layout.attach (update_label,   0, top);
+            layout.attach (update_box,     1, top++);
+            layout.attach (location_label, 0, top);
+            layout.attach (loc,            1, top++);
+            layout.attach (new Gtk.Separator (Gtk.Orientation.HORIZONTAL), 0, top++, 2, 1);
 
-            layout.attach (api_key_label, 0, top++, 2, 1);
-            layout.attach (local_key,     0, top++, 2, 1);
+            // Providers section
+            var providers_title = new Gtk.Label (_("Providers"));
+            providers_title.get_style_context ().add_class ("preferences");
+            providers_title.halign = Gtk.Align.START;
+
+            var provider_label = new Gtk.Label (_("Provider"));
+            provider_label.halign = Gtk.Align.END;
+            var providers = new Gtk.ComboBoxText ();
+            providers.append_text (Enums.ForecastProvider.GWEATHER.to_string ());
+            providers.append_text (Enums.ForecastProvider.OWM.to_string ());
+            providers.active = settings.get_enum ("provider");
+
+            // local api ley
+            var api_key_label = new Gtk.Label (_("Personal api key:"));
+            api_key_label.halign = Gtk.Align.START;
+            var api_key_entry = new Gtk.Entry ();
+            api_key_entry.hexpand = true;
+            api_key_entry.placeholder_text = _("Enter personal api key");
+
+            providers.changed.connect (() => {
+                api_key_entry.sensitive = providers.active != 0;
+            });
+
+            layout.attach (providers_title, 0, top++, 2, 1);
+            layout.attach (provider_label,  0, top);
+            layout.attach (providers,       1, top++);
+            layout.attach (api_key_label,   0, top++, 2, 1);
+            layout.attach (api_key_entry,   0, top++, 2, 1);
 
             Gtk.Box content = this.get_content_area () as Gtk.Box;
             content.valign = Gtk.Align.START;
@@ -122,14 +146,26 @@ namespace Meteo {
             //Actions
             add_button (_("Close"), Gtk.ResponseType.CLOSE);
 
-            response.connect (() => {destroy ();});
-            show_all ();
+            response.connect (() => {
+                if (providers.active != settings.get_enum ("provider")) {
+                    if (providers.active == Enums.ForecastProvider.GWEATHER || api_key_entry.text.length > 0) {
+                        settings.set_string ("idplace", "");
+                        settings.set_enum ("provider", providers.active);
+                    } else {
+                        //
+                    }
+                }
 
-            main_window.settings.bind ("symbolic", icon, "active", GLib.SettingsBindFlags.DEFAULT);
-            main_window.settings.bind ("interval", update_box, "value", SettingsBindFlags.DEFAULT);
-            main_window.settings.bind ("personal-key", local_key, "text", SettingsBindFlags.DEFAULT);
+                destroy ();
+            });
+
+            settings.bind ("auto", loc, "active", GLib.SettingsBindFlags.DEFAULT);
+            settings.bind ("symbolic", icon, "active", GLib.SettingsBindFlags.DEFAULT);
+            settings.bind ("interval", update_box, "value", SettingsBindFlags.DEFAULT);
+            settings.bind ("personal-key", api_key_entry, "text", SettingsBindFlags.DEFAULT);
+
             unit_box.mode_changed.connect (() => {
-                main_window.settings.set_string ("units", unit_box.selected == 1 ? "imperial" : "metric");
+                settings.set_string ("units", unit_box.selected == 1 ? "imperial" : "metric");
             });
         }
     }

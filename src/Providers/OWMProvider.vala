@@ -21,20 +21,65 @@ namespace Meteo {
         private string units;
         public bool use_symbolic { get; construct set; }
 
-        public string id_place {get; construct set;}
+        public string id_place { get; set; }
         public string api_key {get; construct set;}
 
         public int64 update_time = 0;
 
         private Json.Parser parser;
 
-        public OWMProvider (string api, string id, bool s) {
-            Object (api_key:api,
-                    id_place: id,
+        public OWMProvider (string api, Structs.LocationStruct loc, bool s) {
+            Object (api_key: api,
+                    id_place: loc.idplace,
+                    latitude: loc.latitude,
+                    longitude: loc.longitude,
                     use_symbolic: s);
         }
 
+        public override void get_place_id (PlaceIdDelegate cb) {
+            string uri_query = "?lat=" + latitude.to_string () + "&lon=" + longitude.to_string () + "&APPID=" + api_key;
+            string uri = Constants.OWM_API_ADDR + "weather" + uri_query;
+
+            Soup.Session session = new Soup.Session ();
+            Soup.Message message = new Soup.Message ("GET", uri);
+
+            session.queue_message (message, (sess, mess) => {
+                if (mess.status_code != 200) {
+                    show_alert (mess.status_code);
+                    return;
+                }
+
+                try {
+                    var parser = new Json.Parser ();
+                    parser.load_from_data ((string) message.response_body.flatten ().data, -1);
+                    var root = parser.get_root ();
+                    if (root != null) {
+                        var root_object = root.get_object ();
+                        if (root_object != null) {
+                            id_place = root_object.get_int_member_with_default ("id", 0).to_string ();
+                            cb (id_place);
+
+                            return;
+                        }
+                    }
+                } catch (Error e) {
+                    warning (e.message);
+                }
+
+                show_alert (1062);
+            });
+        }
+
+        public override void update_location (Structs.LocationStruct loc) {
+            latitude = loc.latitude;
+            longitude = loc.longitude;
+        }
+
         public override void update_forecast (bool advanced, string u) {
+            if (id_place == "0") {
+                return;
+            }
+
             units = u;
             get_forecast (Enums.ForecastType.CURRENT);
 

@@ -19,8 +19,6 @@
 namespace Meteo {
     public class Providers.GWeatherProvider : Providers.AbstractProvider {
         public string city_name { get; construct set; }
-        public double latitude { get; construct set; }
-        public double longitude { get; construct set; }
 
         private bool advanced = false;
 
@@ -39,7 +37,22 @@ namespace Meteo {
             gweather_info.updated.connect (parse_response);
         }
 
+        public override void get_place_id (PlaceIdDelegate cb) {
+            cb ("0");
+        }
+
+        public override void update_location (Structs.LocationStruct loc) {
+            latitude = loc.latitude;
+            longitude = loc.longitude;
+            city_name = loc.city;
+        }
+
         public override void update_forecast (bool a, string units) {
+            if (!gweather_info.is_valid ()) {
+                show_alert (1002);
+                return;
+            }
+
             advanced = a;
 
             gweather_info.update ();

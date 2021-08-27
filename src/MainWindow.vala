@@ -33,17 +33,6 @@ namespace Meteo {
 
         private Gtk.Label provider_label;
 
-        public string api_key {
-            owned get {
-                string _api_key = settings.get_string ("personal-key").replace ("/", "");
-                if (_api_key == "") {
-                    return Constants.API_KEY;
-                }
-
-                return _api_key;
-            }
-        }
-
         public MainWindow (MeteoApp app) {
             Object (application: app,
                     window_position: Gtk.WindowPosition.CENTER);
@@ -59,8 +48,7 @@ namespace Meteo {
             settings = new GLib.Settings (Constants.APP_NAME);
 
             con_service = new Services.Connector ();
-            geo_service = new Services.Geolocation (api_key);
-            geo_service.changed_location.connect (on_changed_location);
+            geo_service = new Services.Geolocation ();
 
             build_ui ();
 
@@ -69,11 +57,10 @@ namespace Meteo {
             settings.bind ("symbolic", con_service, "use-symbolic", GLib.SettingsBindFlags.GET);
 
             on_changed_provider ();
+            geo_service.changed_location.connect (on_changed_location);
 
             settings.changed["auto"].connect (determine_loc);
             settings.changed["provider"].connect (on_changed_provider);
-
-            // geo_service.show_message.connect (statusbar.add_msg);
 
             if (settings.get_boolean ("auto")) {
                 geo_service.auto_detect ();
@@ -90,6 +77,7 @@ namespace Meteo {
             header.change_location.connect (determine_loc);
             header.show_preferences.connect (() => {
                 var preferences = new Dialogs.Preferences (this);
+                preferences.show_all ();
                 preferences.run ();
             });
 
@@ -132,7 +120,9 @@ namespace Meteo {
             weather_provider = null;
 
             var provider_type = (Enums.ForecastProvider) settings.get_enum ("provider");
-            weather_provider = con_service.get_weather_provider (provider_type, get_location (), api_key);
+            weather_provider = con_service.get_weather_provider (provider_type,
+                                                                 get_location (),
+                                                                 settings.get_string ("personal-key").replace ("/", ""));
 
             if (weather_provider != null) {
                 weather_provider.updated_today.connect (fill_today);
@@ -140,6 +130,8 @@ namespace Meteo {
                 weather_provider.show_alert.connect (on_show_alert);
 
                 provider_label.set_label (_("Provider: ") + provider_type.to_string ());
+
+                update_place_id ();
             }
         }
 
@@ -159,18 +151,27 @@ namespace Meteo {
             settings.set_double ("latitude", loc.latitude);
             settings.set_double ("longitude", loc.longitude);
 
-            if (settings.get_enum ("provider") == Enums.ForecastProvider.OWM) {
-                var idplace = geo_service.determine_id (loc.longitude, loc.latitude, api_key);
-                settings.set_string ("idplace", idplace.to_string ());
+            if (weather_provider != null) {
+                weather_provider.update_location (loc);
+                update_place_id ();
             }
-
-            init_location ();
-            fetch_data ();
         }
 
         private void on_show_alert (uint alert_code) {
             alert_page.description = Utils.parse_code (alert_code);
             main_stack.set_visible_child_name ("alert");
+        }
+
+        private void update_place_id () {
+            if (settings.get_string ("idplace") == "") {
+                waiting_page.update_page_label (_("Update location..."));
+
+                weather_provider.get_place_id ((res) => {
+                    settings.set_string ("idplace", res);
+                    init_location ();
+                    fetch_data ();
+                });
+            }
         }
 
         private void reset_location () {
@@ -180,8 +181,7 @@ namespace Meteo {
             settings.reset ("latitude");
             settings.reset ("city");
             settings.reset ("country");
-
-            settings.set_string ("idplace", "");
+            settings.reset ("idplace");
 
             weather_page.reset_today ();
         }

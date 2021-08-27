@@ -17,14 +17,22 @@
  */
 
 namespace Meteo {
+    public delegate void PlaceIdDelegate (string place_id);
+
     public abstract class Providers.AbstractProvider : GLib.Object {
         public signal void show_alert (uint code);
         public signal void updated_today (Structs.WeatherStruct w);
         public signal void updated_long (Gee.ArrayList<Structs.WeatherStruct?> f);
 
+        public double latitude { get; construct set; }
+        public double longitude { get; construct set; }
+
+
         public int64 sunrise { get; set; default = 0; }
         public int64 sunset { get; set; default = 0; }
 
         public abstract void update_forecast (bool advanced, string units);
+        public abstract void update_location (Structs.LocationStruct l);
+        public abstract void get_place_id (PlaceIdDelegate d);
     }
 }
