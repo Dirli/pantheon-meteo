@@ -26,8 +26,6 @@ namespace Meteo {
 
         public int64 update_time = 0;
 
-        private Json.Parser parser;
-
         public OWMProvider (string api, Structs.LocationStruct loc, bool s) {
             Object (api_key: api,
                     id_place: loc.idplace,
@@ -232,7 +230,6 @@ namespace Meteo {
                                                        Constants.APP_NAME,
                                                        @"$(query_type == Enums.ForecastType.CURRENT ? "current" : "forecast").json");
 
-                parser = new Json.Parser ();
                 if (!update_mtime (cache_json) || need_update (query_type)) {
                     string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
                     var url_query = @"$(query_type == Enums.ForecastType.CURRENT ? "weather" : "forecast")?id=$(id_place)&APPID=$(api_key)&units=$(units)&lang=$(lang)";
@@ -241,9 +238,12 @@ namespace Meteo {
                     var url = Constants.OWM_API_ADDR + url_query;
                     fetch_forecast (url, query_type, cache_json);
                 } else {
+                    var parser = new Json.Parser ();
                     parser.load_from_file (cache_json);
                     parse_json_response (parser.get_root (), query_type);
                 }
+
+                return;
             } catch (Error e) {
                 warning (e.message);
             }
@@ -264,6 +264,7 @@ namespace Meteo {
                 try {
                     string text = (string) mess.response_body.flatten ().data;
                     if (text != "") {
+                        var parser = new Json.Parser ();
                         parser.load_from_data (text, -1);
                         Utils.save_cache (cache_path, text);
                         parse_json_response (parser.get_root (), query_type);
