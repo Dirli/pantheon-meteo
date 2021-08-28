@@ -128,7 +128,13 @@ namespace Meteo {
             api_key_entry.hexpand = true;
             api_key_entry.placeholder_text = _("Enter personal api key");
 
+            GLib.Idle.add (() => {
+                api_key_entry.sensitive = providers.active != 0;
+                return false;
+            });
+
             providers.changed.connect (() => {
+                settings.reset ("personal-key");
                 api_key_entry.sensitive = providers.active != 0;
             });
 
@@ -137,6 +143,7 @@ namespace Meteo {
             layout.attach (providers,       1, top++);
             layout.attach (api_key_label,   0, top++, 2, 1);
             layout.attach (api_key_entry,   0, top++, 2, 1);
+
 
             Gtk.Box content = this.get_content_area () as Gtk.Box;
             content.valign = Gtk.Align.START;
@@ -149,7 +156,7 @@ namespace Meteo {
             response.connect (() => {
                 if (providers.active != settings.get_enum ("provider")) {
                     if (providers.active == Enums.ForecastProvider.GWEATHER || api_key_entry.text.length > 0) {
-                        settings.set_string ("idplace", "");
+                        settings.reset ("idplace");
                         settings.set_enum ("provider", providers.active);
                     } else {
                         //

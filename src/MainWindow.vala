@@ -144,7 +144,6 @@ namespace Meteo {
 
         private void on_changed_location (Structs.LocationStruct loc) {
             reset_location ();
-            Utils.clear_cache ();
 
             settings.set_string ("city", loc.city);
             settings.set_string ("country", loc.country);
@@ -164,6 +163,7 @@ namespace Meteo {
 
         private void update_place_id () {
             if (settings.get_string ("idplace") == "") {
+                Utils.clear_cache ();
                 waiting_page.update_page_label (_("Update location..."));
 
                 weather_provider.get_place_id ((res) => {
@@ -184,6 +184,7 @@ namespace Meteo {
             settings.reset ("idplace");
 
             weather_page.reset_today ();
+            weather_page.clear_forecast ();
         }
 
         private void determine_loc () {
