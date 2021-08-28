@@ -21,11 +21,17 @@ add_project_arguments (
 
 conf_data = configuration_data ()
 conf_data.set_quoted ('VERSION', meson.project_version ())
+conf_data.set_quoted ('CONTACTS', 'litandrej85@gmail.com')
 config_header = configure_file (
     input: 'src/config.vala.in',
     output: 'config.vala',
     configuration: conf_data
 )
+
+gweather_dep = dependency ('gweather-3.0')
+if gweather_dep.version () >= '40.0'
+  add_project_arguments ('--define=GWEATHER_40', language: 'vala')
+endif
 
 common_deps = [
     dependency ('gio-2.0'),
@@ -34,12 +40,12 @@ common_deps = [
     dependency ('gtk+-3.0'),
     dependency ('libsoup-2.4'),
     dependency ('json-glib-1.0'),
+    gweather_dep,
     meson.get_compiler ('c').find_library ('m'),
     meson.get_compiler ('vala').find_library ('posix'),
 ]
 
 app_deps = common_deps + [
-    dependency ('gweather-3.0'),
     dependency ('granite'),
 ]
 
@@ -91,7 +97,6 @@ if get_option ('indicator')
 
     indicator_deps = common_deps + [
         dependency ('gio-unix-2.0'),
-        dependency ('gweather-3.0'),
         wingpanel_dep
     ]
 
@@ -109,6 +114,7 @@ if get_option ('indicator')
         'src/Services/Connector.vala',
         'src/Widgets/Panel.vala',
         'src/Widgets/Popover.vala',
+        config_header,
         c_args: [
             '-DGWEATHER_I_KNOW_THIS_IS_UNSTABLE',
         ],

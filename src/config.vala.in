@@ -1,3 +1,4 @@
 namespace Meteo.Constants {
     public const string VERSION = @VERSION@;
+    public const string CONTACTS = @CONTACTS@;
 }
