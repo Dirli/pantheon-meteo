@@ -19,19 +19,17 @@
 namespace Meteo {
     public class Providers.OWMProvider : Providers.AbstractProvider {
         private string units;
-        public bool use_symbolic { get; construct set; }
 
         public string id_place { get; set; }
         public string api_key {get; construct set;}
 
         public int64 update_time = 0;
 
-        public OWMProvider (string api, Structs.LocationStruct loc, bool s) {
+        public OWMProvider (string api, Structs.LocationStruct loc) {
             Object (api_key: api,
                     id_place: loc.idplace,
                     latitude: loc.latitude,
-                    longitude: loc.longitude,
-                    use_symbolic: s);
+                    longitude: loc.longitude);
         }
 
         public override void get_place_id (PlaceIdDelegate cb) {

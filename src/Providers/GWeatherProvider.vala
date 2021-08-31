@@ -32,7 +32,6 @@ namespace Meteo {
 
         construct {
             GWeather.Location gweather_location = new GWeather.Location.detached (city_name, null, latitude, longitude);
-            // var gweather_location = GWeather.Location.get_world ().find_nearest_city (latitude, longitude);
 
             gweather_info = new GWeather.Info (gweather_location);
 #if GWEATHER_40
@@ -82,7 +81,8 @@ namespace Meteo {
             }
 
             Structs.WeatherStruct weather_struct = {};
-            weather_struct.icon_name = gweather_info.get_icon_name ();
+
+            weather_struct.icon_name = use_symbolic ? gweather_info.get_symbolic_icon_name () : gweather_info.get_icon_name ();
             weather_struct.description = gweather_info.get_sky ();
             weather_struct.clouds = "-";
             weather_struct.pressure = gweather_info.get_pressure ();
@@ -106,7 +106,7 @@ namespace Meteo {
                     Structs.WeatherStruct w_struct = {};
 
                     w_struct.date = iter_date;
-                    w_struct.icon_name = info_iter.get_icon_name ();
+                    w_struct.icon_name = use_symbolic ? info_iter.get_symbolic_icon_name () : info_iter.get_icon_name ();
                     w_struct.temp = info_iter.get_temp_summary ();
 
                     forecast_array.add (w_struct);

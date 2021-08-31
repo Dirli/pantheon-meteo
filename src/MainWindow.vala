@@ -54,13 +54,13 @@ namespace Meteo {
 
             settings.bind ("auto", header, "auto-location", GLib.SettingsBindFlags.GET);
             settings.bind ("idplace", header, "idplace", GLib.SettingsBindFlags.GET);
-            settings.bind ("symbolic", con_service, "use-symbolic", GLib.SettingsBindFlags.GET);
 
             on_changed_provider ();
             geo_service.changed_location.connect (on_changed_location);
 
             settings.changed["auto"].connect (determine_loc);
             settings.changed["provider"].connect (on_changed_provider);
+            settings.changed["symbolic"].connect (on_changed_symbolic);
 
             if (settings.get_boolean ("auto")) {
                 geo_service.auto_detect ();
@@ -131,7 +131,15 @@ namespace Meteo {
 
                 provider_label.set_label (_("Provider: ") + provider_type.to_string ());
 
+                on_changed_symbolic ();
+
                 update_place_id ();
+            }
+        }
+
+        private void on_changed_symbolic () {
+            if (weather_provider != null) {
+                weather_provider.use_symbolic = settings.get_boolean ("symbolic");
             }
         }
 

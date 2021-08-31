@@ -24,6 +24,8 @@ namespace Meteo {
         public signal void updated_today (Structs.WeatherStruct w);
         public signal void updated_long (Gee.ArrayList<Structs.WeatherStruct?> f);
 
+        public bool use_symbolic { get; set; }
+
         public double latitude { get; construct set; }
         public double longitude { get; construct set; }
 

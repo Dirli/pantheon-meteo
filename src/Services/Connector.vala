@@ -18,8 +18,6 @@
 
 namespace Meteo {
     public class Services.Connector : Services.AbstractService {
-        public bool use_symbolic { get; set; }
-
         public Connector () {}
 
         public Providers.AbstractProvider? get_weather_provider (Enums.ForecastProvider provider_type, Structs.LocationStruct loc, string api) {
@@ -29,7 +27,7 @@ namespace Meteo {
                 }
             } else if (provider_type == Enums.ForecastProvider.OWM) {
                 if (api != "") {
-                    return new Providers.OWMProvider (api, loc, use_symbolic);
+                    return new Providers.OWMProvider (api, loc);
                 }
             }
 
