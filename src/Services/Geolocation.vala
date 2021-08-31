@@ -17,7 +17,7 @@
  */
 
 namespace Meteo {
-    public class Services.Geolocation : Services.AbstractService {
+    public class Services.Geolocation : GLib.Object {
         public signal void changed_location (Structs.LocationStruct location_struct);
 
 #if GEOCLUE_EXIST
@@ -46,9 +46,7 @@ namespace Meteo {
                 on_changed_location (gclue_simple.location.latitude, gclue_simple.location.longitude);
             } catch (Error e) {
                 warning ("Failed to connect to GeoClue2 service: %s", e.message);
-                show_message ("location could not be determined automatically");
             }
-
         }
 
         private void on_changed_location (double lat, double lon) {

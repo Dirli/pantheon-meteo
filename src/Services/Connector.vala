@@ -17,7 +17,7 @@
  */
 
 namespace Meteo {
-    public class Services.Connector : Services.AbstractService {
+    public class Services.Connector : GLib.Object {
         public Connector () {}
 
         public Providers.AbstractProvider? get_weather_provider (Enums.ForecastProvider provider_type, Structs.LocationStruct loc, string api) {
