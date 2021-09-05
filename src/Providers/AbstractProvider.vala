@@ -24,6 +24,8 @@ namespace Meteo {
         public signal void updated_today (Structs.WeatherStruct w);
         public signal void updated_long (Gee.ArrayList<Structs.WeatherStruct?> f);
 
+        public int units { get; set; default = 0; }
+
         public bool use_symbolic { get; set; }
 
         public double latitude { get; construct set; }
@@ -33,7 +35,7 @@ namespace Meteo {
         public int64 sunrise { get; set; default = 0; }
         public int64 sunset { get; set; default = 0; }
 
-        public abstract void update_forecast (bool advanced, string units);
+        public abstract void update_forecast (bool advanced);
         public abstract void update_location (Structs.LocationStruct l);
         public abstract void get_place_id (PlaceIdDelegate d);
     }

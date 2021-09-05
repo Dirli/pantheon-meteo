@@ -51,7 +51,7 @@ namespace Meteo {
             city_name = loc.city;
         }
 
-        public override void update_forecast (bool a, string units) {
+        public override void update_forecast (bool a) {
             advanced = a;
 
             gweather_info.update ();
@@ -85,10 +85,26 @@ namespace Meteo {
             weather_struct.icon_name = use_symbolic ? gweather_info.get_symbolic_icon_name () : gweather_info.get_icon_name ();
             weather_struct.description = gweather_info.get_sky ();
             weather_struct.clouds = "-";
-            weather_struct.pressure = gweather_info.get_pressure ();
+
+            var p_unit = Utils.parse_pressure_unit (units);
+            double p_val;
+            if (gweather_info.get_value_pressure (p_unit, out p_val)) {
+                weather_struct.pressure = Utils.pressure_format (p_unit, p_val);
+            }
             weather_struct.humidity = gweather_info.get_humidity ();
-            weather_struct.wind = gweather_info.get_wind ();
-            weather_struct.temp = gweather_info.get_temp_summary ();
+
+            var s_unit = Utils.parse_speed_unit (units);
+            double w_speed;
+            GWeather.WindDirection w_direction;
+            if (gweather_info.get_value_wind (s_unit, out w_speed, out w_direction)) {
+                weather_struct.wind = Utils.wind_format (s_unit, w_speed, w_direction - 1);
+            }
+
+            var t_unit = Utils.parse_temp_unit (units);
+            double t_val;
+            if (gweather_info.get_value_temp (t_unit, out t_val)) {
+                weather_struct.temp = Utils.temp_format (t_unit, t_val);
+            }
 
             long update_val;
             if (gweather_info.get_value_update (out update_val)) {
@@ -100,6 +116,7 @@ namespace Meteo {
         private void parse_long_forecast () {
             var forecast_array = new Gee.ArrayList<Structs.WeatherStruct?> ();
 
+            var t_unit = Utils.parse_temp_unit (units);
             gweather_info.get_forecast_list ().@foreach ((info_iter) => {
                 long iter_date;
                 if (info_iter.get_value_update (out iter_date)) {
@@ -107,7 +124,11 @@ namespace Meteo {
 
                     w_struct.date = iter_date;
                     w_struct.icon_name = use_symbolic ? info_iter.get_symbolic_icon_name () : info_iter.get_icon_name ();
-                    w_struct.temp = info_iter.get_temp_summary ();
+
+                    double t_val;
+                    if (info_iter.get_value_temp (t_unit, out t_val)) {
+                        w_struct.temp = Utils.temp_format (t_unit, t_val);
+                    }
 
                     forecast_array.add (w_struct);
                 }

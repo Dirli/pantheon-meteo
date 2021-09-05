@@ -71,10 +71,10 @@
             <description>Use symbolic icons. Otherwise, application use realistic icons.</description>
         </key>
 
-        <key name="units" type="s">
-            <default>"metric"</default>
+        <key name="units" type="i">
+            <default>0</default>
             <summary>Local units</summary>
-            <description>Units System to use in application: metric or imperial</description>
+            <description>Units System to use in application: default, custom, metric or imperial</description>
         </key>
     </schema>
 </schemalist>

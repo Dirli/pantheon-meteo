@@ -79,12 +79,42 @@ namespace Meteo {
             general_title.halign = Gtk.Align.START;
 
             //System units
+            var units = settings.get_int ("units");
             var unit_label = new Gtk.Label (_("Units") + ":");
             unit_label.halign = Gtk.Align.CENTER;
             var unit_box = new Granite.Widgets.ModeButton ();
-            unit_box.append_text ("\u00B0" + "C - m/s");
-            unit_box.append_text ("\u00B0" + "F - mph");
-            unit_box.selected = settings.get_string ("units") == "metric" ? 0 : 1;
+
+            unit_box.append_text ("Metric");
+            unit_box.append_text ("Imperial");
+            unit_box.append_text ("Custom");
+            unit_box.selected = units & 3;
+
+            var tunit_label = new Gtk.Label (_("Temperature unit"));
+            tunit_label.halign = Gtk.Align.END;
+            var t_units = new Gtk.ComboBoxText ();
+            t_units.append_text (_("kelvin"));
+            t_units.append_text (_("centigrade"));
+            t_units.append_text (_("fahrenheit"));
+            t_units.active = (units & 00070) >> 3;
+
+            var punit_label = new Gtk.Label (_("Pressure unit"));
+            punit_label.halign = Gtk.Align.END;
+            var p_units = new Gtk.ComboBoxText ();
+            p_units.append_text (_("kiloPascal"));
+            p_units.append_text (_("hectoPascal"));
+            p_units.append_text (_("millibars"));
+            p_units.append_text (_("millimeters of mercury"));
+            p_units.append_text (_("inches of mercury"));
+            p_units.active = (units & 00700) >> 6;
+
+            var sunit_label = new Gtk.Label (_("Speed unit"));
+            sunit_label.halign = Gtk.Align.END;
+            var s_units = new Gtk.ComboBoxText ();
+            s_units.append_text (_("meters per second"));
+            s_units.append_text (_("kilometers per hour"));
+            s_units.append_text (_("miles per hour"));
+            s_units.append_text (_("knots"));
+            s_units.active = (units & 07000) >> 9;
 
             //Update interval
             var update_label = new Gtk.Label (_("Update conditions every") + " :");
@@ -103,6 +133,12 @@ namespace Meteo {
             layout.attach (general_title,  0, top++, 2, 1);
             layout.attach (unit_label,     0, top++, 2, 1);
             layout.attach (unit_box,       0, top++, 2, 1);
+            layout.attach (tunit_label,    0, top);
+            layout.attach (t_units,        1, top++);
+            layout.attach (punit_label,    0, top);
+            layout.attach (p_units,        1, top++);
+            layout.attach (sunit_label,    0, top);
+            layout.attach (s_units,        1, top++);
             layout.attach (update_label,   0, top);
             layout.attach (update_box,     1, top++);
             layout.attach (location_label, 0, top);
@@ -130,6 +166,10 @@ namespace Meteo {
 
             GLib.Idle.add (() => {
                 api_key_entry.sensitive = providers.active != 0;
+                t_units.sensitive = unit_box.selected == 2;
+                p_units.sensitive = unit_box.selected == 2;
+                s_units.sensitive = unit_box.selected == 2;
+
                 return false;
             });
 
@@ -154,6 +194,17 @@ namespace Meteo {
             add_button (_("Close"), Gtk.ResponseType.CLOSE);
 
             response.connect (() => {
+                var new_unit = unit_box.selected;
+                if (unit_box.selected == 2) {
+                    new_unit |= (t_units.active << 3);
+                    new_unit |= (p_units.active << 6);
+                    new_unit |= (s_units.active << 9);
+                }
+
+                if (new_unit != units) {
+                    settings.set_int ("units", new_unit);
+                }
+
                 if (providers.active != settings.get_enum ("provider")) {
                     if (providers.active == Enums.ForecastProvider.GWEATHER || api_key_entry.text.length > 0) {
                         settings.reset ("idplace");
@@ -172,7 +223,9 @@ namespace Meteo {
             settings.bind ("personal-key", api_key_entry, "text", SettingsBindFlags.DEFAULT);
 
             unit_box.mode_changed.connect (() => {
-                settings.set_string ("units", unit_box.selected == 1 ? "imperial" : "metric");
+                t_units.sensitive = unit_box.selected == 2;
+                p_units.sensitive = unit_box.selected == 2;
+                s_units.sensitive = unit_box.selected == 2;
             });
         }
     }

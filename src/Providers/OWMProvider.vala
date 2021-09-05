@@ -18,8 +18,6 @@
 
 namespace Meteo {
     public class Providers.OWMProvider : Providers.AbstractProvider {
-        private string units;
-
         public string id_place { get; set; }
         public string api_key {get; construct set;}
 
@@ -71,12 +69,11 @@ namespace Meteo {
             longitude = loc.longitude;
         }
 
-        public override void update_forecast (bool advanced, string u) {
+        public override void update_forecast (bool advanced) {
             if (id_place == "0") {
                 return;
             }
 
-            units = u;
             get_forecast (Enums.ForecastType.CURRENT);
 
             if (advanced) {
@@ -124,23 +121,24 @@ namespace Meteo {
                 weather_struct.icon_name = icon_name;
             }
 
-            weather_struct.temp = Utils.temp_format (units, main_data.get_double_member ("temp"));
-            weather_struct.pressure = Utils.pressure_format ((int) main_data.get_int_member ("pressure"));
+            weather_struct.temp = Utils.temp_format (Utils.parse_temp_unit (units), get_temp_value (main_data.get_double_member ("temp")));
+            weather_struct.pressure = Utils.pressure_format (Utils.parse_pressure_unit (units), get_pressure_value ((int) main_data.get_int_member ("pressure")));
             weather_struct.humidity = "%d%%".printf ((int) main_data.get_int_member ("humidity"));
 
             Json.Object wind = json_object.get_object_member ("wind");
             double? wind_speed = null;
-            double? wind_deg = null;
+            int wind_direction = -1;
             if (wind != null) {
                 if (wind.has_member ("speed")) {
-                    wind_speed = wind.get_double_member ("speed");
+                    wind_speed = get_wind_value (wind.get_double_member ("speed"));
                 }
 
                 if (wind.has_member ("deg")) {
-                    wind_deg = wind.get_double_member ("deg");
+                    double degrees = Math.floor ((wind.get_double_member ("deg") / 22.5) + 0.5);
+                    wind_direction = (int) (degrees % 16);
                 }
             }
-            weather_struct.wind = Utils.wind_format (units, wind_speed, wind_deg);
+            weather_struct.wind = Utils.wind_format (Utils.parse_speed_unit (units), wind_speed, wind_direction);
 
             var clouds = json_object.get_object_member ("clouds");
             if (clouds != null) {
@@ -153,13 +151,14 @@ namespace Meteo {
         private void parse_long_forecast (Json.Object json_object) {
             var struct_array = new Gee.ArrayList<Structs.WeatherStruct?> ();
 
+            var t_unit = Utils.parse_temp_unit (units);
             Json.Array forecast_list = json_object.get_array_member ("list");
             forecast_list.foreach_element ((json_array, i, element_node) => {
                 var el_object = element_node.get_object ();
                 if (el_object != null) {
                     Structs.WeatherStruct weather_struct = {};
                     weather_struct.date = el_object.get_int_member ("dt");
-                    weather_struct.temp = Utils.temp_format (units, el_object.get_object_member ("main").get_double_member ("temp"));
+                    weather_struct.temp = Utils.temp_format (t_unit, get_temp_value (el_object.get_object_member ("main").get_double_member ("temp")));
 
                     var icon_name = Utils.get_icon_name (el_object.get_array_member ("weather").get_object_element (0).get_string_member ("icon"));
                     if (use_symbolic) {
@@ -230,7 +229,8 @@ namespace Meteo {
 
                 if (!update_mtime (cache_json) || need_update (query_type)) {
                     string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
-                    var url_query = @"$(query_type == Enums.ForecastType.CURRENT ? "weather" : "forecast")?id=$(id_place)&APPID=$(api_key)&units=$(units)&lang=$(lang)";
+                    var units_str = ((Enums.Units) units & 3).to_string ();
+                    var url_query = @"$(query_type == Enums.ForecastType.CURRENT ? "weather" : "forecast")?id=$(id_place)&APPID=$(api_key)&units=$(units_str)&lang=$(lang)";
 
                     update_time = 0;
                     var url = Constants.OWM_API_ADDR + url_query;
@@ -275,6 +275,72 @@ namespace Meteo {
 
                 show_alert (1001);
             });
+        }
+
+        private double get_wind_value (double speed) {
+            double w_val = speed;
+            switch (units & 3) {
+                case 2:
+                    var w_unit = (units & 07000) >> 9;
+                    if (w_unit == 1) {
+                        w_val = speed * 3.6;
+                    } else if (w_unit == 2) {
+                        w_val = speed * 2.24;
+                    } else if (w_unit == 3) {
+                        w_val = speed * 1.94;
+                    }
+                    break;
+            }
+
+            return w_val;
+        }
+
+        private double get_temp_value (double temp1) {
+            double t_val = temp1;
+
+            switch (units & 3) {
+                case 2:
+                    var t_unit = (units & 00070) >> 3;
+                    if (t_unit == 1) {
+                        t_val = temp1 - 273.15;
+                    } else if (t_unit == 2) {
+                        t_val = ((temp1 - 273.15) * 1.8000) + 32.00;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            // string tempformat = "%.0f".printf (temp1);
+            // if (temp2 != null) {
+            //     tempformat += "...%.0f".printf (temp2);
+            // }
+
+            return t_val;
+        }
+
+        private double get_pressure_value (int val) {
+            double p_val = (double) val;
+
+            switch (units & 3) {
+                case 1:
+                    p_val = val * 0.02953;
+                    break;
+                case 2:
+                    var p_unit = (units & 00700) >> 6;
+                    if (p_unit == 0) {
+                        p_val = val * 0.1;
+                    } else if (p_unit == 3) {
+                        p_val = val * 0.750063755419211;
+                    } else if (p_unit == 4) {
+                        p_val = val * 0.02953;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return p_val;
         }
     }
 }

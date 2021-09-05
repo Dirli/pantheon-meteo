@@ -35,6 +35,60 @@ namespace Meteo.Utils {
                 return _("Unknown problem yet");
         }
     }
+
+    public GWeather.TemperatureUnit parse_temp_unit (int u) {
+        switch (u & 3) {
+            case 0:
+                return GWeather.TemperatureUnit.CENTIGRADE;
+            case 1:
+                return GWeather.TemperatureUnit.FAHRENHEIT;
+            case 2:
+                // kelvin value="2"
+                // centigrade value="3"
+                // fahrenheit value="4"
+                return (GWeather.TemperatureUnit) (((u & 00070) >> 3) + 2);
+            default:
+                return GWeather.TemperatureUnit.KELVIN;
+        }
+    }
+
+    public GWeather.PressureUnit parse_pressure_unit (int u) {
+        switch (u & 3) {
+            case 0:
+                return GWeather.PressureUnit.HPA;
+            case 1:
+                return GWeather.PressureUnit.INCH_HG;
+            case 2:
+                // kpa value="2"
+                // hpa value="3"
+                // mb value="4"
+                // mm-hg value="5"
+                // inch-hg value="6"
+
+                return (GWeather.PressureUnit) (((u & 00700) >> 6) + 2);
+            default:
+                return GWeather.PressureUnit.HPA;
+        }
+    }
+
+    public GWeather.SpeedUnit parse_speed_unit (int u) {
+        switch (u & 3) {
+            case 0:
+                return GWeather.SpeedUnit.MS;
+            case 1:
+                return GWeather.SpeedUnit.MPH;
+            case 2:
+                // ms value="2"
+                // kph value="3"
+                // mph value="4"
+                // knots value="5"
+
+                return (GWeather.SpeedUnit) (((u & 07000) >> 9) + 2);
+            default:
+                return GWeather.SpeedUnit.MS;
+        }
+    }
+
     public static string get_icon_name (string code) {
         return code == "01d" ? "weather-clear" :
                code == "01n" ? "weather-clear-night" :
@@ -95,22 +149,22 @@ namespace Meteo.Utils {
         }
     }
 
-    public static string temp_format (string units, double temp1, double? temp2 = null) {
-        string tempformat = "%.0f".printf(temp1);
-        if (temp2 != null) {
-            tempformat += "...%.0f".printf(temp2);
-        }
-        tempformat += " \u00B0";
-        switch (units) {
-            case "imperial":
-                tempformat += "F";
+    public static string temp_format (GWeather.TemperatureUnit t_unit, double temp1) {
+        string t_label = "unknown";
+
+        switch (t_unit) {
+            case GWeather.TemperatureUnit.CENTIGRADE:
+                t_label = "\u00B0C";
                 break;
-            case "metric":
-            default:
-                tempformat += "C";
+            case GWeather.TemperatureUnit.FAHRENHEIT:
+                t_label = "\u00B0F";
+                break;
+            case GWeather.TemperatureUnit.KELVIN:
+                t_label = "K";
                 break;
         }
-        return tempformat;
+
+        return "%.0f %s".printf (temp1, t_label);
     }
 
     public static string time_format (GLib.DateTime datetime) {
@@ -125,77 +179,92 @@ namespace Meteo.Utils {
         return timeformat;
     }
 
-    public static string wind_format (string units, double? speed = null, double? deg = null) {
+    public static string wind_format (GWeather.SpeedUnit s_unit, double? speed, int wind_d) {
         if (speed == null) {
             return "no data";
         }
-        string windformat = "%.1f ".printf(speed);
-        switch (units) {
-            case "imperial":
-                windformat += _("mph");
+
+        string w_label = "unknown";
+
+        switch (s_unit) {
+            case GWeather.SpeedUnit.MS:
+                w_label = _("m/s");
                 break;
-            case "metric":
-            default:
-                windformat += _("m/s");
+            case GWeather.SpeedUnit.MPH:
+                w_label = _("mph");
+                break;
+            case GWeather.SpeedUnit.KPH:
+                w_label = _("kph");
+                break;
+            case GWeather.SpeedUnit.KNOTS:
+                w_label = _("knots");
                 break;
         }
 
-        if (deg != null) {
-            double degrees = Math.floor((deg / 22.5) + 0.5);
-            string[] arr = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
-            int index = (int)(degrees % 16);
+        string windformat = "%.1f %s".printf (speed, w_label);
 
-            switch (arr[index]) {
+        string[] arr = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
+        if (wind_d > -1 && wind_d < arr.length) {
+            switch (arr[wind_d]) {
                 case "N":
                 case "NNE":
                 case "NNW":
                     windformat += ", ↓";
-                break;
+                    break;
                 case "NE":
                     windformat += ", ↙";
-                break;
+                    break;
                 case "ENE":
                 case "E":
                 case "ESE":
                     windformat += ", ←";
-                break;
+                    break;
                 case "SE":
                     windformat += ", ↖";
-                break;
+                    break;
                 case "SSE":
                 case "S":
                 case "SSW":
                     windformat += ", ↑";
-                break;
+                    break;
                 case "SW":
                     windformat += ", ↗";
-                break;
+                    break;
                 case "WSW":
                 case "W":
                 case "WNW":
                     windformat += ", →";
-                break;
+                    break;
                 case "NW":
                     windformat += ", ↘";
-                break;
+                    break;
             }
         }
+
         return windformat;
     }
 
-    public static string pressure_format (int val) {
-        string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
-        string presformat;
-        switch (lang) {
-            case "ru":
-                double transfor_val = val * 0.750063755419211;
-                presformat = "%.0f mm Hg".printf(transfor_val);
-                break;
-            default:
-                presformat = "%d hPa".printf(val);
-                break;
+    public static string pressure_format (GWeather.PressureUnit p_unit, double p_val) {
+        string p_label = "unknown";
 
+        switch (p_unit) {
+            case GWeather.PressureUnit.HPA:
+                p_label = _("hPa");
+                break;
+            case GWeather.PressureUnit.INCH_HG:
+                p_label = _("in Hg");
+                break;
+            case GWeather.PressureUnit.MB:
+                p_label = _("mb");
+                break;
+            case GWeather.PressureUnit.KPA:
+                p_label = _("kPa");
+                break;
+            case GWeather.PressureUnit.MM_HG:
+                p_label = _("mm Hg");
+                break;
         }
-        return presformat;
+
+        return "%.0f %s".printf (p_val, p_label);
     }
 }

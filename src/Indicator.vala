@@ -42,7 +42,7 @@ namespace Meteo {
         private Providers.AbstractProvider? weather_provider;
 
         public Indicator () {
-            Object (code_name : "meteo-indicator");
+            Object (code_name: "meteo-indicator");
 
             settings = new GLib.Settings (Constants.APP_NAME);
             visible = settings.get_boolean ("indicator");
@@ -50,7 +50,7 @@ namespace Meteo {
             network_monitor = GLib.NetworkMonitor.get_default ();
             con_service = new Services.Connector ();
 
-            init_provider ();
+            init_weather_provider ();
 
             try {
                 var provider = new Gtk.CssProvider ();
@@ -73,6 +73,7 @@ namespace Meteo {
 
             settings.changed["indicator"].connect (on_indicator_change);
             settings.changed["interval"].connect (on_interval_change);
+            settings.changed["units"].connect (on_units_changed);
         }
 
         public override Gtk.Widget get_display_widget () {
@@ -107,7 +108,7 @@ namespace Meteo {
                 return false;
             }
 
-            weather_provider.update_forecast (false, settings.get_string ("units"));
+            weather_provider.update_forecast (false);
 
             return true;
         }
@@ -138,7 +139,14 @@ namespace Meteo {
             }
         }
 
-        private void init_provider () {
+        private void on_units_changed () {
+            if (weather_provider != null) {
+                weather_provider.units = settings.get_int ("units");
+                start_watcher ();
+            }
+        }
+
+        private void init_weather_provider () {
             Structs.LocationStruct location = {};
 
             location.city = settings.get_string ("city");
@@ -151,6 +159,7 @@ namespace Meteo {
                                                                  location,
                                                                  settings.get_string ("personal-key").replace ("/", ""));
             if (weather_provider != null) {
+                weather_provider.units = settings.get_int ("units");
                 weather_provider.updated_today.connect (update_today);
             }
         }

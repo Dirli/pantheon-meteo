@@ -61,6 +61,7 @@ namespace Meteo {
             settings.changed["auto"].connect (determine_loc);
             settings.changed["provider"].connect (on_changed_provider);
             settings.changed["symbolic"].connect (on_changed_symbolic);
+            settings.changed["units"].connect (on_changed_units);
 
             if (settings.get_boolean ("auto")) {
                 geo_service.auto_detect ();
@@ -132,6 +133,7 @@ namespace Meteo {
                 provider_label.set_label (_("Provider: ") + provider_type.to_string ());
 
                 on_changed_symbolic ();
+                on_changed_units ();
 
                 update_place_id ();
             }
@@ -140,6 +142,12 @@ namespace Meteo {
         private void on_changed_symbolic () {
             if (weather_provider != null) {
                 weather_provider.use_symbolic = settings.get_boolean ("symbolic");
+            }
+        }
+
+        private void on_changed_units () {
+            if (weather_provider != null) {
+                weather_provider.units = settings.get_int ("units");
             }
         }
 
@@ -234,7 +242,7 @@ namespace Meteo {
 
             waiting_page.update_page_label (_("Loading forecast..."));
             main_stack.set_visible_child_name ("waiting");
-            weather_provider.update_forecast (true, settings.get_string ("units"));
+            weather_provider.update_forecast (true);
         }
 
         private void fill_today (Structs.WeatherStruct today_weather) {

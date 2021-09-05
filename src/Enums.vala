@@ -37,4 +37,23 @@ namespace Meteo.Enums {
             }
         }
     }
+
+    public enum Units {
+        METRIC,
+        IMPERIAL,
+        CUSTOM;
+
+        public string to_string () {
+            switch (this) {
+                case IMPERIAL:
+                    return "imperial";
+                case METRIC:
+                    return "metric";
+                case CUSTOM:
+                    return "";
+                default:
+                    GLib.assert_not_reached ();
+            }
+        }
+    }
 }
