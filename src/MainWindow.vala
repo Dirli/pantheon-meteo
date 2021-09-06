@@ -54,6 +54,7 @@ namespace Meteo {
 
             settings.bind ("auto", header, "auto-location", GLib.SettingsBindFlags.GET);
             settings.bind ("idplace", header, "idplace", GLib.SettingsBindFlags.GET);
+            settings.bind ("days-count", weather_page, "max-days", GLib.SettingsBindFlags.GET);
 
             on_changed_provider ();
             geo_service.changed_location.connect (on_changed_location);
@@ -256,9 +257,11 @@ namespace Meteo {
             weather_page.clear_forecast ();
 
             struct_list.@foreach ((weather_iter) => {
-                weather_page.add_forecast_time (new GLib.DateTime.from_unix_local (weather_iter.date),
+                if (!weather_page.add_forecast_time (new GLib.DateTime.from_unix_local (weather_iter.date),
                                                 weather_iter.icon_name,
-                                                weather_iter.temp);
+                                                weather_iter.temp)) {
+                    return false;
+                }
 
                 return true;
             });

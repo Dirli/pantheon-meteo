@@ -41,6 +41,12 @@
             <description>Selected weather forecast provider</description>
         </key>
 
+        <key name="days-count" type="d">
+            <default>5</default>
+            <summary>The number of days for which the forecast is displayed</summary>
+            <description>The number of days for which the forecast is displayed</description>
+        </key>
+
         <key name="idplace" type="s">
             <default>""</default>
             <summary>City ID</summary>

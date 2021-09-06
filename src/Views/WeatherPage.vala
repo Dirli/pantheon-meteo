@@ -21,6 +21,8 @@ namespace Meteo {
         private bool sunrise_added = false;
         private bool sunset_added = false;
 
+        public int max_days { get; set; }
+
         private GLib.DateTime sunrise_time;
         private GLib.DateTime sunset_time;
 
@@ -162,9 +164,13 @@ namespace Meteo {
             return forecast_day;
         }
 
-        public void add_forecast_time (GLib.DateTime forecast_time, string icon_name, string forecast_temp) {
+        public bool add_forecast_time (GLib.DateTime forecast_time, string icon_name, string forecast_temp) {
             var forecast_day = forecast_stack.get_child_by_name (@"$(forecast_time.get_day_of_year ())");
             if (forecast_day == null) {
+                if (forecast_stack.get_children ().length () >= max_days) {
+                    return false;
+                }
+
                 forecast_day = add_day_label (forecast_time);
             }
 
@@ -201,6 +207,8 @@ namespace Meteo {
             hour_box.add (new Gtk.Label (forecast_temp));
 
             ((Gtk.Box) forecast_day).add (hour_box);
+
+            return true;
         }
     }
 }
