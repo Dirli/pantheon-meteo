@@ -229,8 +229,11 @@ namespace Meteo {
 
                 if (!update_mtime (cache_json) || need_update (query_type)) {
                     string lang = Gtk.get_default_language ().to_string ().substring (0, 2);
-                    var units_str = ((Enums.Units) units & 3).to_string ();
-                    var url_query = @"$(query_type == Enums.ForecastType.CURRENT ? "weather" : "forecast")?id=$(id_place)&APPID=$(api_key)&units=$(units_str)&lang=$(lang)";
+                    var url_query = @"$(query_type == Enums.ForecastType.CURRENT ? "weather" : "forecast")?id=$(id_place)&APPID=$(api_key)&lang=$(lang)";
+                    if ((units & 3) < 2) {
+                        var units_str = ((Enums.Units) units & 3).to_string ();
+                        url_query += @"&units=$(units_str)";
+                    }
 
                     update_time = 0;
                     var url = Constants.OWM_API_ADDR + url_query;
