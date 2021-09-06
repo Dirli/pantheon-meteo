@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: io.elementary.meteo\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-17 01:52+0300\n"
+"POT-Creation-Date: 2021-09-06 23:20+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,56 +46,140 @@ msgstr ""
 msgid "Donate"
 msgstr ""
 
-#: src/Dialogs/About.vala:96 src/Dialogs/Preferences.vala:123
+#: src/Dialogs/About.vala:96 src/Dialogs/Preferences.vala:203
 msgid "Close"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:27 src/Widgets/Header.vala:56
+#: src/Dialogs/Preferences.vala:29 src/Widgets/Header.vala:56
 msgid "Preferences"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:34
+#: src/Dialogs/Preferences.vala:39
 msgid "Interface"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:37
-msgid "General"
-msgstr ""
-
-#: src/Dialogs/Preferences.vala:42
+#: src/Dialogs/Preferences.vala:44
 msgid "Symbolic icons"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:48
-msgid "Update conditions every"
+#: src/Dialogs/Preferences.vala:50
+msgid "Display the forecast for (d.)"
 msgstr ""
 
-#: src/Dialogs/Preferences.vala:55
-msgid "Units"
-msgstr ""
-
-#: src/Dialogs/Preferences.vala:64
-msgid "Personal api key:"
-msgstr ""
-
-#: src/Dialogs/Preferences.vala:68
-msgid "Enter personal api key"
-msgstr ""
-
-#: src/Dialogs/Preferences.vala:86
+#: src/Dialogs/Preferences.vala:73
 msgid "Use System Tray Indicator"
 msgstr ""
 
+#: src/Dialogs/Preferences.vala:86
+msgid "General"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:92
+msgid "Units"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:101
+msgid "Temperature unit"
+msgstr ""
+
 #: src/Dialogs/Preferences.vala:104
+msgid "kelvin"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:105
+msgid "centigrade"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:106
+msgid "fahrenheit"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:109
+msgid "Pressure unit"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:112
+msgid "kiloPascal"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:113
+msgid "hectoPascal"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:114
+msgid "millibars"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:115
+msgid "millimeters of mercury"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:116
+msgid "inches of mercury"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:119
+msgid "Speed unit"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:122
+msgid "meters per second"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:123
+msgid "kilometers per hour"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:124
+msgid "miles per hour"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:125 src/Utils.vala:200
+msgid "knots"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:129
+msgid "Update conditions every (h.)"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:136
 msgid "Find my location automatically"
 msgstr ""
 
-#: src/MainWindow.vala:209
-msgid "Last update: "
+#: src/Dialogs/Preferences.vala:139
+msgid "Need to install the geoclue service"
 msgstr ""
 
-#: src/Services/Geolocation.vala:102
-msgid "Couldn't parse the response"
+#: src/Dialogs/Preferences.vala:158
+msgid "Providers"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:162
+msgid "Provider"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:170
+msgid "Personal api key:"
+msgstr ""
+
+#: src/Dialogs/Preferences.vala:174
+msgid "Enter personal api key"
+msgstr ""
+
+#: src/MainWindow.vala:93
+msgid "Something went wrong"
+msgstr ""
+
+#: src/MainWindow.vala:134
+msgid "Provider: "
+msgstr ""
+
+#: src/MainWindow.vala:184
+msgid "Updating the location..."
+msgstr ""
+
+#: src/MainWindow.vala:244
+msgid "Loading the forecast..."
 msgstr ""
 
 #: src/Utils.vala:23
@@ -111,15 +195,51 @@ msgid "Problems with api-key"
 msgstr ""
 
 #: src/Utils.vala:29
+msgid "Couldn't fetch a forecast"
+msgstr ""
+
+#: src/Utils.vala:31
+msgid "Couldn't read the response"
+msgstr ""
+
+#: src/Utils.vala:33
+msgid "Couldn't parse the response"
+msgstr ""
+
+#: src/Utils.vala:35
 msgid "Unknown problem yet"
 msgstr ""
 
-#: src/Utils.vala:129
+#: src/Utils.vala:191
+msgid "m/s"
+msgstr ""
+
+#: src/Utils.vala:194
 msgid "mph"
 msgstr ""
 
-#: src/Utils.vala:133
-msgid "m/s"
+#: src/Utils.vala:197
+msgid "kph"
+msgstr ""
+
+#: src/Utils.vala:252
+msgid "hPa"
+msgstr ""
+
+#: src/Utils.vala:255
+msgid "in Hg"
+msgstr ""
+
+#: src/Utils.vala:258
+msgid "mb"
+msgstr ""
+
+#: src/Utils.vala:261
+msgid "kPa"
+msgstr ""
+
+#: src/Utils.vala:264
+msgid "mm Hg"
 msgstr ""
 
 #: src/Views/DefaultPage.vala:22
@@ -146,24 +266,28 @@ msgstr ""
 msgid "Determine the location manually"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:52
+#: src/Views/WeatherPage.vala:56
 msgid "Today"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:72
+#: src/Views/WeatherPage.vala:76
 msgid "Pressure:"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:77
+#: src/Views/WeatherPage.vala:81
 msgid "Humidity:"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:82
+#: src/Views/WeatherPage.vala:86
 msgid "Wind:"
 msgstr ""
 
-#: src/Views/WeatherPage.vala:87
+#: src/Views/WeatherPage.vala:91
 msgid "Cloudiness:"
+msgstr ""
+
+#: src/Views/WeatherPage.vala:147
+msgid "Last update: "
 msgstr ""
 
 #: src/Widgets/Header.vala:71
