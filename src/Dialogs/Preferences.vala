@@ -46,13 +46,6 @@ namespace Meteo {
             Gtk.Switch icon = new Gtk.Switch ();
             icon.halign = Gtk.Align.START;
 
-            //Update interval
-            var days_label = new Gtk.Label (_("Display the forecast for (d.)") + " :");
-            days_label.halign = Gtk.Align.END;
-            var days_box = new Gtk.SpinButton.with_range (5, 10, 1);
-            days_box.set_halign (Gtk.Align.END);
-            days_box.set_width_chars (4);
-
             //Create UI
             var layout = new Gtk.Grid ();
             layout.valign = Gtk.Align.START;
@@ -65,8 +58,6 @@ namespace Meteo {
             layout.attach (interface_title, 0, top++, 2);
             layout.attach (icon_label,      0, top);
             layout.attach (icon,            1, top++);
-            layout.attach (days_label,      0, top++);
-            layout.attach (days_box,        1, top++);
 
             //Select indicator
 #if INDICATOR_EXIST
@@ -80,6 +71,16 @@ namespace Meteo {
 
             settings.bind ("indicator", ind_switch, "active", GLib.SettingsBindFlags.DEFAULT);
 #endif
+
+            //Update interval
+            var days_label = new Gtk.Label (_("Display the forecast for (d.)") + " :");
+            days_label.halign = Gtk.Align.END;
+            var days_box = new Gtk.SpinButton.with_range (5, 10, 1);
+            days_box.set_halign (Gtk.Align.START);
+            days_box.set_width_chars (4);
+
+            layout.attach (days_label,      0, top);
+            layout.attach (days_box,        1, top++);
             layout.attach (new Gtk.Separator (Gtk.Orientation.HORIZONTAL), 0, top++, 2, 1);
 
             // General section
@@ -129,7 +130,7 @@ namespace Meteo {
             var update_label = new Gtk.Label (_("Update conditions every (h.)") + " :");
             update_label.halign = Gtk.Align.END;
             var update_box = new Gtk.SpinButton.with_range (1, 24, 1);
-            update_box.set_halign (Gtk.Align.END);
+            update_box.set_halign (Gtk.Align.START);
             update_box.set_width_chars (4);
 
             //Automatic location
