@@ -26,6 +26,8 @@ namespace Meteo {
         private GLib.DateTime sunrise_time;
         private GLib.DateTime sunset_time;
 
+        private GLib.HashTable<int, Gtk.Box> days_hash;
+
         private Gtk.Image today_icon;
         private Gtk.Label today_temp;
         private Gtk.Label today_pressure;
@@ -45,6 +47,8 @@ namespace Meteo {
         }
 
         construct {
+            days_hash = new GLib.HashTable<int, Gtk.Box> (direct_hash, direct_equal);
+
             // today
             var today_grid = new Gtk.Grid ();
             today_grid.valign = Gtk.Align.CENTER;
@@ -140,6 +144,8 @@ namespace Meteo {
             foreach (unowned Gtk.Widget box in forecast_stack.get_children ()) {
                 forecast_stack.remove (box);
             }
+
+            days_hash.remove_all ();
         }
 
         public void update_today (Structs.WeatherStruct weather_struct) {
@@ -156,23 +162,29 @@ namespace Meteo {
             weather_main.label = weather_struct.description;
         }
 
-        private Gtk.Widget add_day_label (GLib.DateTime date) {
+        private void add_day_label (GLib.DateTime date) {
             var forecast_day = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 12);
             forecast_day.halign = Gtk.Align.CENTER;
-            forecast_stack.add_titled (forecast_day, @"$(date.get_day_of_year ())", date.format ("%a, %d %b"));
+            forecast_day.margin_bottom = 10;
 
-            return forecast_day;
+            var scrolled_window = new Gtk.ScrolledWindow (null, null);
+            scrolled_window.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER);
+            scrolled_window.add (forecast_day);
+
+            forecast_stack.add_titled (scrolled_window, @"$(date.get_day_of_year ())", date.format ("%a, %d %b"));
+
+            days_hash.insert (date.get_day_of_year (), forecast_day);
         }
 
         public bool add_forecast_time (GLib.DateTime forecast_time, string icon_name, string forecast_temp) {
-            var forecast_day = forecast_stack.get_child_by_name (@"$(forecast_time.get_day_of_year ())");
-            if (forecast_day == null) {
-                if (forecast_stack.get_children ().length () >= max_days) {
+            if (!days_hash.contains (forecast_time.get_day_of_year ())) {
+                if (days_hash.size () >= max_days) {
                     return false;
                 }
 
-                forecast_day = add_day_label (forecast_time);
+                add_day_label (forecast_time);
             }
+            var forecast_day = days_hash.get (forecast_time.get_day_of_year ());
 
             if (!sunrise_added && sunrise_time != null && sunrise_time.get_day_of_year () == forecast_time.get_day_of_year ()) {
                 if (forecast_time.get_hour () > sunrise_time.get_hour () && (forecast_time.get_hour () - 3) <= sunrise_time.get_hour ()) {
@@ -182,7 +194,7 @@ namespace Meteo {
                     sunrise_box.add (new Gtk.Label (Utils.time_format (sunrise_time)));
                     sunrise_box.add (new Gtk.Image.from_icon_name ("daytime-sunrise-symbolic", Gtk.IconSize.DIALOG));
 
-                    ((Gtk.Box) forecast_day).add (sunrise_box);
+                    forecast_day.add (sunrise_box);
                 }
             }
 
@@ -194,7 +206,7 @@ namespace Meteo {
                     sunset_box.add (new Gtk.Label (Utils.time_format (sunset_time)));
                     sunset_box.add (new Gtk.Image.from_icon_name ("daytime-sunset-symbolic", Gtk.IconSize.DIALOG));
 
-                    ((Gtk.Box) forecast_day).add (sunset_box);
+                    forecast_day.add (sunset_box);
                 }
             }
 
@@ -206,7 +218,7 @@ namespace Meteo {
             hour_box.add (forecast_icon);
             hour_box.add (new Gtk.Label (forecast_temp));
 
-            ((Gtk.Box) forecast_day).add (hour_box);
+            forecast_day.add (hour_box);
 
             return true;
         }

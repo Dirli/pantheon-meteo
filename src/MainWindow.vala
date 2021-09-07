@@ -181,7 +181,7 @@ namespace Meteo {
         private void update_place_id () {
             if (settings.get_string ("idplace") == "") {
                 Utils.clear_cache ();
-                waiting_page.update_page_label (_("Update location..."));
+                waiting_page.update_page_label (_("Updating the location..."));
 
                 weather_provider.get_place_id ((res) => {
                     settings.set_string ("idplace", res);
@@ -241,7 +241,7 @@ namespace Meteo {
                 return;
             }
 
-            waiting_page.update_page_label (_("Loading forecast..."));
+            waiting_page.update_page_label (_("Loading the forecast..."));
             main_stack.set_visible_child_name ("waiting");
             weather_provider.update_forecast (true);
         }
