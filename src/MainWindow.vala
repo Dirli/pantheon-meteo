@@ -33,6 +33,11 @@ namespace Meteo {
 
         private Gtk.Label provider_label;
 
+        private const ActionEntry[] ACTION_ENTRIES = {
+            { Constants.ACTION_QUIT, action_quit },
+            { Constants.ACTION_PREFERENCES, action_preferences },
+        };
+
         public MainWindow (MeteoApp app) {
             Object (application: app,
                     window_position: Gtk.WindowPosition.CENTER);
@@ -40,9 +45,16 @@ namespace Meteo {
             Gtk.CssProvider provider = new Gtk.CssProvider ();
             provider.load_from_resource ("/io/elementary/meteo/application.css");
             Gtk.StyleContext.add_provider_for_screen (Gdk.Screen.get_default (), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+            application.set_accels_for_action (Constants.ACTION_PREFIX + Constants.ACTION_QUIT, {"<Control>q"});
+            application.set_accels_for_action (Constants.ACTION_PREFIX + Constants.ACTION_PREFERENCES, {"<Control>p"});
         }
 
         construct {
+            var actions = new GLib.SimpleActionGroup ();
+            actions.add_action_entries (ACTION_ENTRIES, this);
+            insert_action_group ("win", actions);
+
             set_default_size (750, 400);
 
             settings = new GLib.Settings (Constants.APP_NAME);
@@ -77,11 +89,7 @@ namespace Meteo {
             header.update_data.connect (fetch_data);
             header.changed_location.connect (on_changed_location);
             header.change_location.connect (determine_loc);
-            header.show_preferences.connect (() => {
-                var preferences = new Dialogs.Preferences (this);
-                preferences.show_all ();
-                preferences.run ();
-            });
+            header.show_preferences.connect (action_preferences);
 
             set_titlebar (header);
 
@@ -116,6 +124,16 @@ namespace Meteo {
 
             main_stack.notify["visible-child-name"].connect (on_changed_child);
             add (view_box);
+        }
+
+        private void action_quit () {
+            destroy ();
+        }
+
+        private void action_preferences () {
+            var preferences = new Dialogs.Preferences (this);
+            preferences.show_all ();
+            preferences.run ();
         }
 
         private void on_changed_provider () {

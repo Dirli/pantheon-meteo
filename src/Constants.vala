@@ -24,4 +24,8 @@ namespace Meteo.Constants {
 
     public const string OWM_API_ADDR = "http://api.openweathermap.org/data/2.5/";
     public const string API_KEY = "5767c553547943d85f70c2849aa47cc8";
+
+    public const string ACTION_PREFIX = "win.";
+    public const string ACTION_QUIT = "action-quit";
+    public const string ACTION_PREFERENCES = "action-preferences";
 }
