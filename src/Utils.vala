@@ -150,19 +150,10 @@ namespace Meteo.Utils {
     }
 
     public static string temp_format (GWeather.TemperatureUnit t_unit, double temp1) {
-        string t_label = "unknown";
-
-        switch (t_unit) {
-            case GWeather.TemperatureUnit.CENTIGRADE:
-                t_label = "\u00B0C";
-                break;
-            case GWeather.TemperatureUnit.FAHRENHEIT:
-                t_label = "\u00B0F";
-                break;
-            case GWeather.TemperatureUnit.KELVIN:
-                t_label = "K";
-                break;
-        }
+        string t_label = t_unit == GWeather.TemperatureUnit.CENTIGRADE ? "\u00B0C" :
+                         t_unit == GWeather.TemperatureUnit.FAHRENHEIT ? "\u00B0F" :
+                         t_unit == GWeather.TemperatureUnit.KELVIN ? "K" :
+                         "unknown";
 
         return "%.0f %s".printf (temp1, t_label);
     }
@@ -184,22 +175,11 @@ namespace Meteo.Utils {
             return "no data";
         }
 
-        string w_label = "unknown";
-
-        switch (s_unit) {
-            case GWeather.SpeedUnit.MS:
-                w_label = _("m/s");
-                break;
-            case GWeather.SpeedUnit.MPH:
-                w_label = _("mph");
-                break;
-            case GWeather.SpeedUnit.KPH:
-                w_label = _("kph");
-                break;
-            case GWeather.SpeedUnit.KNOTS:
-                w_label = _("knots");
-                break;
-        }
+        string w_label = s_unit == GWeather.SpeedUnit.MS ? _("m/s") :
+                         s_unit == GWeather.SpeedUnit.MPH ? _("mph") :
+                         s_unit == GWeather.SpeedUnit.KPH ? _("kph") :
+                         s_unit == GWeather.SpeedUnit.KNOTS ? _("knots") :
+                         "unknown";
 
         string windformat = "%.1f %s".printf (speed, w_label);
 
@@ -245,25 +225,12 @@ namespace Meteo.Utils {
     }
 
     public static string pressure_format (GWeather.PressureUnit p_unit, double p_val) {
-        string p_label = "unknown";
-
-        switch (p_unit) {
-            case GWeather.PressureUnit.HPA:
-                p_label = _("hPa");
-                break;
-            case GWeather.PressureUnit.INCH_HG:
-                p_label = _("in Hg");
-                break;
-            case GWeather.PressureUnit.MB:
-                p_label = _("mb");
-                break;
-            case GWeather.PressureUnit.KPA:
-                p_label = _("kPa");
-                break;
-            case GWeather.PressureUnit.MM_HG:
-                p_label = _("mm Hg");
-                break;
-        }
+        string p_label = p_unit == GWeather.PressureUnit.HPA ? _("hPa") :
+                         p_unit == GWeather.PressureUnit.INCH_HG ? _("in Hg") :
+                         p_unit == GWeather.PressureUnit.MB ? _("mb") :
+                         p_unit == GWeather.PressureUnit.KPA ? _("kPa") :
+                         p_unit == GWeather.PressureUnit.MM_HG ? _("mm Hg") :
+                         "unknown";
 
         return "%.0f %s".printf (p_val, p_label);
     }
