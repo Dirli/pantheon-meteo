@@ -12,8 +12,8 @@ Know the forecast of the next hours & days using OpenWeatherMap API (https://ope
 ### Features:
 * Current weather, with information about temperature, pressure, wind speed and direction, sunrise & sunset.
 * Forecast for next 18 hours.
-* Forecast for next five days.
-* Choose your units (metric or imperial).
+* Forecast for next 5-10 days (depending on the provider).
+* Choose your units (custom, metric or imperial).
 * Choosing a forecast provider
 * Wingpanel indicator.
 

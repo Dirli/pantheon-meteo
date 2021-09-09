@@ -1,3 +1,18 @@
+pantheon-meteo (1.0.0-1) bullseye; urgency=medium
+
+  * added provider selection from the list
+  * added animation of the data request
+  * add several hotkeys (ctrl+q, ctrl+p)
+  * switching to the GPL3 license
+  * improved the selection of units
+  * added the ability to select the number of displayed days
+  * added ScrolledWindow for forecast view that the window was not stretched
+  * replaced the Wingpanel.Separator with Gtk.Separator
+  * update names of libwingpanel dependency
+  * updated app icon
+
+ -- dirli <litandrej85@gmail.com>  Thu, 9 Sep 2021 12:52:12 +0300
+
 pantheon-meteo (0.10.0-1) testing; urgency=medium
 
   * improved network tracking with the indicator
