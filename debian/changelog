@@ -1,3 +1,9 @@
+pantheon-meteo (1.0.1-1) bullseye; urgency=medium
+
+  * json-glib version has been upgraded
+
+ -- dirli <litandrej85@gmail.com>  Fri, 17 Sep 2021 23:07:09 +0300
+
 pantheon-meteo (1.0.0-1) bullseye; urgency=medium
 
   * added provider selection from the list

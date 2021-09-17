@@ -1,7 +1,7 @@
 project (
   'io.elementary.meteo',
   ['vala', 'c'],
-  version: '1.0.0'
+  version: '1.0.1'
 )
 
 gnome = import ('gnome')
@@ -39,7 +39,7 @@ common_deps = [
   dependency ('glib-2.0'),
   dependency ('gtk+-3.0'),
   dependency ('libsoup-2.4'),
-  dependency ('json-glib-1.0'),
+  dependency ('json-glib-1.0', version: '>=1.6.0'),
   gweather_dep,
   meson.get_compiler ('c').find_library ('m'),
   meson.get_compiler ('vala').find_library ('posix'),
