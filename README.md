@@ -34,7 +34,7 @@ Know the forecast of the next hours & days using OpenWeatherMap API (https://ope
 * libgranite-dev
 * libgtk-3-dev
 * libgweather-3-dev
-* libjson-glib-dev (>= 1.16)
+* libjson-glib-dev
 * libsoup2.4-dev
 * libwingpanel-dev (>= 3.0)
 * meson

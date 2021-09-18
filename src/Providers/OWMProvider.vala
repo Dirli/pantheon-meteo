@@ -49,8 +49,8 @@ namespace Meteo {
                     var root = parser.get_root ();
                     if (root != null) {
                         var root_object = root.get_object ();
-                        if (root_object != null) {
-                            id_place = root_object.get_int_member_with_default ("id", 0).to_string ();
+                        if (root_object != null && root_object.has_member ("id")) {
+                            id_place = root_object.get_int_member ("id").to_string ();
                             cb (id_place);
 
                             return;
