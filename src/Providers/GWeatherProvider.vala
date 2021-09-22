@@ -31,7 +31,9 @@ namespace Meteo {
         }
 
         construct {
-            GWeather.Location gweather_location = new GWeather.Location.detached (city_name, null, latitude, longitude);
+            // GWeather.Location gweather_location = new GWeather.Location.detached (city_name, null, latitude, longitude);
+            var gweather_location = GWeather.Location.get_world ();
+            gweather_location = gweather_location.find_nearest_city (latitude, longitude);
 
             gweather_info = new GWeather.Info (gweather_location);
 #if GWEATHER_40
