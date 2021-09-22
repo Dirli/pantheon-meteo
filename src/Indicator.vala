@@ -155,7 +155,7 @@ namespace Meteo {
             location.longitude = settings.get_double ("longitude");
             location.idplace = settings.get_string ("idplace");
 
-            weather_provider = con_service.get_weather_provider (Enums.ForecastProvider.GWEATHER,
+            weather_provider = con_service.get_weather_provider ((Enums.ForecastProvider) settings.get_enum ("provider"),
                                                                  location,
                                                                  settings.get_string ("personal-key").replace ("/", ""));
             if (weather_provider != null) {
