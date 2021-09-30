@@ -139,23 +139,15 @@ namespace Meteo {
         private void on_changed_provider () {
             weather_provider = null;
 
-            var provider_type = (Enums.ForecastProvider) settings.get_enum ("provider");
-            weather_provider = con_service.get_weather_provider (provider_type,
-                                                                 get_location (),
-                                                                 settings.get_string ("personal-key").replace ("/", ""));
+            Structs.LocationStruct location = {};
 
-            if (weather_provider != null) {
-                weather_provider.updated_today.connect (fill_today);
-                weather_provider.updated_long.connect (fill_forecast);
-                weather_provider.show_alert.connect (on_show_alert);
+            location.city = settings.get_string ("city");
+            location.country = settings.get_string ("country");
+            location.latitude = settings.get_double ("latitude");
+            location.longitude = settings.get_double ("longitude");
+            location.idplace = settings.get_string ("idplace");
 
-                provider_label.set_label (_("Provider: ") + provider_type.to_string ());
-
-                on_changed_symbolic ();
-                on_changed_units ();
-
-                update_place_id ();
-            }
+            init_weather_provider (location);
         }
 
         private void on_changed_symbolic () {
@@ -188,6 +180,8 @@ namespace Meteo {
             if (weather_provider != null) {
                 weather_provider.update_location (loc);
                 update_place_id ();
+            } else {
+                init_weather_provider (loc);
             }
         }
 
@@ -206,6 +200,26 @@ namespace Meteo {
                     init_location ();
                     fetch_data ();
                 });
+            }
+        }
+
+        private void init_weather_provider (Structs.LocationStruct loc) {
+            var provider_type = (Enums.ForecastProvider) settings.get_enum ("provider");
+            weather_provider = con_service.get_weather_provider (provider_type,
+                                                                 loc,
+                                                                 settings.get_string ("personal-key").replace ("/", ""));
+
+            if (weather_provider != null) {
+                weather_provider.updated_today.connect (fill_today);
+                weather_provider.updated_long.connect (fill_forecast);
+                weather_provider.show_alert.connect (on_show_alert);
+
+                provider_label.set_label (_("Provider: ") + provider_type.to_string ());
+
+                on_changed_symbolic ();
+                on_changed_units ();
+
+                update_place_id ();
             }
         }
 
@@ -240,18 +254,6 @@ namespace Meteo {
             } else {
                 header.set_title (@"$(settings.get_string ("city")), $(settings.get_string ("country"))");
             }
-        }
-
-        private Structs.LocationStruct get_location () {
-            Structs.LocationStruct location = {};
-
-            location.city = settings.get_string ("city");
-            location.country = settings.get_string ("country");
-            location.latitude = settings.get_double ("latitude");
-            location.longitude = settings.get_double ("longitude");
-            location.idplace = settings.get_string ("idplace");
-
-            return location;
         }
 
         public void fetch_data () {
