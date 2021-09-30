@@ -134,6 +134,18 @@ namespace Meteo {
 
         private void on_idplace_changed () {
             if (settings.get_string ("idplace") != "") {
+                if (weather_provider != null) {
+                    Structs.LocationStruct location = {};
+
+                    location.city = settings.get_string ("city");
+                    location.country = settings.get_string ("country");
+                    location.latitude = settings.get_double ("latitude");
+                    location.longitude = settings.get_double ("longitude");
+                    location.idplace = settings.get_string ("idplace");
+
+                    weather_provider.update_location (location);
+                }
+
                 start_watcher ();
             }
         }

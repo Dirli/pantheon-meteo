@@ -51,6 +51,11 @@ namespace Meteo {
             latitude = loc.latitude;
             longitude = loc.longitude;
             city_name = loc.city;
+
+            var new_location = GWeather.Location.get_world ();
+            new_location = new_location.find_nearest_city (latitude, longitude);
+
+            gweather_info.set_location (new_location);
         }
 
         public override void update_forecast (bool a) {
