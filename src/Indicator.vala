@@ -39,7 +39,7 @@ namespace Meteo {
         private Services.Connector con_service;
         private GLib.NetworkMonitor network_monitor;
 
-        private Providers.AbstractProvider? weather_provider;
+        private Providers.AbstractProvider? weather_provider = null;
 
         public Indicator () {
             Object (code_name: "meteo-indicator");
@@ -60,10 +60,8 @@ namespace Meteo {
                 logind_manager = GLib.Bus.get_proxy_sync (GLib.BusType.SYSTEM, Constants.LOGIND_BUS_NAME, Constants.LOGIND_BUS_PATH);
                 if (logind_manager != null) {
                     logind_manager.prepare_for_sleep.connect ((start) => {
-                        if (!start && settings.get_boolean ("indicator")) {
-                            if (network_monitor.get_connectivity () == NetworkConnectivity.FULL) {
-                                start_watcher ();
-                            }
+                        if (!start) {
+                            start_watcher ();
                         }
                     });
                 }
@@ -74,15 +72,14 @@ namespace Meteo {
             settings.changed["indicator"].connect (on_indicator_change);
             settings.changed["interval"].connect (on_interval_change);
             settings.changed["units"].connect (on_units_changed);
+            settings.changed["idplace"].connect (on_idplace_changed);
         }
 
         public override Gtk.Widget get_display_widget () {
             if (panel_wid == null) {
                 panel_wid = new Widgets.Panel ();
                 if (visible) {
-                    if (network_monitor.get_connectivity () == NetworkConnectivity.FULL) {
-                        start_watcher ();
-                    }
+                    start_watcher ();
 
                     network_monitor.network_changed.connect (on_network_changed);
                 }
@@ -116,17 +113,13 @@ namespace Meteo {
         protected void on_indicator_change () {
             if (settings.get_boolean ("indicator")) {
                 visible = true;
-
-                if (network_monitor.get_connectivity () == NetworkConnectivity.FULL) {
-                    start_watcher ();
-                }
-
                 network_monitor.network_changed.connect (on_network_changed);
             } else {
                 visible = false;
-                stop_watcher ();
                 network_monitor.network_changed.disconnect (on_network_changed);
             }
+
+            start_watcher ();
         }
 
         protected void on_interval_change () {
@@ -139,6 +132,12 @@ namespace Meteo {
             }
         }
 
+        private void on_idplace_changed () {
+            if (settings.get_string ("idplace") != "") {
+                start_watcher ();
+            }
+        }
+
         private void on_units_changed () {
             if (weather_provider != null) {
                 weather_provider.units = settings.get_int ("units");
@@ -146,7 +145,7 @@ namespace Meteo {
             }
         }
 
-        private void init_weather_provider () {
+        private bool init_weather_provider () {
             Structs.LocationStruct location = {};
 
             location.city = settings.get_string ("city");
@@ -161,7 +160,11 @@ namespace Meteo {
             if (weather_provider != null) {
                 weather_provider.units = settings.get_int ("units");
                 weather_provider.updated_today.connect (update_today);
+
+                return true;
             }
+
+            return false;
         }
 
         private void update_today (Structs.WeatherStruct weather_struct) {
@@ -179,6 +182,12 @@ namespace Meteo {
 
         private void start_watcher () {
             stop_watcher ();
+
+            if (!visible ||
+                network_monitor.get_connectivity () != NetworkConnectivity.FULL ||
+                !(weather_provider != null || init_weather_provider ())) {
+                return;
+            }
 
             var interval = settings.get_int ("interval") * 3600;
             interval = interval >= 3600 ? interval : 3600;
