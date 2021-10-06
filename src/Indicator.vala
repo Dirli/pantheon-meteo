@@ -94,6 +94,8 @@ namespace Meteo {
                 popover_wid.hide_indicator.connect (() => {
                     settings.set_boolean ("indicator", false);
                 });
+
+                settings.bind ("city", popover_wid, "city-name", GLib.SettingsBindFlags.GET);
             }
 
             return popover_wid;
@@ -184,8 +186,7 @@ namespace Meteo {
                 panel_wid.update_state (weather_struct.temp, weather_struct.icon_name);
 
                 if (popover_wid != null) {
-                    popover_wid.update_state (settings.get_string ("city"),
-                                              weather_struct,
+                    popover_wid.update_state (weather_struct,
                                               weather_provider.sunrise,
                                               weather_provider.sunset);
                 }

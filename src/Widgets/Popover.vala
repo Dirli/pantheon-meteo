@@ -28,11 +28,16 @@ namespace Meteo {
         private Gtk.Label sunrise_item;
         private Gtk.Label sunset_item;
 
+        public string city_name {
+            set {
+                city_item.label = value;
+            }
+        }
+
         public Popover () {
             Object (orientation: Gtk.Orientation.HORIZONTAL,
                     hexpand: true,
                     row_spacing: 10);
-
         }
 
         construct {
@@ -40,29 +45,12 @@ namespace Meteo {
             city_item.get_style_context ().add_class ("city");
             city_item.margin_top = 10;
 
-            humidity_item = new Gtk.Label ("-");
-            humidity_item.halign = Gtk.Align.START;
-            Gtk.Box humidity_box = create_box (humidity_item, create_icon ("weather-showers", _("Humidity")));
-
-            pressure_item = new Gtk.Label ("-");
-            pressure_item.halign = Gtk.Align.START;
-            Gtk.Box pressure_box = create_box (pressure_item, create_icon ("weather-severe-alert", _("Pressure")));
-
-            wind_item = new Gtk.Label ("-");
-            wind_item.halign = Gtk.Align.START;
-            Gtk.Box wind_box = create_box (wind_item, create_icon ("weather-windy", _("Wind")));
-
-            cloud_item = new Gtk.Label ("-");
-            cloud_item.halign = Gtk.Align.START;
-            Gtk.Box cloud_box = create_box (cloud_item, create_icon ("weather-overcast", _("Clouds")));
-
-            sunrise_item = new Gtk.Label ("-");
-            sunrise_item.halign = Gtk.Align.START;
-            Gtk.Box sunrise_box = create_box (sunrise_item, create_icon ("daytime-sunrise", _("Sunrise")));
-
-            sunset_item = new Gtk.Label ("-");
-            sunset_item.halign = Gtk.Align.START;
-            Gtk.Box sunset_box = create_box (sunset_item, create_icon ("daytime-sunset", _("Sunset")));
+            humidity_item = new Gtk.Label (null);
+            pressure_item = new Gtk.Label (null);
+            wind_item = new Gtk.Label (null);
+            cloud_item = new Gtk.Label (null);
+            sunrise_item = new Gtk.Label (null);
+            sunset_item = new Gtk.Label (null);
 
             var separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
             separator.hexpand = true;
@@ -91,21 +79,19 @@ namespace Meteo {
                 }
             });
 
-            attach (city_item,    0, 0, 1, 1);
-            attach (humidity_box, 0, 1, 1, 1);
-            attach (pressure_box, 0, 2, 1, 1);
-            attach (wind_box,     0, 3, 1, 1);
-            attach (cloud_box,    0, 4, 1, 1);
-            attach (sunrise_box,  0, 5, 1, 1);
-            attach (sunset_box,   0, 6, 1, 1);
-            attach (separator,    0, 7, 1, 1);
-            attach (hide_button,  0, 8, 1, 1);
-            attach (app_button,   0, 9, 1, 1);
+            attach (city_item, 0, 0);
+            attach (create_box (humidity_item, create_icon ("weather-showers", _("Humidity"))), 0, 1);
+            attach (create_box (pressure_item, create_icon ("weather-severe-alert", _("Pressure"))), 0, 2);
+            attach (create_box (wind_item, create_icon ("weather-windy", _("Wind"))), 0, 3);
+            attach (create_box (cloud_item, create_icon ("weather-overcast", _("Clouds"))), 0, 4);
+            attach (create_box (sunrise_item, create_icon ("daytime-sunrise", _("Sunrise"))), 0, 5);
+            attach (create_box (sunset_item, create_icon ("daytime-sunset", _("Sunset"))), 0, 6);
+            attach (separator, 0, 7);
+            attach (hide_button, 0, 8);
+            attach (app_button, 0, 9);
         }
 
-        public void update_state (string city_name, Structs.WeatherStruct w, int64 sunrise, int64 sunset) {
-            city_item.label = city_name;
-
+        public void update_state (Structs.WeatherStruct w, int64 sunrise, int64 sunset) {
             humidity_item.label = w.humidity;
             pressure_item.label = w.pressure;
             wind_item.label = w.wind;
@@ -130,6 +116,8 @@ namespace Meteo {
         }
 
         private Gtk.Box create_box (Gtk.Label elem_label, Gtk.Image elem_img) {
+            elem_label.halign = Gtk.Align.START;
+
             Gtk.Box elem_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 10);
             elem_box.pack_start (elem_img, false, false, 0);
             elem_box.pack_start (elem_label, false, false, 0);
