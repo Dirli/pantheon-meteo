@@ -18,7 +18,7 @@
 
 namespace Meteo {
     public class MainWindow : Gtk.Window {
-        public GLib.Settings settings;
+        public Services.SettingsWrapper settings;
 
         private Gtk.Stack main_stack;
         private Views.WeatherPage weather_page;
@@ -66,7 +66,7 @@ namespace Meteo {
 
             set_default_size (750, 400);
 
-            settings = new GLib.Settings (Constants.APP_NAME);
+            settings = new Services.SettingsWrapper ();
 
             con_service = new Services.Connector ();
             geo_service = new Services.Geolocation ();
@@ -148,15 +148,7 @@ namespace Meteo {
         private void on_changed_provider () {
             weather_provider = null;
 
-            Structs.LocationStruct location = {};
-
-            location.city = settings.get_string ("city");
-            location.country = settings.get_string ("country");
-            location.latitude = settings.get_double ("latitude");
-            location.longitude = settings.get_double ("longitude");
-            location.idplace = settings.get_string ("idplace");
-
-            init_weather_provider (location);
+            init_weather_provider (settings.get_location ());
         }
 
         private void on_changed_symbolic () {
@@ -181,10 +173,7 @@ namespace Meteo {
         private void on_changed_location (Structs.LocationStruct loc) {
             reset_location ();
 
-            settings.set_string ("city", loc.city);
-            settings.set_string ("country", loc.country);
-            settings.set_double ("latitude", loc.latitude);
-            settings.set_double ("longitude", loc.longitude);
+            settings.set_location (loc);
 
             if (weather_provider != null) {
                 weather_provider.update_location (loc);
@@ -235,11 +224,7 @@ namespace Meteo {
         private void reset_location () {
             main_stack.set_visible_child_name ("default");
 
-            settings.reset ("longitude");
-            settings.reset ("latitude");
-            settings.reset ("city");
-            settings.reset ("country");
-            settings.reset ("idplace");
+            settings.set_location (null);
 
             weather_page.reset_today ();
             weather_page.clear_forecast ();
@@ -287,8 +272,8 @@ namespace Meteo {
 
             struct_list.@foreach ((weather_iter) => {
                 if (!weather_page.add_forecast_time (new GLib.DateTime.from_unix_local (weather_iter.date),
-                                                weather_iter.icon_name,
-                                                weather_iter.temp)) {
+                                                     weather_iter.icon_name,
+                                                     weather_iter.temp)) {
                     return false;
                 }
 

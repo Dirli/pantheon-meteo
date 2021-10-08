@@ -29,7 +29,7 @@ namespace Meteo {
     """;
 
     public class Indicator : Wingpanel.Indicator {
-        private GLib.Settings settings;
+        private Services.SettingsWrapper settings;
         private uint timeout_id;
 
         private Widgets.Panel? panel_wid = null;
@@ -44,7 +44,7 @@ namespace Meteo {
         public Indicator () {
             Object (code_name: "meteo-indicator");
 
-            settings = new GLib.Settings (Constants.APP_NAME);
+            settings = new Services.SettingsWrapper ();
             visible = settings.get_boolean ("indicator");
 
             network_monitor = GLib.NetworkMonitor.get_default ();
@@ -137,15 +137,7 @@ namespace Meteo {
         private void on_idplace_changed () {
             if (settings.get_string ("idplace") != "") {
                 if (weather_provider != null) {
-                    Structs.LocationStruct location = {};
-
-                    location.city = settings.get_string ("city");
-                    location.country = settings.get_string ("country");
-                    location.latitude = settings.get_double ("latitude");
-                    location.longitude = settings.get_double ("longitude");
-                    location.idplace = settings.get_string ("idplace");
-
-                    weather_provider.update_location (location);
+                    weather_provider.update_location (settings.get_location ());
                 }
 
                 start_watcher ();
@@ -160,16 +152,8 @@ namespace Meteo {
         }
 
         private bool init_weather_provider () {
-            Structs.LocationStruct location = {};
-
-            location.city = settings.get_string ("city");
-            location.country = settings.get_string ("country");
-            location.latitude = settings.get_double ("latitude");
-            location.longitude = settings.get_double ("longitude");
-            location.idplace = settings.get_string ("idplace");
-
             weather_provider = con_service.get_weather_provider ((Enums.ForecastProvider) settings.get_enum ("provider"),
-                                                                 location,
+                                                                 settings.get_location (),
                                                                  settings.get_string ("personal-key").replace ("/", ""));
             if (weather_provider != null) {
                 weather_provider.units = settings.get_int ("units");
