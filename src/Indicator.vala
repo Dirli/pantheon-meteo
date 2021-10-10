@@ -107,6 +107,10 @@ namespace Meteo {
                 return false;
             }
 
+            if (popover_wid != null) {
+                popover_wid.start_spinner (true);
+            }
+
             weather_provider.update_forecast (false);
 
             return true;
@@ -173,6 +177,8 @@ namespace Meteo {
                     popover_wid.update_state (weather_struct,
                                               weather_provider.sunrise,
                                               weather_provider.sunset);
+
+                    popover_wid.start_spinner (false);
                 }
             }
         }
@@ -205,7 +211,11 @@ namespace Meteo {
             fetch_data ();
         }
 
-        public override void closed () {}
+        public override void closed () {
+            if (popover_wid != null) {
+                popover_wid.start_spinner (false);
+            }
+        }
     }
 
 }

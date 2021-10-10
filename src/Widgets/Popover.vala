@@ -28,6 +28,8 @@ namespace Meteo {
         private Gtk.Label sunrise_item;
         private Gtk.Label sunset_item;
 
+        private Gtk.Spinner fetch_spinner;
+
         public string city_name {
             set {
                 city_item.label = value;
@@ -43,7 +45,14 @@ namespace Meteo {
         construct {
             city_item = new Gtk.Label ("-");
             city_item.get_style_context ().add_class ("city");
-            city_item.margin_top = 10;
+
+            fetch_spinner = new Gtk.Spinner ();
+
+            var head_box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 10);
+            head_box.margin_top = 10;
+            head_box.halign = Gtk.Align.CENTER;
+            head_box.add (city_item);
+            head_box.add (fetch_spinner);
 
             humidity_item = new Gtk.Label (null);
             pressure_item = new Gtk.Label (null);
@@ -79,7 +88,7 @@ namespace Meteo {
                 }
             });
 
-            attach (city_item, 0, 0);
+            attach (head_box, 0, 0);
             attach (create_box (humidity_item, create_icon ("weather-showers", _("Humidity"))), 0, 1);
             attach (create_box (pressure_item, create_icon ("weather-severe-alert", _("Pressure"))), 0, 2);
             attach (create_box (wind_item, create_icon ("weather-windy", _("Wind"))), 0, 3);
@@ -89,6 +98,28 @@ namespace Meteo {
             attach (separator, 0, 7);
             attach (hide_button, 0, 8);
             attach (app_button, 0, 9);
+
+            GLib.Idle.add (() => {
+                if (!fetch_spinner.active) {
+                    fetch_spinner.hide ();
+                }
+
+                return false;
+            });
+        }
+
+        public void start_spinner (bool start) {
+            if (start) {
+                if (!fetch_spinner.active) {
+                    fetch_spinner.start ();
+                    fetch_spinner.show ();
+                }
+            } else {
+                if (fetch_spinner.active) {
+                    fetch_spinner.stop ();
+                    fetch_spinner.hide ();
+                }
+            }
         }
 
         public void update_state (Structs.WeatherStruct w, int64 sunrise, int64 sunset) {
