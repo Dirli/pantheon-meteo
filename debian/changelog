@@ -1,3 +1,14 @@
+pantheon-meteo (1.0.2-1) bullseye; urgency=medium
+
+ * added animation to the indicator
+ * added support dark theme (EOS)
+ * added provider synchronization for the indicator
+ * fixed provider initialization in the main window when first selected
+ * fixed GWeather provider for Odin
+ * rolled back to json-glib version available in focal
+
+ -- dirli <litandrej85@gmail.com>  Sun, 14 Nov 2021 01:52:22 +0300
+
 pantheon-meteo (1.0.1-1) bullseye; urgency=medium
 
   * json-glib version has been upgraded

@@ -18,7 +18,8 @@ Rules-Requires-Root: no
 
 Package: pantheon-meteo
 Architecture: any
-Depends: geoclue-2.0, ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends},
+         geoclue-2.0
 Recommends: wingpanel-indicator-meteo
 Description: Displays the current weather and 5-day forecast for the Pantheon DE
  Displays the current weather and 5-day forecast for the Pantheon DE
@@ -26,7 +27,8 @@ Description: Displays the current weather and 5-day forecast for the Pantheon DE
 
 Package: wingpanel-indicator-meteo
 Architecture: any
-Depends: pantheon-meteo, ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends},
+         pantheon-meteo
 Enhances: wingpanel
 Description: Displays the weather forecast in the Wingpanel
  Displays the weather forecast in the Wingpanel

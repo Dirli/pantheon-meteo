@@ -1,7 +1,7 @@
 project (
   'io.elementary.meteo',
   ['vala', 'c'],
-  version: '1.0.1'
+  version: '1.0.2'
 )
 
 gnome = import ('gnome')
