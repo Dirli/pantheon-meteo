@@ -105,7 +105,12 @@ namespace Meteo {
             var default_page = new Views.DefaultPage ();
             default_page.activated.connect ((index) => {
                 header.remove_custome_title ();
-                settings.set_boolean ("auto", index == 0 ? true : false);
+                var auto_val = index == 0;
+                if (settings.get_boolean ("auto") == auto_val) {
+                    determine_loc ();
+                } else {
+                    settings.set_boolean ("auto", auto_val);
+                }
             });
             alert_page = new Granite.Widgets.AlertView (_("Something went wrong"), "", "process-error");
             waiting_page = new Views.WaitingPage ();
