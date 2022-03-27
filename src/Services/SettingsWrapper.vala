@@ -10,22 +10,25 @@ namespace Meteo {
 
             location.city = get_string ("city");
             location.country = get_string ("country");
-            location.latitude = get_double ("latitude");
-            location.longitude = get_double ("longitude");
             location.idplace = get_string ("idplace");
+
+            double lat;
+            double lon;
+
+            @get ("coords", "(dd)", out lat, out lon);
+            location.latitude = lat;
+            location.longitude = lon;
 
             return location;
         }
 
         public void set_location (Structs.LocationStruct? loc) {
             if (loc != null) {
-                set_string ("city", loc.city);
-                set_string ("country", loc.country);
-                set_double ("latitude", loc.latitude);
-                set_double ("longitude", loc.longitude);
+                set_string ("city", loc.city ?? "");
+                set_string ("country", loc.country ?? "");
+                @set ("coords", "(dd)", loc.latitude, loc.longitude);
             } else {
-                reset ("longitude");
-                reset ("latitude");
+                reset ("coords");
                 reset ("city");
                 reset ("country");
                 reset ("idplace");

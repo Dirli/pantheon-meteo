@@ -23,16 +23,10 @@
             <description>City name</description>
         </key>
 
-        <key name="latitude" type="d">
-            <default>0</default>
-            <summary>Latitude</summary>
-            <description>Latitude</description>
-        </key>
-
-        <key name="longitude" type="d">
-            <default>0</default>
-            <summary>Longitude</summary>
-            <description>Longitude</description>
+        <key name="coords" type="(dd)">
+            <default>(0, 0)</default>
+            <summary>coordinates</summary>
+            <description>coordinates (lat, lon)</description>
         </key>
 
         <key enum="io.elementary.meteo.providers" name="provider">
