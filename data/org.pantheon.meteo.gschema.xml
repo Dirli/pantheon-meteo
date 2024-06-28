@@ -1,10 +1,10 @@
 <schemalist>
-    <enum id="io.elementary.meteo.providers">
+    <enum id="org.pantheon.meteo.providers">
         <value value="0" nick="gweather"/>
         <value value="1" nick="owm"/>
     </enum>
 
-    <schema id="io.elementary.meteo" path="/io/elementary/meteo/">
+    <schema id="org.pantheon.meteo" path="/org/pantheon/meteo/">
         <key name="auto" type="b">
             <default>false</default>
             <summary>Autolocation</summary>
@@ -29,7 +29,7 @@
             <description>coordinates (lat, lon)</description>
         </key>
 
-        <key enum="io.elementary.meteo.providers" name="provider">
+        <key enum="org.pantheon.meteo.providers" name="provider">
             <default>'gweather'</default>
             <summary>Selected weather forecast provider</summary>
             <description>Selected weather forecast provider</description>

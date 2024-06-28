@@ -1,5 +1,5 @@
 project (
-  'io.elementary.meteo',
+  'org.pantheon.meteo',
   ['vala', 'c'],
   version: '1.0.2'
 )
@@ -20,6 +20,7 @@ add_project_arguments (
 )
 
 conf_data = configuration_data ()
+conf_data.set_quoted ('APP_NAME', meson.project_name ())
 conf_data.set_quoted ('VERSION', meson.project_version ())
 conf_data.set_quoted ('CONTACTS', 'litandrej85@gmail.com')
 config_header = configure_file (

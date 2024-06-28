@@ -17,8 +17,6 @@
  */
 
 namespace Meteo.Constants {
-    public const string APP_NAME = "io.elementary.meteo";
-
     public const string LOGIND_BUS_NAME = "org.freedesktop.login1";
     public const string LOGIND_BUS_PATH = "/org/freedesktop/login1";
 

@@ -36,10 +36,15 @@ namespace Meteo {
             gweather_location = gweather_location.find_nearest_city (latitude, longitude);
 
             gweather_info = new GWeather.Info (gweather_location);
+
 #if GWEATHER_40
+			gweather_info.set_application_id (Constants.APP_NAME);
             gweather_info.set_contact_info (Constants.CONTACTS);
+			gweather_info.set_enabled_providers (GWeather.Provider.METAR | GWeather.Provider.MET_NO | GWeather.Provider.OWM);
+#else
+			gweather_info.set_enabled_providers (GWeather.Provider.ALL);
 #endif
-            gweather_info.set_enabled_providers (GWeather.Provider.ALL);
+
             gweather_info.updated.connect (parse_response);
         }
 

@@ -1,4 +1,5 @@
 namespace Meteo.Constants {
+    public const string APP_NAME = @APP_NAME@;
     public const string VERSION = @VERSION@;
     public const string CONTACTS = @CONTACTS@;
 }
