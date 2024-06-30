@@ -29,9 +29,36 @@ config_header = configure_file (
   configuration: conf_data
 )
 
-gweather_dep = dependency ('gweather-3.0')
-if gweather_dep.version () >= '40.0'
-  add_project_arguments ('--define=GWEATHER_40', language: 'vala')
+app_files = files (
+  'src/Constants.vala',
+  'src/Enums.vala',
+  'src/MainWindow.vala',
+  'src/Meteo.vala',
+  'src/Structs.vala',
+  'src/Utils.vala',
+  'src/Dialogs/About.vala',
+  'src/Dialogs/Preferences.vala',
+  'src/Providers/AbstractProvider.vala',
+  'src/Providers/GWeatherProvider.vala',
+  'src/Providers/OWMProvider.vala',
+  'src/Services/Connector.vala',
+  'src/Services/Geolocation.vala',
+  'src/Services/SettingsWrapper.vala',
+  'src/Views/DefaultPage.vala',
+  'src/Views/WaitingPage.vala',
+  'src/Views/WeatherPage.vala',
+  'src/Widgets/Header.vala',  
+)
+
+gweather_dep = dependency ('gweather4', required: false)
+if gweather_dep.found ()
+  app_files += files (
+    'src/Widgets/LocationEntry.vala',
+  )
+  
+  add_project_arguments ('--define=GWEATHER_4', language: 'vala')
+else
+  gweather_dep = dependency ('gweather-3.0', version: '>=40.0')
 endif
 
 common_deps = [
@@ -65,24 +92,7 @@ subdir ('po')
 
 executable (
   meson.project_name (),
-  'src/Constants.vala',
-  'src/Enums.vala',
-  'src/MainWindow.vala',
-  'src/Meteo.vala',
-  'src/Structs.vala',
-  'src/Utils.vala',
-  'src/Dialogs/About.vala',
-  'src/Dialogs/Preferences.vala',
-  'src/Providers/AbstractProvider.vala',
-  'src/Providers/GWeatherProvider.vala',
-  'src/Providers/OWMProvider.vala',
-  'src/Services/Connector.vala',
-  'src/Services/Geolocation.vala',
-  'src/Services/SettingsWrapper.vala',
-  'src/Views/DefaultPage.vala',
-  'src/Views/WaitingPage.vala',
-  'src/Views/WeatherPage.vala',
-  'src/Widgets/Header.vala',
+  app_files,
   asresources,
   config_header,
   vala_args: vala_args,

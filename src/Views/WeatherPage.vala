@@ -112,11 +112,12 @@ namespace Meteo {
             forecast_stack = new Gtk.Stack ();
 
             var stack_switcher = new Gtk.StackSwitcher ();
+            stack_switcher.halign = Gtk.Align.CENTER;
             stack_switcher.homogeneous = true;
             stack_switcher.stack = forecast_stack;
 
             var forecast_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 24);
-            forecast_box.halign = Gtk.Align.CENTER;
+            forecast_box.halign = Gtk.Align.FILL;
             forecast_box.valign = Gtk.Align.END;
             forecast_box.add (forecast_stack);
             forecast_box.add (stack_switcher);

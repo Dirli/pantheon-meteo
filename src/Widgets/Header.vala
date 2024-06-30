@@ -91,7 +91,11 @@ namespace Meteo {
         }
 
         public void manual_detect () {
-            var location_entry = new GWeather.LocationEntry (GWeather.Location.get_world ());
+#if GWEATHER_4
+            var location_entry = new Widgets.LocationEntry ();
+#else
+            var location_entry = new GWeather.LocationEntry ();
+#endif
             location_entry.placeholder_text = _("Search for new location:");
             location_entry.width_chars = 30;
 

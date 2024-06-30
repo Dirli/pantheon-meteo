@@ -17,6 +17,14 @@
  */
 
 namespace Meteo.Enums {
+    public enum EntryColumn {
+        DISPLAY_NAME = 0,
+        LOCATION,
+        LOCAL_COMPARE_NAME,
+        ENGLISH_COMPARE_NAME,
+        NUM_COLUMNS
+    }
+
     public enum ForecastType {
         CURRENT,
         PERIOD,
