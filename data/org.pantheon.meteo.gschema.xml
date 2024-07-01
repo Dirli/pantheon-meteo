@@ -1,7 +1,7 @@
 <schemalist>
     <enum id="org.pantheon.meteo.providers">
         <value value="0" nick="gweather"/>
-        <value value="1" nick="owm"/>
+        <!-- <value value="1" nick="owm"/> -->
     </enum>
 
     <schema id="org.pantheon.meteo" path="/org/pantheon/meteo/">

@@ -164,7 +164,7 @@ namespace Meteo {
             provider_label.halign = Gtk.Align.END;
             var providers = new Gtk.ComboBoxText ();
             providers.append_text (Enums.ForecastProvider.GWEATHER.to_string ());
-            providers.append_text (Enums.ForecastProvider.OWM.to_string ());
+            //  providers.append_text (Enums.ForecastProvider.OWM.to_string ());
             providers.active = settings.get_enum ("provider");
 
             // local api ley

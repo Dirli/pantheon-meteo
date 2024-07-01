@@ -31,15 +31,15 @@ namespace Meteo.Enums {
     }
 
     public enum ForecastProvider {
-        GWEATHER,
-        OWM;
+        GWEATHER;
+        //  OWM;
 
         public string to_string () {
             switch (this) {
                 case GWEATHER:
                     return "GWeather";
-                case OWM:
-                    return "OpenWeatherMap";
+                //  case OWM:
+                //      return "OpenWeatherMap";
                 default:
                     GLib.assert_not_reached ();
             }

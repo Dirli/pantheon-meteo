@@ -25,10 +25,10 @@ namespace Meteo {
                 if (loc.city != "") {
                     return new Providers.GWeatherProvider (loc.city, loc.latitude, loc.longitude);
                 }
-            } else if (provider_type == Enums.ForecastProvider.OWM) {
-                if (api != "") {
-                    return new Providers.OWMProvider (api, loc);
-                }
+            //  } else if (provider_type == Enums.ForecastProvider.OWM) {
+            //      if (api != "") {
+            //          return new Providers.OWMProvider (api, loc);
+            //      }
             }
 
             return null;
