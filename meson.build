@@ -111,9 +111,7 @@ if get_option ('indicator')
     wingpanel_dep
   ]
 
-  shared_library (
-    'meteo',
-    'src/Indicator.vala',
+  indicator_files = files (
     'src/Constants.vala',
     'src/Enums.vala',
     'src/Structs.vala',
@@ -123,16 +121,9 @@ if get_option ('indicator')
     # 'src/Providers/OWMProvider.vala',
     'src/Services/Connector.vala',
     'src/Services/SettingsWrapper.vala',
-    'src/Widgets/Panel.vala',
-    'src/Widgets/Popover.vala',
-    config_header,
-    c_args: [
-      '-DGWEATHER_I_KNOW_THIS_IS_UNSTABLE',
-    ],
-    dependencies: indicator_deps,
-    install: true,
-    install_dir: wingpanel_dep.get_pkgconfig_variable ('indicatorsdir'),
   )
+
+  subdir ('indicator')
 endif
 
 meson.add_install_script ('meson_post_install.py')
