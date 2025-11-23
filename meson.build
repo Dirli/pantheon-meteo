@@ -1,7 +1,8 @@
 project (
   'org.pantheon.meteo',
   ['vala', 'c'],
-  version: '1.0.2'
+  version: '1.1.0',
+  meson_version: '>= 0.56.0'
 )
 
 gnome = import ('gnome')
